@@ -25,11 +25,11 @@
 .page-hero .eyebrow,.contact-hero .eyebrow{color:#b08a5a;} 
 .news-card,.otype-card,.info-card,.contact-form-card,.trust-item,.faq-item,.highlight-box,.pinned-banner{border-radius:var(--radius-lg);background:rgba(255,255,255,.72);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(232,217,190,.45);box-shadow:var(--shadow-xs);} 
 
-.contact-hero{position:relative;overflow:hidden;padding:calc(var(--nav-h)+72px) 0 92px;background:linear-gradient(180deg,#f8f4ee 0%,#ffffff 100%);} 
-.contact-hero::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at top right,rgba(190,160,127,.16),transparent 34%),linear-gradient(135deg,rgba(255,255,255,.32),transparent 56%);} 
-.contact-hero .page-hero-inner{position:relative;z-index:1;max-width:760px;} 
-.contact-hero h1{color:#7a5737;font-size:clamp(34px,4vw,46px);line-height:1.28;letter-spacing:.04em;margin:16px 0 16px;} 
-.contact-hero p{color:rgba(111,83,58,.88);max-width:640px;font-size:clamp(16px,1.7vw,18px);line-height:1.85;margin:0 0 28px;} 
+.contact-hero{background:linear-gradient(140deg,var(--gray) 0%,#ece6db 100%);padding:calc(var(--nav-h)+56px) 0 80px;position:relative;overflow:hidden;}
+.contact-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 80% 20%,rgba(201,169,110,.14),transparent 38%),radial-gradient(circle at 10% 80%,rgba(107,79,58,.06),transparent 32%);}
+.contact-hero .page-hero-inner{position:relative;z-index:1;max-width:860px;}
+.contact-hero h1{font-size:clamp(2rem,4.2vw,3.6rem);line-height:1.18;margin:0 0 20px;color:var(--text);}
+.contact-hero p{max-width:720px;font-size:1.04rem;line-height:1.9;color:var(--text-sub);margin:0 0 28px;}
 .hero-actions{display:flex;gap:14px;flex-wrap:wrap;}
 .hero-main-btn{display:inline-flex;align-items:center;justify-content:center;padding:14px 28px;border-radius:999px;background:var(--brand);color:#fff;font-weight:700;font-size:.95rem;text-decoration:none;box-shadow:0 14px 30px rgba(124,97,67,.18);transition:transform .25s,box-shadow .25s;}
 .hero-main-btn:hover{transform:translateY(-2px);box-shadow:0 18px 34px rgba(124,97,67,.22);}
@@ -100,8 +100,8 @@
 <div class="container">
 <div class="page-hero-inner reveal visible">
 <nav class="page-hero-breadcrumb" aria-label="麵包屑"><a href="index.html">首頁</a><span class="sep">／</span><span>聯絡我們</span></nav>
-<span class="eyebrow">預約預約・借址登記諮詢</span>
-<h1>公司借址登記，歡迎與我們聯絡</h1>
+<span class="eyebrow">預約參觀・借址登記諮詢</span>
+<h1>有關公司借址登記，歡迎直接與我們聯絡</h1>
 <div class="hero-actions">
 <a href="#contact-form" class="hero-main-btn">填表預約諮詢</a>
 <a href="https://maps.app.goo.gl/3bf4QKqGevJn798CA" target="_blank" rel="noopener" class="hero-sub-btn">Google 地圖導航</a>
@@ -121,12 +121,12 @@
 <div class="contact-panel reveal">
 <span class="eyebrow">聯絡資訊</span>
 <h2 class="section-title" style="font-size:clamp(1.7rem,2.4vw,2.35rem);">預約參觀、詢問費用或了解借址方案，都能從這裡開始</h2>
-<p class="intro">如果您正在找中壢共享辦公室，或希望了解公司借址營業登記細節，歡迎直接來電、填表，或用 Google 地圖導航到現場參觀。</p>
+<p class="intro">如果您正在找中壢共享辦公室、想比較年租辦公室方案，或希望了解公司借址營業登記細節，歡迎直接來電、填表，或用 Google 地圖導航到現場參觀。</p>
 <div class="info-stack">
 <div class="info-card"><div class="info-kicker">地址</div><div class="info-value">桃園市中壢區延平路 261 號 9 樓<br/>近中壢火車站，適合安排現場參觀與諮詢。</div></div>
 <div class="info-card"><div class="info-kicker">電話</div><div class="info-value"><a href="tel:032759489">03-275-9489</a></div></div>
 <div class="info-card"><div class="info-kicker">電子郵件</div><div class="info-value"><a href="mailto:edgd2619@gmail.com">edgd2619@gmail.com</a></div></div>
-<div class="info-card"><div class="info-kicker">營業時間</div><div class="info-value">週一至週五 10:30–18:00<br/>若想看辦公室空間，請先預約時段。</div></div>
+<div class="info-card"><div class="info-kicker">營業時間</div><div class="info-value">週一至週五 10:30–18:00<br/>若想看辦公室空間，建議先預約時段。</div></div>
 </div>
 <div class="inline-links">
 <a href="tel:032759489">立即來電</a>
@@ -136,7 +136,7 @@
 </div>
 <div class="form-box reveal" id="contact-form">
 <h3>歡迎來信</h3>
-<p class="form-lead">可直接留言想了解的服務項目，例如中壢共享辦公室、公司借址營業登記、辦公室費用或預約現場參觀時間。</p>
+<p class="form-lead">可直接留言想了解的服務項目，例如中壢共享辦公室、公司借址營業登記、年租辦公室費用或預約現場參觀時間。</p>
 <form id="contactForm" action="mailto:edgd2619@gmail.com" method="post" enctype="text/plain" novalidate>
 <div class="f-row">
 <div class="f-group"><label for="fname">姓名 <span class="req">*</span></label><input type="text" id="fname" name="name" placeholder="您的姓名" required autocomplete="name"/></div>
@@ -144,8 +144,7 @@
 </div>
 <div class="f-row">
 <div class="f-group"><label for="femail">電子郵件 <span class="req">*</span></label><input type="email" id="femail" name="email" placeholder="your@email.com" required autocomplete="email"/></div>
-<div class="f-group"><label for="fservice">詢問項目</label><select id="fservice" name="service"><option value="">請選擇（可不填）</option><option>公司借址營業登記</option><option>共享辦公室</option>/
-</option><option>會計師帳務服務</option><option>律師法律諮詢</option><option>Logo 名片設計</option><option>公司命名服務</option><option>其他服務</option></select></div>
+<div class="f-group"><label for="fservice">詢問項目</label><select id="fservice" name="service"><option value="">請選擇（可不填）</option><option>公司借址營業登記</option><option>年租共享辦公室（2-3人）</option><option>年租共享辦公室（3-5人）</option><option>會議室使用（租客免費）</option><option>會計師帳務服務</option><option>律師法律諮詢</option><option>Logo 名片設計</option><option>公司命名服務</option><option>其他服務</option></select></div>
 </div>
 <div class="f-group"><label for="fmsg">留言內容 <span class="req">*</span></label><textarea id="fmsg" name="message" placeholder="例如：我想了解 2～3 人年租辦公室費用，或預約現場參觀時間…" required></textarea></div>
 <button type="submit" class="btn-submit">送出訊息</button>
@@ -176,7 +175,7 @@
 <div><div class="f-brand-name">日日好日商務中心</div><span class="f-brand-en">Every Day Good Day Business Center</span><p class="f-brand-desc">桃園中壢最溫暖的商務中心，以一站式服務陪伴每位創業者，讓未來的每一天都是好日子。</p></div>
 <div class="f-col"><h4>服務項目</h4><ul><li><a href="services.html">公司借址登記</a></li><li><a href="services.html">共享辦公室（年租）</a></li><li><a href="services.html">Logo 名片設計</a></li><li><a href="services.html">會計師帳務服務</a></li><li><a href="services.html">公司命名服務</a></li></ul></div>
 <div class="f-col"><h4>快速導覽</h4><ul><li><a href="index.html">首頁</a></li><li><a href="space.html">辦公環境</a></li><li><a href="news.html">最新消息</a></li><li><a href="contact.html">聯絡我們</a></li></ul></div>
-<div class="f-col"><h4>聯絡資訊</h4><ul><li>桃園市中壢區延平路 261 號 9 樓</li><li><a href="tel:0327594898">03-275-9489</a></li><li>週一至週五 10:30–18:00</li><li><a href="https://www.facebook.com/everydaygooddaybc" target="_blank" rel="noopener">Facebook</a></li><li><a href="https://www.instagram.com/edgd2619" target="_blank" rel="noopener">Instagram</a></li></ul></div>
+<div class="f-col"><h4>聯絡資訊</h4><ul><li>桃園市中壢區延平路 261 號 9 樓</li><li><a href="tel:032759489">03-275-9489</a></li><li>週一至週五 10:30–18:00</li><li><a href="https://www.facebook.com/everydaygooddaybc" target="_blank" rel="noopener">Facebook</a></li><li><a href="https://www.instagram.com/edgd2619" target="_blank" rel="noopener">Instagram</a></li></ul></div>
 </div>
 <div class="footer-bottom"><p>© 2025 日日好日商務中心 · All rights reserved.</p><div class="footer-soc"><a href="https://www.facebook.com/everydaygooddaybc" target="_blank" rel="noopener" aria-label="Facebook"><svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg></a><a href="https://www.instagram.com/edgd2619" target="_blank" rel="noopener" aria-label="Instagram"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></a></div></div>
 </div></footer>
