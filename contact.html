@@ -214,22 +214,7 @@
 })();
 </script>
 <script>
-(function(){
-  var form=document.getElementById('contactForm');
-  if(!form)return;
-  form.addEventListener('submit',function(e){
-    e.preventDefault();
-    var n=document.getElementById('fname').value.trim(),p=document.getElementById('fphone').value.trim(),
-        em=document.getElementById('femail').value.trim(),msg=document.getElementById('fmsg').value.trim();
-    if(!n||!p||!em||!msg){alert('請填寫所有必填欄位（姓名、電話、Email、留言內容）。');return;}
-    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){alert('請輸入有效的電子郵件地址。');return;}
-    var btn=form.querySelector('.btn-submit');btn.textContent='傳送中…';btn.disabled=true;
-    setTimeout(function(){
-      form.style.display='none';
-      document.getElementById('formSuccess').classList.add('show');
-    },1200);
-  });
-})();
+
 </script>
 </body>
 </html>
