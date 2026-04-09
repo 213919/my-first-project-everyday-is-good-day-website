@@ -137,7 +137,7 @@
 <div class="form-box reveal" id="contact-form">
 <h3>歡迎來信</h3>
 <p class="form-lead">可直接留言想了解的服務項目，例如中壢共享辦公室、公司借址營業登記、年租辦公室費用或預約現場參觀時間。</p>
-<form id="contactForm" action="https://formspree.io/f/mpqoeloo" method="POST">
+<form id="contactForm">
   <input type="hidden" name="_next" value="https://edgd2619.com/thanks.html">
 <div class="f-row">
 <div class="f-group"><label for="fname">姓名 <span class="req">*</span></label><input type="text" id="fname" name="name" placeholder="您的姓名" required autocomplete="name"/></div>
@@ -216,6 +216,45 @@
 </script>
 <script>
 
+</script>
+  <script>
+(function(){
+  var form = document.getElementById('contactForm');
+  if(!form) return;
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+
+    var btn = form.querySelector('.btn-submit');
+    btn.textContent = '送出中...';
+    btn.disabled = true;
+
+    var data = new FormData(form);
+
+    fetch('https://formspree.io/f/mpqoeloo', {
+      method: 'POST',
+      body: data,
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
+    .then(function(response){
+      if(response.ok){
+        window.location.href = 'https://edgd2619.com/thanks.html';
+      } else {
+        alert('送出失敗，請稍後再試');
+        btn.textContent = '送出訊息';
+        btn.disabled = false;
+      }
+    })
+    .catch(function(){
+      alert('發生錯誤，請檢查網路');
+      btn.textContent = '送出訊息';
+      btn.disabled = false;
+    });
+
+  });
+})();
 </script>
 </body>
 </html>
