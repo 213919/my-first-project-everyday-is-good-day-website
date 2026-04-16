@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🔮 4 月預約表 ｜ 1493 仁昇設計塔羅森林</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600&display=swap');
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg:         #0d2b3e;
+            --bg-mid:     #0f3347;
+            --teal:       #14b8a6;
+            --teal-light: #5eead4;
+            --cyan:       #67e8f9;
+            --silver:     #e2e8f0;
+            --silver-dim: #cbd5e1;
+            --silver-glow:#f1f5f9;
+            --glass-bg:   rgba(255, 255, 255, 0.10);
+            --glass-bg2:  rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(94, 234, 212, 0.40);
+            --glass-border2: rgba(203, 213, 225, 0.25);
+            --text:       #f1f5f9;
+            --text-muted: #94a3b8;
+        }
+
+        body {
+            font-family: 'Noto Serif TC', 'Microsoft JhengHei', serif;
+            background-color: var(--bg);
+            background-image:
+                radial-gradient(ellipse at 10% 0%,   rgba(20,184,166,0.35) 0%, transparent 50%),
+                radial-gradient(ellipse at 90% 100%, rgba(103,232,249,0.25) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 50%,  rgba(15, 51, 71,  1.0) 0%, transparent 80%);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.8;
+        }
+
+        /* ─── TOP BANNER ─── */
+        .top-banner {
+            position: relative;
+            z-index: 1;
+            background: rgba(20, 184, 166, 0.18);
+            border-bottom: 1px solid var(--glass-border);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            padding: 11px 20px;
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--teal-light);
+            letter-spacing: 0.18em;
+        }
+
+        /* ─── HERO ─── */
+        .hero {
+            position: relative;
+            z-index: 1;
+            padding: 72px 20px 48px;
+            text-align: center;
+        }
+
+        .hero-month {
+            font-size: 0.82rem;
+            letter-spacing: 0.5em;
+            color: var(--teal-light);
+            margin-bottom: 14px;
+            text-transform: uppercase;
+        }
+
+        .hero-title {
+            font-size: clamp(1.9rem, 5.5vw, 3.2rem);
+            font-weight: 600;
+            color: var(--silver-glow);
+            letter-spacing: 0.1em;
+            margin-bottom: 14px;
+            text-shadow: 0 0 32px rgba(103,232,249,0.35), 0 2px 6px rgba(0,0,0,0.3);
+        }
+
+        .hero-title .accent { color: var(--cyan); }
+
+        .hero-subtitle {
+            font-size: 0.96rem;
+            color: var(--teal-light);
+            letter-spacing: 0.25em;
+            margin-bottom: 36px;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            max-width: 320px;
+            margin: 0 auto 56px;
+        }
+        .divider::before { content: ''; flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--teal)); }
+        .divider::after  { content: ''; flex: 1; height: 1px; background: linear-gradient(to left,  transparent, var(--teal)); }
+        .divider span { color: var(--teal-light); font-size: 1.1rem; filter: drop-shadow(0 0 5px var(--teal)); }
+
+        /* ─── LAYOUT ─── */
+        .container { max-width: 860px; margin: 0 auto; padding: 0 20px; position: relative; z-index: 1; }
+        .section-gap { margin-bottom: 64px; }
+
+        .section-title {
+            text-align: center;
+            font-size: 0.78rem;
+            letter-spacing: 0.45em;
+            color: var(--teal-light);
+            margin-bottom: 28px;
+            text-transform: uppercase;
+        }
+
+        /* ─── GLASS BASE ─── */
+        .glass {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow:
+                0 8px 32px rgba(0,0,0,0.25),
+                inset 0 1px 0 rgba(255,255,255,0.12),
+                inset 0 0 0 1px rgba(94,234,212,0.06);
+        }
+
+        /* ─── STUDIO PHOTO ─── */
+        .studio-photo img {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            display: block;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 50px rgba(20,184,166,0.15);
+        }
+
+        /* ─── BRAND BLOCK ─── */
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+            padding: 38px 32px;
+            flex-wrap: wrap;
+        }
+
+        .brand-logo img {
+            width: 130px;
+            height: 130px;
+            object-fit: contain;
+            border-radius: 50%;
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 0 28px rgba(20,184,166,0.25);
+            background: rgba(20,184,166,0.08);
+        }
+
+        .brand-info { flex: 1; min-width: 200px; }
+
+        .brand-num {
+            font-size: clamp(2.8rem, 7vw, 4.6rem);
+            font-weight: 300;
+            color: var(--silver-glow);
+            letter-spacing: 0.22em;
+            line-height: 1;
+            margin-bottom: 6px;
+            text-shadow: 0 0 28px rgba(103,232,249,0.3);
+        }
+
+        .brand-name {
+            font-size: 0.88rem;
+            color: var(--teal-light);
+            letter-spacing: 0.38em;
+            margin-bottom: 20px;
+        }
+
+        .brand-services { list-style: none; }
+        .brand-services li {
+            font-size: 0.88rem;
+            color: var(--silver-dim);
+            padding: 3px 0;
+            letter-spacing: 0.05em;
+        }
+        .brand-services li::before { content: '◈  '; color: var(--teal-light); font-size: 0.65rem; }
+
+        /* ─── CREDENTIALS ─── */
+        .cred-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+            gap: 10px;
+        }
+
+        .cred-tag {
+            background: var(--glass-bg2);
+            border: 1px solid var(--glass-border2);
+            border-radius: 10px;
+            padding: 11px 16px;
+            font-size: 0.84rem;
+            color: var(--silver-dim);
+            text-align: center;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            transition: border-color 0.2s, color 0.2s, background 0.2s;
+        }
+        .cred-tag:hover {
+            background: rgba(20,184,166,0.12);
+            border-color: var(--glass-border);
+            color: var(--silver);
+        }
+
+        /* ─── NOTICE ─── */
+        .notice {
+            background: rgba(20,184,166,0.12);
+            border: 1px solid var(--glass-border);
+            border-left: 3px solid var(--teal-light);
+            border-radius: 14px;
+            padding: 24px 28px;
+            font-size: 0.92rem;
+            color: var(--silver-dim);
+            line-height: 2;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        /* ─── SERVICE CARDS ─── */
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 18px;
+        }
+
+        .service-card {
+            background: var(--glass-bg2);
+            border: 1px solid var(--glass-border2);
+            border-radius: 16px;
+            padding: 28px 18px;
+            text-align: center;
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.08);
+            transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s, background 0.25s;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.13);
+            border-color: var(--glass-border);
+            box-shadow: 0 14px 36px rgba(0,0,0,0.3), 0 0 20px rgba(20,184,166,0.18);
+        }
+
+        .s-emoji { font-size: 2.1rem; margin-bottom: 13px; display: block; filter: drop-shadow(0 0 8px rgba(103,232,249,0.5)); }
+        .s-name  { font-size: 0.97rem; font-weight: 500; color: var(--silver-glow); margin-bottom: 9px; }
+        .s-desc  { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px; line-height: 1.7; }
+        .s-price { font-size: 1.1rem; font-weight: 600; color: var(--cyan); letter-spacing: 0.06em; text-shadow: 0 0 14px rgba(103,232,249,0.5); }
+
+        /* ─── FORM ─── */
+        .form-card {
+            background: rgba(255,255,255,0.10);
+            border: 1px solid var(--glass-border);
+            border-radius: 22px;
+            padding: 44px 38px;
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            box-shadow: 0 12px 48px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15), inset 0 -1px 0 rgba(94,234,212,0.06);
+        }
+
+        .form-card-title {
+            text-align: center;
+            font-size: 1.28rem;
+            color: var(--silver-glow);
+            letter-spacing: 0.18em;
+            margin-bottom: 7px;
+            text-shadow: 0 0 20px rgba(103,232,249,0.25);
+        }
+
+        .form-card-sub {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--teal-light);
+            letter-spacing: 0.1em;
+            margin-bottom: 34px;
+        }
+
+        .form-group { margin-bottom: 24px; }
+
+        .form-label {
+            display: block;
+            font-size: 0.87rem;
+            color: var(--teal-light);
+            letter-spacing: 0.12em;
+            margin-bottom: 10px;
+        }
+
+        .req   { color: var(--cyan); margin-left: 3px; }
+        .lnote { font-size: 0.74rem; color: var(--text-muted); margin-left: 8px; }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(94,234,212,0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 0.9rem;
+            color: var(--text);
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+            outline: none;
+        }
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--teal-light);
+            background: rgba(255,255,255,0.12);
+            box-shadow: 0 0 0 3px rgba(20,184,166,0.18), 0 0 14px rgba(20,184,166,0.1);
+        }
+        .form-input::placeholder, .form-textarea::placeholder { color: rgba(148,163,184,0.5); }
+        .form-textarea { resize: vertical; min-height: 96px; }
+
+        .radio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+            gap: 8px;
+        }
+
+        .radio-opt {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 12px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(94,234,212,0.2);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s, color 0.2s;
+            font-size: 0.84rem;
+            color: var(--silver-dim);
+        }
+        .radio-opt:hover {
+            background: rgba(20,184,166,0.15);
+            border-color: var(--teal-light);
+            color: var(--silver-glow);
+        }
+        .radio-opt input[type="radio"] {
+            accent-color: var(--teal);
+            width: 14px; height: 14px; flex-shrink: 0;
+        }
+
+        .form-hint { font-size: 0.76rem; color: var(--text-muted); margin-top: 8px; line-height: 1.65; }
+        .form-divider { height: 1px; background: linear-gradient(to right, transparent, var(--glass-border), transparent); margin: 28px 0; }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--teal), #0891b2);
+            color: #fff;
+            font-family: inherit;
+            font-size: 0.98rem;
+            font-weight: 700;
+            letter-spacing: 0.32em;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+            margin-top: 8px;
+            box-shadow: 0 4px 20px rgba(20,184,166,0.4);
+        }
+        .submit-btn:hover {
+            opacity: 0.92;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(20,184,166,0.5);
+        }
+        .submit-btn:active { transform: translateY(0); }
+
+        .form-select {
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2314b8a6' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            cursor: pointer;
+        }
+        .form-select option {
+            background: #0d2b3e;
+            color: #e2e8f0;
+            padding: 8px;
+        }
+
+        .success-msg {
+            display: none;
+            text-align: center;
+            padding: 28px 20px;
+            background: rgba(20,184,166,0.15);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            color: var(--teal-light);
+            font-size: 1.02rem;
+            letter-spacing: 0.05em;
+            margin-top: 20px;
+            line-height: 2;
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+        }
+
+        /* ─── LOCATION ─── */
+        .loc-card { padding: 36px 30px; }
+
+        .loc-title {
+            font-size: 0.95rem;
+            color: var(--teal-light);
+            letter-spacing: 0.32em;
+            text-align: center;
+            margin-bottom: 22px;
+            text-shadow: 0 0 14px rgba(94,234,212,0.4);
+        }
+
+        .loc-sub {
+            font-size: 0.82rem;
+            color: var(--teal-light);
+            letter-spacing: 0.22em;
+            margin: 20px 0 13px;
+            text-align: center;
+        }
+
+        .loc-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(94,234,212,0.1);
+            font-size: 0.87rem;
+            color: var(--silver-dim);
+            line-height: 1.75;
+        }
+        .loc-item:last-child { border-bottom: none; }
+        .loc-icon { flex-shrink: 0; margin-top: 2px; }
+
+        /* ─── FOOTER ─── */
+        .footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 32px 20px 52px;
+            border-top: 1px solid rgba(94,234,212,0.15);
+        }
+        .footer-icon { font-size: 1.7rem; margin-bottom: 9px; filter: drop-shadow(0 0 10px rgba(103,232,249,0.6)); }
+        .footer-text { font-size: 0.79rem; color: var(--text-muted); letter-spacing: 0.22em; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 600px) {
+            .brand-block { flex-direction: column; text-align: center; }
+            .form-card { padding: 28px 18px; }
+            .radio-grid { grid-template-columns: repeat(2, 1fr); }
+            .service-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+
+<!-- BACK LINK -->
+<div style="background:rgba(13,43,62,0.85);border-bottom:1px solid rgba(94,234,212,0.2);padding:9px 20px;text-align:left;">
+    <a href="index.html" style="color:#5eead4;font-size:0.82rem;letter-spacing:0.15em;text-decoration:none;">← 返回日日好日商務中心</a>
+</div>
+<!-- TOP BANNER -->
+<div class="top-banner">
+    🔔 填好表單後請私訊我一個貼圖，確認時間後才算預約成功 🔔
+</div>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-month">April · 2026</div>
+    <h1 class="hero-title">🔮 4 月預約表 <span class="accent">♾️</span> 🧙</h1>
+    <p class="hero-subtitle">1493 仁昇設計塔羅森林</p>
+    <div class="divider"><span>◈</span></div>
+</section>
+
+<!-- STUDIO PHOTO -->
+<div class="container section-gap studio-photo">
+    <img src="images/019d7cf9-tarot.png" alt="仁昇設計塔羅森林 服務項目" />
+</div>
+
+<!-- BRAND BLOCK -->
+<div class="container section-gap">
+    <div class="brand-block glass">
+        <div class="brand-logo">
+            <img src="images/logo-1493.png" alt="仁昇設計塔羅森林 品牌標誌" />
+        </div>
+        <div class="brand-info">
+            <ul class="brand-services">
+                <li>Magnified Healing® ／ 擴大療癒法</li>
+                <li>Unconscious TAROT ／ 潛意識塔羅占卜</li>
+                <li>Relaxation Hypnosis ／ 深層催眠療癒</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<!-- CREDENTIALS -->
+<div class="container section-gap">
+    <p class="section-title">✦ About Me ✦</p>
+    <div class="cred-grid">
+        <div class="cred-tag">偉特塔羅牌占卜師</div>
+        <div class="cred-tag">臼井聖火靈氣大師階</div>
+        <div class="cred-tag">聖火卡魯那靈氣二階</div>
+        <div class="cred-tag">擴大療癒法一階工作坊教師</div>
+        <div class="cred-tag">擴大療癒法二階慶典輔導員</div>
+        <div class="cred-tag">擴大療癒法三階光能習修者</div>
+        <div class="cred-tag">擴大療癒法三階教師（四階）</div>
+        <div class="cred-tag">美國 IET® 九大天使能量療癒</div>
+    </div>
+</div>
+
+<!-- NOTICE -->
+<div class="container section-gap">
+    <div class="notice">
+        占卜諮詢採預約制，為確保每位來訪者的體驗品質，請您依約準時前來。<br />
+        若延遲抵達，將無法延長原定占卜時間，避免影響後續預約顧客的權利。
+    </div>
+</div>
+
+<!-- SERVICE CARDS -->
+<div class="container section-gap">
+    <p class="section-title">✦ 服務項目與收費 ✦</p>
+    <div class="service-grid">
+        <div class="service-card">
+            <span class="s-emoji">🔮</span>
+            <div class="s-name">潛意識塔羅占卜</div>
+            <div class="s-desc">塔羅牌搭配各式牌卡進行占卜（約 40–60 分鐘）</div>
+            <div class="s-price">NT$ 1,000</div>
+        </div>
+        <div class="service-card">
+            <span class="s-emoji">♾️</span>
+            <div class="s-name">祈願魔法＋占卜組合</div>
+            <div class="s-desc">潛意識塔羅占卜＋遠距白魔法（除厄／良緣／福祐 三擇一）</div>
+            <div class="s-price">NT$ 1,419</div>
+        </div>
+        <div class="service-card">
+            <span class="s-emoji">💕</span>
+            <div class="s-name">能量療癒＋占卜組合</div>
+            <div class="s-desc">潛意識塔羅占卜＋擴大療癒能量 現場療癒（約 90 分鐘）</div>
+            <div class="s-price">NT$ 1,619</div>
+        </div>
+        <div class="service-card">
+            <span class="s-emoji">🕊️</span>
+            <div class="s-name">潛意識深層催眠療癒</div>
+            <div class="s-desc">與潛意識對話，釋放矛盾枷鎖，喚醒內在力量（約 180 分鐘）</div>
+            <div class="s-price">NT$ 4,919</div>
+        </div>
+    </div>
+</div>
+
+<!-- FORM -->
+<div class="container section-gap">
+    <div class="form-card">
+        <h2 class="form-card-title">✦ 預約表單 ✦</h2>
+        <p class="form-card-sub">🔔 填寫完畢後，請私訊粉專一則貼圖或訊息，確認時間後才算預約成功</p>
+
+        <form id="appointmentForm">
+            
+            <div class="form-group">
+                <label class="form-label" for="service-type">選擇服務項目<span class="req">*</span></label>
+                <select class="form-input form-select" id="service-type" name="service-type" required>
+                    <option value="" disabled selected>── 請選擇您要預約的服務 ──</option>
+                    <option value="潛意識塔羅占卜 NT1000">🔮 潛意識塔羅占卜 ／ NT$1,000（約 40–60 分鐘）</option>
+                    <option value="祈願魔法+占卜組合 NT1419">♾️ 祈願魔法＋占卜組合 ／ NT$1,419（占卜＋遠距白魔法）</option>
+                    <option value="能量療癒+占卜組合 NT1619">💕 能量療癒＋占卜組合 ／ NT$1,619（占卜＋擴大療癒，約 90 分鐘）</option>
+                    <option value="潛意識深層催眠療癒 NT4919">🕊️ 潛意識深層催眠療癒 ／ NT$4,919（約 180 分鐘）</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">
+                    預約星期幾<span class="req">*</span>
+                    <span class="lnote">（週六需提前兩日預約）</span>
+                </label>
+                <div class="radio-grid">
+                    <label class="radio-opt"><input type="radio" name="weekday" value="一" /> 星期一</label>
+                    <label class="radio-opt"><input type="radio" name="weekday" value="二" /> 星期二</label>
+                    <label class="radio-opt"><input type="radio" name="weekday" value="三" /> 星期三</label>
+                    <label class="radio-opt"><input type="radio" name="weekday" value="四" /> 星期四</label>
+                    <label class="radio-opt"><input type="radio" name="weekday" value="五" /> 星期五</label>
+                    <label class="radio-opt"><input type="radio" name="weekday" value="六" /> 星期六</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">預約時間<span class="req">*</span></label>
+                <div class="radio-grid">
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="11:00–12:00" /> 11:00–12:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="13:00–14:00" /> 13:00–14:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="14:00–15:00" /> 14:00–15:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="15:00–16:00" /> 15:00–16:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="16:00–17:00" /> 16:00–17:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="17:00–18:00" /> 17:00–18:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="18:00–19:00" /> 18:00–19:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="19:00–20:00" /> 19:00–20:00</label>
+                    <label class="radio-opt"><input type="radio" name="time-slot" value="其他" /> 其他時間聊聊</label>
+                </div>
+            </div>
+
+            <div class="form-divider"></div>
+
+            <div class="form-group">
+                <label class="form-label" for="preferred-date">希望可以的日期<span class="req">*</span></label>
+                <input class="form-input" type="text" id="preferred-date" name="preferred-date" placeholder="ex: 4/13" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="social-id">臉書暱稱 或 IG id<span class="req">*</span></label>
+                <input class="form-input" type="text" id="social-id" name="social-id" placeholder="請輸入您的臉書暱稱或 IG 帳號" />
+                <p class="form-hint">讓我們知道是誰的預約，填寫完後請私訊粉專一則貼圖或訊息開啟對話，後續以粉專做時間確認。</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="topic">想要占卜的事情概況<span class="req">*</span></label>
+                <textarea class="form-textarea" id="topic" name="topic" placeholder="大致上描述即可"></textarea>
+                <p class="form-hint">🔔 送出表單後請私訊一則訊息或是貼圖！！！<br />我們彼此確定好時間後才算是預約成功喔</p>
+            </div>
+
+            <button type="submit" class="submit-btn">送 出 預 約 表 單</button>
+        </form>
+
+        <div class="success-msg" id="successMsg">
+            🎉 表單已送出！<br />
+            請記得私訊粉專一則貼圖或訊息，<br />
+            我們確認好時間後才算預約成功喔 🔮
+        </div>
+    </div>
+</div>
+
+<!-- LOCATION -->
+<div class="container section-gap">
+    <div class="loc-card glass">
+        <h3 class="loc-title">『 地理位置 』</h3>
+        <div class="loc-item"><span class="loc-icon">📍</span><span>中壢 國際財星大樓 9樓 日日好日 裡面</span></div>
+        <div class="loc-item"><span class="loc-icon">📍</span><span>一樓是 聯邦銀行</span></div>
+        <div class="loc-item"><span class="loc-icon">📍</span><span>宏其婦幼醫院對面</span></div>
+        <p class="loc-sub">『 交通資訊 』</p>
+        <div class="loc-item"><span class="loc-icon">🚄</span><span>火車：中壢火車站延著元化路（前站出口右轉方向）步行前往約 10 分鐘（900 公尺）</span></div>
+        <div class="loc-item"><span class="loc-icon">🚌</span><span>公車：搭乘桃園客運 1號／中壢客運 1號 → 於『新街』站下車再步行約 50 公尺</span></div>
+        <div class="loc-item"><span class="loc-icon">🚎</span><span>國光：【1818】臺北車站（北一門）→ 於『新街』站下車後步行 50 公尺</span></div>
+        <div class="loc-item"><span class="loc-icon">🚇</span><span>機捷：機場捷運『環北站』下車 → 步行 15 分鐘約 1 公里</span></div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <div class="footer-icon">🔮</div>
+    <p class="footer-text">由 1493 仁昇設計塔羅森林 製作</p>
+    <p class="footer-text" style="margin-top:6px;opacity:0.5;">💕 🔔 表單後請私訊粉專一則訊息或是貼圖 🔔 💕</p>
+</footer>
+
+<script>
+    document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        this.style.display = 'none';
+        var msg = document.getElementById('successMsg');
+        msg.style.display = 'block';
+        window.scrollTo({ top: msg.offsetTop - 60, behavior: 'smooth' });
+        setTimeout(function() {
+            window.location.href = 'https://www.instagram.com/1493nco';
+        }, 2500);
+    });
+</script>
+</body>
+</html>
