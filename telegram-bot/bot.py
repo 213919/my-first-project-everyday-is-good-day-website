@@ -3,6 +3,8 @@
 透過 Telegram 呼叫 Claude AI 執行工作命令，並定時通知合約到期情況
 """
 
+from __future__ import annotations
+
 import os
 import json
 import logging
