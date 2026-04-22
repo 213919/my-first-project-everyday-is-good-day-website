@@ -1,0 +1,8 @@
+[
+  {
+    "name": "王小明",
+    "company": "範例科技有限公司",
+    "contract_end_date": "2026-05-10",
+    "notes": "這是範例資料，可用 /removecontract 刪除"
+  }
+]
