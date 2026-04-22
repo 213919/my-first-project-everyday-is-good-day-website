@@ -144,8 +144,27 @@ def read_excel_contracts(category: str) -> tuple[list[dict], str]:
         wb = openpyxl.load_workbook(filepath, data_only=True)
         ws = wb.active
 
-        raw_headers = [cell.value for cell in ws[1]]
-        headers = [str(h).strip() if h is not None else "" for h in raw_headers]
+        # 自動掃描前 5 行，找到含有欄位名稱的那一行
+        header_row_idx = None
+        headers = []
+        for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=5, values_only=True), start=1):
+            row_strs = [str(v).strip() if v is not None else "" for v in row]
+            if cfg["col_name"] in row_strs or cfg["col_period"] in row_strs:
+                header_row_idx = row_idx
+                headers = row_strs
+                break
+
+        if not headers:
+            # 回報前 5 行內容供除錯
+            sample = []
+            for row in ws.iter_rows(min_row=1, max_row=3, values_only=True):
+                sample.append(", ".join(str(v) for v in row if v is not None))
+            return [], (
+                f"【{category}】找不到欄位標題行。\n"
+                f"Excel 前三行內容：\n" + "\n".join(sample)
+            )
+
+        data_start_row = header_row_idx + 1
 
         def find_col(col_name: str) -> int | None:
             try:
@@ -169,7 +188,7 @@ def read_excel_contracts(category: str) -> tuple[list[dict], str]:
             )
 
         contracts = []
-        for row in ws.iter_rows(min_row=2, values_only=True):
+        for row in ws.iter_rows(min_row=data_start_row, values_only=True):
             if all(v is None for v in row):
                 continue
             name = str(row[name_idx]).strip() if row[name_idx] is not None else ""
