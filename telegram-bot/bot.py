@@ -13,7 +13,14 @@ from pathlib import Path
 from collections import defaultdict
 from dotenv import load_dotenv
 import anthropic
-from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
+from telegram import (
+    Update,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    CopyTextButton,
+)
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -516,57 +523,82 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 # ── 定時通知邏輯 ──────────────────────────────────────────────
 
+def _contract_card(c: dict) -> tuple[str, InlineKeyboardMarkup]:
+    """產生單筆合約的訊息文字與複製按鈕鍵盤。"""
+    name = c.get("name", "—")
+    uid = c.get("unified_id") or "—"
+    start = to_roc_str(c.get("_start_date_obj"))
+    end = to_roc_str(c.get("_end_date_obj"))
+    days_left = c.get("days_left", "")
+    end_obj = c.get("_end_date_obj")
+    end_copy = (
+        f"民國{end_obj.year - 1911}年{end_obj.month}月{end_obj.day}日"
+        if end_obj else "—"
+    )
+
+    text = (
+        f"公司名稱：{name}\n"
+        f"統　　編：{uid}\n"
+        f"合約期間：{start} ～ {end}\n"
+        f"剩餘天數：還有 {days_left} 天"
+    )
+
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(f"📋 {name}", copy_text=CopyTextButton(text=name))],
+        [InlineKeyboardButton(f"🔢 {uid}", copy_text=CopyTextButton(text=uid))],
+        [InlineKeyboardButton(f"📅 {end_copy}", copy_text=CopyTextButton(text=end_copy))],
+    ])
+    return text, keyboard
+
+
 async def _send_contract_report(bot, chat_id: int) -> None:
     today = datetime.date.today()
-    lines = [f"合約到期通知｜{today.strftime('%Y/%m/%d')}\n"]
     found_any = False
 
-    category_labels = {
-        "日日好日": "【日日好日】小鐘提回報",
-        "日青": "【日青】小青提回報",
-    }
+    categories = [("日日好日", "小鐘提"), ("日青", "小青提")]
 
-    for category, label in category_labels.items():
-        # 本週到期（7天內）
+    for category, assistant in categories:
         week_list, err_w = get_expiring_from_excel(category, 7)
-        # 三週內到期（8~21天）
-        three_week_list, err_3 = get_expiring_from_excel(category, 21)
+        three_week_list, _ = get_expiring_from_excel(category, 21)
         three_week_list = [c for c in three_week_list if c["days_left"] > 7]
 
-        if err_w and err_3:
-            lines.append(f"{label}：⚠️ {err_w}\n")
+        if err_w and not week_list and not three_week_list:
+            await bot.send_message(chat_id=chat_id, text=f"【{category}】{assistant}：⚠️ {err_w}")
             continue
 
         if not week_list and not three_week_list:
             continue
 
         found_any = True
-        lines.append(f"━━━ {label} ━━━")
+
+        # 分類標題
+        await bot.send_message(
+            chat_id=chat_id,
+            text=(
+                f"━━━━━━━━━━━━━━━\n"
+                f"【{category}】{assistant}回報\n"
+                f"{today.strftime('%Y/%m/%d')}\n"
+                f"━━━━━━━━━━━━━━━"
+            ),
+        )
 
         if week_list:
-            lines.append("🔴 本週到期：")
-            for idx, c in enumerate(week_list, 1):
-                lines.append(format_contract_entry(c, idx))
-        else:
-            lines.append("🔴 本週到期：無")
+            await bot.send_message(chat_id=chat_id, text="🔴 本週到期")
+            for c in week_list:
+                text, kb = _contract_card(c)
+                await bot.send_message(chat_id=chat_id, text=text, reply_markup=kb)
 
         if three_week_list:
-            lines.append("\n🟡 三週內即將到期：")
-            for idx, c in enumerate(three_week_list, 1):
-                lines.append(format_contract_entry(c, idx))
-        else:
-            lines.append("🟡 三週內即將到期：無")
-
-        lines.append("")
+            await bot.send_message(chat_id=chat_id, text="🟡 三週內即將到期")
+            for c in three_week_list:
+                text, kb = _contract_card(c)
+                await bot.send_message(chat_id=chat_id, text=text, reply_markup=kb)
 
     if not found_any:
         await bot.send_message(
             chat_id=chat_id,
             text=f"合約到期通知｜{today.strftime('%Y/%m/%d')}\n\n本週及三週內沒有即將到期的合約。",
         )
-        return
-
-    await send_long(bot, chat_id, "\n".join(lines))
 
 
 async def weekly_contract_job(context: ContextTypes.DEFAULT_TYPE) -> None:
