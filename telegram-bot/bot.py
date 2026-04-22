@@ -189,7 +189,8 @@ def _read_sheet(ws, cfg: dict, category: str) -> tuple[list[dict], str]:
         start_date, end_date = parse_roc_period(period_val)
         unified_id = ""
         if id_idx is not None and id_idx < len(row) and row[id_idx] is not None:
-            unified_id = str(row[id_idx]).strip()
+            val = row[id_idx]
+            unified_id = str(int(val)) if isinstance(val, float) else str(val).strip()
         contracts.append({
             "name": name,
             "unified_id": unified_id,
