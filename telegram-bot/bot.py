@@ -38,15 +38,23 @@ SYSTEM_PROMPT = os.getenv(
     "請用繁體中文回應，簡潔有力，直接提供可執行的建議與行動方案。"
     "你擅長：行程規劃、文件撰寫、資料整理、決策分析、任務追蹤。",
 )
-EXPIRY_WARN_DAYS = int(os.getenv("EXPIRY_WARN_DAYS", "30"))
 
-# 資料根目錄：桌面的「克勞德」資料夾
 BASE_DIR = Path.home() / "Desktop" / "克勞德"
 
-# 兩個業務的合約資料夾
-CATEGORIES = {
-    "日日好日": BASE_DIR / "日日好日續約合約",
-    "日青": BASE_DIR / "日青續約合約",
+# Excel 來源設定（欄位名稱依老闆提供）
+EXCEL_CONFIG = {
+    "日日好日": {
+        "file": BASE_DIR / "日日好日 總體客戶資料.xlsx",
+        "col_name": os.getenv("RIHARI_COL_NAME", "名稱"),
+        "col_id": os.getenv("RIHARI_COL_ID", "統編"),
+        "col_period": os.getenv("RIHARI_COL_PERIOD", "合約結束日期"),
+    },
+    "日青": {
+        "file": BASE_DIR / "日青營業登記.xlsx",
+        "col_name": os.getenv("NICHINICHI_COL_NAME", "名稱"),
+        "col_id": os.getenv("NICHINICHI_COL_ID", "統編"),
+        "col_period": os.getenv("NICHINICHI_COL_PERIOD", "合約結束日期"),
+    },
 }
 
 ALLOWED_CHAT_IDS: set[int] = set()
@@ -59,7 +67,6 @@ if ALLOWED_CHAT_IDS_RAW.strip():
 conversation_history: dict[int, list[dict]] = defaultdict(list)
 client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
 
-# ConversationHandler states
 ASK_CATEGORY, ASK_NAME, ASK_DATE, ASK_NOTES = range(4)
 
 MAIN_KEYBOARD = ReplyKeyboardMarkup(
@@ -80,45 +87,134 @@ CATEGORY_KEYBOARD = ReplyKeyboardMarkup(
 )
 
 
-# ── 合約資料存取 ──────────────────────────────────────────────
+# ── 民國日期解析 ──────────────────────────────────────────────
 
-def contracts_file(category: str) -> Path:
-    return CATEGORIES[category] / "contracts.json"
-
-
-def ensure_dirs() -> None:
-    for folder in CATEGORIES.values():
-        folder.mkdir(parents=True, exist_ok=True)
-
-
-def load_contracts(category: str) -> list[dict]:
-    f = contracts_file(category)
-    if not f.exists():
-        return []
-    with open(f, encoding="utf-8") as fp:
-        return json.load(fp)
+def parse_roc_date(s: str) -> datetime.date | None:
+    """解析民國日期字串 YYYMMDD → datetime.date"""
+    s = str(s).strip().replace("/", "").replace(".", "")
+    # 可能是 7 碼（民國）
+    if len(s) == 7:
+        try:
+            year = int(s[:3]) + 1911
+            month = int(s[3:5])
+            day = int(s[5:7])
+            return datetime.date(year, month, day)
+        except (ValueError, TypeError):
+            return None
+    return None
 
 
-def save_contracts(category: str, contracts: list[dict]) -> None:
-    ensure_dirs()
-    with open(contracts_file(category), "w", encoding="utf-8") as fp:
-        json.dump(contracts, fp, ensure_ascii=False, indent=2)
+def parse_roc_period(value) -> tuple[datetime.date | None, datetime.date | None]:
+    """解析 'YYYMMDD-YYYMMDD' 格式，回傳 (起始日, 結束日)"""
+    s = str(value).strip()
+    if "-" in s:
+        parts = s.split("-", 1)
+        if len(parts) == 2:
+            return parse_roc_date(parts[0]), parse_roc_date(parts[1])
+    # 只有單一日期視為結束日
+    return None, parse_roc_date(s)
 
 
-def get_expiring_contracts(category: str, within_days: int) -> list[dict]:
-    contracts = load_contracts(category)
+def to_roc_str(d: datetime.date | None) -> str:
+    """datetime.date → 民國年顯示字串"""
+    if not d:
+        return "—"
+    return f"民國{d.year - 1911}年{d.month}月{d.day}日"
+
+
+# ── Excel 讀取 ────────────────────────────────────────────────
+
+def read_excel_contracts(category: str) -> tuple[list[dict], str]:
+    """
+    讀取指定業務的 Excel 合約資料。
+    回傳 (合約清單, 錯誤訊息)。
+    """
+    cfg = EXCEL_CONFIG.get(category)
+    if not cfg:
+        return [], f"找不到「{category}」的設定"
+
+    filepath: Path = cfg["file"]
+    if not filepath.exists():
+        return [], f"找不到 Excel 檔案：\n{filepath}\n\n請確認桌面「克勞德」資料夾內有此檔案。"
+
+    try:
+        import openpyxl
+        wb = openpyxl.load_workbook(filepath, data_only=True)
+        ws = wb.active
+
+        raw_headers = [cell.value for cell in ws[1]]
+        headers = [str(h).strip() if h is not None else "" for h in raw_headers]
+
+        def find_col(col_name: str) -> int | None:
+            try:
+                return headers.index(col_name)
+            except ValueError:
+                return None
+
+        name_idx = find_col(cfg["col_name"])
+        id_idx = find_col(cfg["col_id"])
+        period_idx = find_col(cfg["col_period"])
+
+        if name_idx is None:
+            return [], (
+                f"【{category}】找不到「{cfg['col_name']}」欄位。\n"
+                f"Excel 現有欄位：{', '.join(h for h in headers if h)}"
+            )
+        if period_idx is None:
+            return [], (
+                f"【{category}】找不到「{cfg['col_period']}」欄位。\n"
+                f"Excel 現有欄位：{', '.join(h for h in headers if h)}"
+            )
+
+        contracts = []
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            if all(v is None for v in row):
+                continue
+            name = str(row[name_idx]).strip() if row[name_idx] is not None else ""
+            if not name or name.lower() == "none":
+                continue
+
+            period_val = row[period_idx] if period_idx < len(row) else None
+            if not period_val:
+                continue
+
+            start_date, end_date = parse_roc_period(period_val)
+
+            unified_id = ""
+            if id_idx is not None and id_idx < len(row) and row[id_idx] is not None:
+                unified_id = str(row[id_idx]).strip()
+
+            contracts.append({
+                "name": name,
+                "unified_id": unified_id,
+                "contract_start_date": start_date.isoformat() if start_date else "",
+                "contract_end_date": end_date.isoformat() if end_date else "",
+                "_category": category,
+                "_start_date_obj": start_date,
+                "_end_date_obj": end_date,
+            })
+
+        return contracts, ""
+
+    except Exception as e:
+        logger.exception("讀取 Excel 失敗 [%s]", category)
+        return [], f"讀取 Excel 時發生錯誤：{e}"
+
+
+def get_expiring_from_excel(category: str, within_days: int) -> tuple[list[dict], str]:
+    """取得指定天數內到期的合約，回傳 (到期清單, 錯誤訊息)"""
+    contracts, err = read_excel_contracts(category)
+    if err:
+        return [], err
     today = datetime.date.today()
     deadline = today + datetime.timedelta(days=within_days)
     result = []
     for c in contracts:
-        try:
-            end = datetime.date.fromisoformat(c["contract_end_date"])
-            if today <= end <= deadline:
-                result.append({**c, "days_left": (end - today).days})
-        except (ValueError, KeyError):
-            pass
+        end = c.get("_end_date_obj")
+        if end and today <= end <= deadline:
+            result.append({**c, "days_left": (end - today).days})
     result.sort(key=lambda x: x["days_left"])
-    return result
+    return result, ""
 
 
 # ── 工具函式 ─────────────────────────────────────────────────
@@ -134,8 +230,10 @@ def days_status(days_left: int) -> str:
         return f"已過期 {abs(days_left)} 天"
     if days_left == 0:
         return "今天到期！"
-    if days_left <= EXPIRY_WARN_DAYS:
-        return f"還有 {days_left} 天 ⚠️"
+    if days_left <= 7:
+        return f"還有 {days_left} 天 🔴"
+    if days_left <= 21:
+        return f"還有 {days_left} 天 🟡"
     return f"還有 {days_left} 天"
 
 
@@ -148,23 +246,43 @@ async def send_long(update_or_bot, chat_id: int, text: str, **kwargs) -> None:
             await update_or_bot.send_message(chat_id=chat_id, text=text[i: i + 4096], **kwargs)
 
 
+def format_contract_entry(c: dict, idx: int) -> str:
+    start = to_roc_str(c.get("_start_date_obj"))
+    end = to_roc_str(c.get("_end_date_obj"))
+    days_left = c.get("days_left", "")
+    status = f"（還有 {days_left} 天）" if days_left != "" else ""
+    return (
+        f"{idx}. {c.get('name', '—')}\n"
+        f"   統編：{c.get('unified_id') or '—'}\n"
+        f"   合約期間：{start} ~ {end}{status}"
+    )
+
+
 def format_contracts_list(category: str) -> str:
-    contracts = load_contracts(category)
+    contracts, err = read_excel_contracts(category)
+    if err:
+        return f"【{category}】⚠️ {err}"
     if not contracts:
-        return f"【{category}】目前沒有任何合約記錄。"
+        return f"【{category}】Excel 中目前沒有資料。"
+
     today = datetime.date.today()
+    # 依到期日排序
+    contracts.sort(key=lambda c: c.get("contract_end_date") or "")
+
     lines = [f"【{category}】合約清單（共 {len(contracts)} 筆）\n"]
     for i, c in enumerate(contracts, 1):
-        try:
-            end = datetime.date.fromisoformat(c["contract_end_date"])
-            status = days_status((end - today).days)
-        except (ValueError, KeyError):
-            status = "日期格式錯誤"
-        note = c.get("notes") or "無"
+        end = c.get("_end_date_obj")
+        if end:
+            days_left = (end - today).days
+            status = days_status(days_left)
+        else:
+            status = "—"
+        start = to_roc_str(c.get("_start_date_obj"))
+        end_str = to_roc_str(end)
         lines.append(
             f"{i}. {c.get('name', '—')}\n"
-            f"   到期：{c.get('contract_end_date', '—')}（{status}）\n"
-            f"   備註：{note}"
+            f"   統編：{c.get('unified_id') or '—'}\n"
+            f"   期間：{start} ~ {end_str}（{status}）"
         )
     return "\n".join(lines)
 
@@ -175,11 +293,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not is_authorized(update.effective_chat.id):
         await update.message.reply_text("抱歉，您沒有使用此機器人的權限。")
         return
-    ensure_dirs()
     await update.message.reply_text(
         "您好！我是您的行政主管助理 Claude。\n\n"
-        "直接輸入工作指令，或點選下方按鈕操作合約管理。\n"
-        f"合約資料存放在：~/Desktop/克勞德/",
+        "直接輸入工作指令，或點選下方按鈕操作合約管理。",
         reply_markup=MAIN_KEYBOARD,
     )
 
@@ -189,18 +305,17 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await update.message.reply_text("抱歉，您沒有使用此機器人的權限。")
         return
     await update.message.reply_text(
-        "使用說明\n\n"
-        "按鈕功能：\n"
-        "🏢 日日好日合約 - 查看日日好日的合約清單\n"
-        "🌿 日青合約 - 查看日青的合約清單\n"
-        "➕ 新增合約 - 新增合約（會詢問是哪個業務）\n"
-        "🗑️ 刪除合約 - 刪除合約\n"
-        "⚠️ 檢查到期 - 立即檢查兩個業務的到期合約\n"
-        "🗂️ 清除對話 - 清除 AI 對話記錄\n\n"
-        "每週一早上 10:00 自動通知即將到期合約。\n\n"
-        f"資料存放路徑：\n"
-        f"~/Desktop/克勞德/日日好日續約合約/\n"
-        f"~/Desktop/克勞德/日青續約合約/",
+        "按鈕功能說明：\n\n"
+        "🏢 日日好日合約 — 查看日日好日完整合約清單\n"
+        "🌿 日青合約 — 查看日青完整合約清單\n"
+        "⚠️ 檢查到期 — 本週 + 三週內即將到期清單\n"
+        "➕ 新增合約 — 手動新增單筆合約\n"
+        "🗑️ 刪除合約 — 刪除手動新增的合約\n"
+        "🗂️ 清除對話 — 清除 AI 對話記錄\n\n"
+        "每週一 10:00 自動推送到期通知。\n"
+        f"Excel 資料來源：\n"
+        f"  日日好日：日日好日 總體客戶資料.xlsx\n"
+        f"  日青：日青營業登記.xlsx",
         reply_markup=MAIN_KEYBOARD,
     )
 
@@ -217,23 +332,23 @@ async def clear_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("抱歉，您沒有使用此機器人的權限。")
         return
     conversation_history[update.effective_chat.id].clear()
-    await update.message.reply_text("對話記錄已清除，可以開始新任務了。", reply_markup=MAIN_KEYBOARD)
+    await update.message.reply_text("對話記錄已清除。", reply_markup=MAIN_KEYBOARD)
 
 
-# ── 查看合約 ───────────────────────────────────────────────────
+# ── 查看合約 ──────────────────────────────────────────────────
 
 async def list_rihari(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not is_authorized(update.effective_chat.id):
         await update.message.reply_text("抱歉，您沒有使用此機器人的權限。")
         return
-    await update.message.reply_text(format_contracts_list("日日好日"), reply_markup=MAIN_KEYBOARD)
+    await send_long(update, update.effective_chat.id, format_contracts_list("日日好日"), reply_markup=MAIN_KEYBOARD)
 
 
 async def list_nichinichi(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not is_authorized(update.effective_chat.id):
         await update.message.reply_text("抱歉，您沒有使用此機器人的權限。")
         return
-    await update.message.reply_text(format_contracts_list("日青"), reply_markup=MAIN_KEYBOARD)
+    await send_long(update, update.effective_chat.id, format_contracts_list("日青"), reply_markup=MAIN_KEYBOARD)
 
 
 # ── 檢查到期 ──────────────────────────────────────────────────
@@ -245,7 +360,22 @@ async def check_contracts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await _send_contract_report(context.bot, update.effective_chat.id)
 
 
-# ── 刪除合約 ──────────────────────────────────────────────────
+# ── 刪除合約（手動新增的才能刪）────────────────────────────────
+
+def load_manual_contracts(category: str) -> list[dict]:
+    f = BASE_DIR / f"{category}續約合約" / "contracts.json"
+    if not f.exists():
+        return []
+    with open(f, encoding="utf-8") as fp:
+        return json.load(fp)
+
+
+def save_manual_contracts(category: str, contracts: list[dict]) -> None:
+    folder = BASE_DIR / f"{category}續約合約"
+    folder.mkdir(parents=True, exist_ok=True)
+    with open(folder / "contracts.json", "w", encoding="utf-8") as fp:
+        json.dump(contracts, fp, ensure_ascii=False, indent=2)
+
 
 async def remove_contract(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not is_authorized(update.effective_chat.id):
@@ -253,19 +383,17 @@ async def remove_contract(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         return
 
     all_contracts = []
-    for cat in CATEGORIES:
-        for c in load_contracts(cat):
+    for cat in ("日日好日", "日青"):
+        for c in load_manual_contracts(cat):
             all_contracts.append({**c, "_category": cat})
 
     if not all_contracts:
-        await update.message.reply_text("目前沒有任何合約記錄。", reply_markup=MAIN_KEYBOARD)
+        await update.message.reply_text("目前沒有手動新增的合約記錄。", reply_markup=MAIN_KEYBOARD)
         return
 
     lines = ["請回傳要刪除的合約編號：\n"]
     for i, c in enumerate(all_contracts, 1):
-        lines.append(
-            f"{i}. [{c['_category']}] {c.get('name', '—')}｜{c.get('contract_end_date', '—')}"
-        )
+        lines.append(f"{i}. [{c['_category']}] {c.get('name', '—')}｜{c.get('contract_end_date', '—')}")
     lines.append("\n直接回傳數字即可，例如：2")
     await update.message.reply_text("\n".join(lines))
     context.user_data["awaiting_remove"] = True
@@ -280,7 +408,7 @@ async def addcontract_start(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         return ConversationHandler.END
     context.user_data["new_contract"] = {}
     await update.message.reply_text(
-        "新增合約\n\n請選擇要新增到哪個業務：",
+        "新增合約\n\n請選擇業務：",
         reply_markup=CATEGORY_KEYBOARD,
     )
     return ASK_CATEGORY
@@ -316,7 +444,7 @@ async def got_date(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
         await update.message.reply_text("日期格式不正確，請重新輸入（格式：YYYY-MM-DD）：")
         return ASK_DATE
     context.user_data["new_contract"]["contract_end_date"] = raw
-    await update.message.reply_text("請輸入備註（可直接輸入「無」跳過）：")
+    await update.message.reply_text("請輸入備註（直接輸入「無」跳過）：")
     return ASK_NOTES
 
 
@@ -326,16 +454,15 @@ async def got_notes(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     category = data.pop("_category")
     data["notes"] = "" if notes == "無" else notes
 
-    contracts = load_contracts(category)
+    contracts = load_manual_contracts(category)
     contracts.append(data)
-    save_contracts(category, contracts)
+    save_manual_contracts(category, contracts)
 
     await update.message.reply_text(
-        f"合約已儲存到【{category}】！\n\n"
+        f"合約已手動新增到【{category}】！\n\n"
         f"姓名：{data['name']}\n"
         f"到期日：{data['contract_end_date']}\n"
-        f"備註：{data.get('notes') or '無'}\n\n"
-        f"檔案位置：~/Desktop/克勞德/{category}續約合約/contracts.json",
+        f"備註：{data.get('notes') or '無'}",
         reply_markup=MAIN_KEYBOARD,
     )
     return ConversationHandler.END
@@ -351,47 +478,55 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 async def _send_contract_report(bot, chat_id: int) -> None:
     today = datetime.date.today()
-    all_expiring = {}
-    for cat in CATEGORIES:
-        expiring = get_expiring_contracts(cat, EXPIRY_WARN_DAYS)
-        if expiring:
-            all_expiring[cat] = expiring
+    lines = [f"合約到期通知｜{today.strftime('%Y/%m/%d')}\n"]
+    found_any = False
 
-    if not all_expiring:
+    category_labels = {
+        "日日好日": "【日日好日】小鐘提回報",
+        "日青": "【日青】小青提回報",
+    }
+
+    for category, label in category_labels.items():
+        # 本週到期（7天內）
+        week_list, err_w = get_expiring_from_excel(category, 7)
+        # 三週內到期（8~21天）
+        three_week_list, err_3 = get_expiring_from_excel(category, 21)
+        three_week_list = [c for c in three_week_list if c["days_left"] > 7]
+
+        if err_w and err_3:
+            lines.append(f"{label}：⚠️ {err_w}\n")
+            continue
+
+        if not week_list and not three_week_list:
+            continue
+
+        found_any = True
+        lines.append(f"━━━ {label} ━━━")
+
+        if week_list:
+            lines.append("🔴 本週到期：")
+            for idx, c in enumerate(week_list, 1):
+                lines.append(format_contract_entry(c, idx))
+        else:
+            lines.append("🔴 本週到期：無")
+
+        if three_week_list:
+            lines.append("\n🟡 三週內即將到期：")
+            for idx, c in enumerate(three_week_list, 1):
+                lines.append(format_contract_entry(c, idx))
+        else:
+            lines.append("🟡 三週內即將到期：無")
+
+        lines.append("")
+
+    if not found_any:
         await bot.send_message(
             chat_id=chat_id,
-            text=f"合約到期通知（{today}）\n\n兩個業務未來 {EXPIRY_WARN_DAYS} 天內都沒有即將到期的合約，請放心。"
+            text=f"合約到期通知｜{today.strftime('%Y/%m/%d')}\n\n本週及三週內沒有即將到期的合約。",
         )
         return
 
-    contract_summary = []
-    for cat, items in all_expiring.items():
-        for c in items:
-            contract_summary.append(
-                f"- [{cat}] {c['name']}：{c['contract_end_date']} 到期，還有 {c['days_left']} 天"
-                + (f"，備註：{c['notes']}" if c.get("notes") else "")
-            )
-
-    prompt = (
-        f"今天是 {today}（週一）。以下是未來 {EXPIRY_WARN_DAYS} 天內即將到期的合約清單：\n\n"
-        + "\n".join(contract_summary)
-        + "\n\n請用繁體中文撰寫一份簡潔的週一早上合約到期提醒通知，"
-        "分成日日好日和日青兩個區塊，列出每位當事人的情況，並建議應優先處理哪些。"
-    )
-
-    try:
-        response = client.messages.create(
-            model="claude-sonnet-4-6",
-            max_tokens=1024,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        message = response.content[0].text
-    except Exception as e:
-        logger.error("Claude API error in scheduled job: %s", e)
-        message = f"合約到期提醒（{today}）\n\n" + "\n".join(contract_summary)
-
-    await send_long(bot, chat_id, message)
+    await send_long(bot, chat_id, "\n".join(lines))
 
 
 async def weekly_contract_job(context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -421,12 +556,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     text = update.message.text or ""
 
-    # 按鈕觸發
     if text in BUTTON_MAP:
         await BUTTON_MAP[text](update, context)
         return
 
-    # 刪除合約的號碼輸入
     if context.user_data.get("awaiting_remove"):
         pool = context.user_data.get("remove_pool", [])
         try:
@@ -434,18 +567,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             if 0 <= idx < len(pool):
                 target = pool[idx]
                 cat = target["_category"]
-                contracts = load_contracts(cat)
-                # 以姓名+日期比對找到並移除
+                contracts = load_manual_contracts(cat)
                 contracts = [
                     c for c in contracts
                     if not (c.get("name") == target.get("name") and
                             c.get("contract_end_date") == target.get("contract_end_date"))
                 ]
-                save_contracts(cat, contracts)
+                save_manual_contracts(cat, contracts)
                 context.user_data.pop("awaiting_remove", None)
                 context.user_data.pop("remove_pool", None)
                 await update.message.reply_text(
-                    f"已刪除：[{cat}] {target.get('name', '—')}｜{target.get('contract_end_date', '—')}",
+                    f"已刪除：[{cat}] {target.get('name', '—')}",
                     reply_markup=MAIN_KEYBOARD,
                 )
             else:
@@ -486,8 +618,6 @@ def main() -> None:
         raise ValueError("請在 .env 設定 TELEGRAM_BOT_TOKEN")
     if not ANTHROPIC_API_KEY:
         raise ValueError("請在 .env 設定 ANTHROPIC_API_KEY")
-
-    ensure_dirs()
 
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
