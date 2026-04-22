@@ -50,12 +50,14 @@ EXCEL_CONFIG = {
         "col_name": os.getenv("RIHARI_COL_NAME", "名稱"),
         "col_id": os.getenv("RIHARI_COL_ID", "統編"),
         "col_period": os.getenv("RIHARI_COL_PERIOD", "合約結束日期"),
+        "sheets": [],  # 空白 = 讀取 active sheet
     },
     "日青": {
         "file": BASE_DIR / "日青營業登記.xlsx",
         "col_name": os.getenv("NICHINICHI_COL_NAME", "名稱"),
         "col_id": os.getenv("NICHINICHI_COL_ID", "統編"),
-        "col_period": os.getenv("NICHINICHI_COL_PERIOD", "合約結束日期"),
+        "col_period": os.getenv("NICHINICHI_COL_PERIOD", "合約日期"),
+        "sheets": ["61號營業登記客戶", "59號營業登記客戶"],
     },
 }
 
@@ -126,11 +128,76 @@ def to_roc_str(d: datetime.date | None) -> str:
 
 # ── Excel 讀取 ────────────────────────────────────────────────
 
+def _read_sheet(ws, cfg: dict, category: str) -> tuple[list[dict], str]:
+    """從單一工作表讀取合約資料，回傳 (清單, 錯誤訊息)。"""
+    # 自動掃描前 5 行，找到含有欄位名稱的那一行
+    headers = []
+    header_row_idx = None
+    for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=5, values_only=True), start=1):
+        row_strs = [str(v).strip() if v is not None else "" for v in row]
+        if cfg["col_name"] in row_strs or cfg["col_period"] in row_strs:
+            header_row_idx = row_idx
+            headers = row_strs
+            break
+
+    if not headers:
+        sample = []
+        for row in ws.iter_rows(min_row=1, max_row=3, values_only=True):
+            sample.append(", ".join(str(v) for v in row if v is not None))
+        return [], (
+            f"【{category}／{ws.title}】找不到欄位標題行。\n前三行：\n" + "\n".join(sample)
+        )
+
+    def find_col(col_name: str) -> int | None:
+        try:
+            return headers.index(col_name)
+        except ValueError:
+            return None
+
+    name_idx = find_col(cfg["col_name"])
+    id_idx = find_col(cfg["col_id"])
+    period_idx = find_col(cfg["col_period"])
+
+    if name_idx is None:
+        return [], (
+            f"【{category}／{ws.title}】找不到「{cfg['col_name']}」欄位。\n"
+            f"現有欄位：{', '.join(h for h in headers if h)}"
+        )
+    if period_idx is None:
+        return [], (
+            f"【{category}／{ws.title}】找不到「{cfg['col_period']}」欄位。\n"
+            f"現有欄位：{', '.join(h for h in headers if h)}"
+        )
+
+    contracts = []
+    for row in ws.iter_rows(min_row=header_row_idx + 1, values_only=True):
+        if all(v is None for v in row):
+            continue
+        name = str(row[name_idx]).strip() if row[name_idx] is not None else ""
+        if not name or name.lower() == "none":
+            continue
+        period_val = row[period_idx] if period_idx < len(row) else None
+        if not period_val:
+            continue
+        start_date, end_date = parse_roc_period(period_val)
+        unified_id = ""
+        if id_idx is not None and id_idx < len(row) and row[id_idx] is not None:
+            unified_id = str(row[id_idx]).strip()
+        contracts.append({
+            "name": name,
+            "unified_id": unified_id,
+            "contract_start_date": start_date.isoformat() if start_date else "",
+            "contract_end_date": end_date.isoformat() if end_date else "",
+            "_category": category,
+            "_sheet": ws.title,
+            "_start_date_obj": start_date,
+            "_end_date_obj": end_date,
+        })
+    return contracts, ""
+
+
 def read_excel_contracts(category: str) -> tuple[list[dict], str]:
-    """
-    讀取指定業務的 Excel 合約資料。
-    回傳 (合約清單, 錯誤訊息)。
-    """
+    """讀取指定業務的 Excel 合約資料（支援多分頁）。回傳 (合約清單, 錯誤訊息)。"""
     cfg = EXCEL_CONFIG.get(category)
     if not cfg:
         return [], f"找不到「{category}」的設定"
@@ -142,80 +209,32 @@ def read_excel_contracts(category: str) -> tuple[list[dict], str]:
     try:
         import openpyxl
         wb = openpyxl.load_workbook(filepath, data_only=True)
-        ws = wb.active
 
-        # 自動掃描前 5 行，找到含有欄位名稱的那一行
-        header_row_idx = None
-        headers = []
-        for row_idx, row in enumerate(ws.iter_rows(min_row=1, max_row=5, values_only=True), start=1):
-            row_strs = [str(v).strip() if v is not None else "" for v in row]
-            if cfg["col_name"] in row_strs or cfg["col_period"] in row_strs:
-                header_row_idx = row_idx
-                headers = row_strs
-                break
+        sheet_names = cfg.get("sheets") or []
+        if not sheet_names:
+            # 讀取 active sheet
+            sheets_to_read = [wb.active]
+        else:
+            missing = [s for s in sheet_names if s not in wb.sheetnames]
+            if missing:
+                return [], (
+                    f"【{category}】找不到分頁：{', '.join(missing)}\n"
+                    f"Excel 現有分頁：{', '.join(wb.sheetnames)}"
+                )
+            sheets_to_read = [wb[s] for s in sheet_names]
 
-        if not headers:
-            # 回報前 5 行內容供除錯
-            sample = []
-            for row in ws.iter_rows(min_row=1, max_row=3, values_only=True):
-                sample.append(", ".join(str(v) for v in row if v is not None))
-            return [], (
-                f"【{category}】找不到欄位標題行。\n"
-                f"Excel 前三行內容：\n" + "\n".join(sample)
-            )
+        all_contracts = []
+        errors = []
+        for ws in sheets_to_read:
+            contracts, err = _read_sheet(ws, cfg, category)
+            if err:
+                errors.append(err)
+            all_contracts.extend(contracts)
 
-        data_start_row = header_row_idx + 1
+        if errors and not all_contracts:
+            return [], "\n".join(errors)
 
-        def find_col(col_name: str) -> int | None:
-            try:
-                return headers.index(col_name)
-            except ValueError:
-                return None
-
-        name_idx = find_col(cfg["col_name"])
-        id_idx = find_col(cfg["col_id"])
-        period_idx = find_col(cfg["col_period"])
-
-        if name_idx is None:
-            return [], (
-                f"【{category}】找不到「{cfg['col_name']}」欄位。\n"
-                f"Excel 現有欄位：{', '.join(h for h in headers if h)}"
-            )
-        if period_idx is None:
-            return [], (
-                f"【{category}】找不到「{cfg['col_period']}」欄位。\n"
-                f"Excel 現有欄位：{', '.join(h for h in headers if h)}"
-            )
-
-        contracts = []
-        for row in ws.iter_rows(min_row=data_start_row, values_only=True):
-            if all(v is None for v in row):
-                continue
-            name = str(row[name_idx]).strip() if row[name_idx] is not None else ""
-            if not name or name.lower() == "none":
-                continue
-
-            period_val = row[period_idx] if period_idx < len(row) else None
-            if not period_val:
-                continue
-
-            start_date, end_date = parse_roc_period(period_val)
-
-            unified_id = ""
-            if id_idx is not None and id_idx < len(row) and row[id_idx] is not None:
-                unified_id = str(row[id_idx]).strip()
-
-            contracts.append({
-                "name": name,
-                "unified_id": unified_id,
-                "contract_start_date": start_date.isoformat() if start_date else "",
-                "contract_end_date": end_date.isoformat() if end_date else "",
-                "_category": category,
-                "_start_date_obj": start_date,
-                "_end_date_obj": end_date,
-            })
-
-        return contracts, ""
+        return all_contracts, ""
 
     except Exception as e:
         logger.exception("讀取 Excel 失敗 [%s]", category)
