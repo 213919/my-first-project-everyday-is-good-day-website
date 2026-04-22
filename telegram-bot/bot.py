@@ -28,7 +28,6 @@ MAIN_KEYBOARD = ReplyKeyboardMarkup(
         [KeyboardButton("🗂️ 清除對話")],
     ],
     resize_keyboard=True,
-    persistent=True,
 )
 
 load_dotenv()
