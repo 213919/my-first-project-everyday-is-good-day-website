@@ -11,7 +11,7 @@ from pathlib import Path
 from collections import defaultdict
 from dotenv import load_dotenv
 import anthropic
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -19,6 +19,16 @@ from telegram.ext import (
     MessageHandler,
     filters,
     ContextTypes,
+)
+
+MAIN_KEYBOARD = ReplyKeyboardMarkup(
+    [
+        [KeyboardButton("📋 查看合約"), KeyboardButton("⚠️ 檢查到期")],
+        [KeyboardButton("➕ 新增合約"), KeyboardButton("🗑️ 刪除合約")],
+        [KeyboardButton("🗂️ 清除對話")],
+    ],
+    resize_keyboard=True,
+    persistent=True,
 )
 
 load_dotenv()
@@ -115,16 +125,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
     await update.message.reply_text(
         "您好！我是您的行政主管助理 Claude。\n\n"
-        "直接輸入工作指令，或使用以下功能：\n\n"
-        "合約管理：\n"
-        "/addcontract - 新增合約\n"
-        "/listcontracts - 查看所有合約\n"
-        "/checkcontracts - 立即檢查快到期合約\n"
-        "/removecontract - 刪除合約\n\n"
-        "其他：\n"
-        "/clear - 清除對話記錄\n"
-        "/help - 顯示使用說明\n"
-        "/id - 顯示您的 Chat ID"
+        "直接輸入工作指令，或點選下方按鈕操作合約管理。",
+        reply_markup=MAIN_KEYBOARD,
     )
 
 
@@ -331,10 +333,25 @@ async def weekly_contract_job(context: ContextTypes.DEFAULT_TYPE) -> None:
 
 # ── 一般訊息處理 ──────────────────────────────────────────────
 
+BUTTON_MAP = {
+    "📋 查看合約": list_contracts,
+    "⚠️ 檢查到期": check_contracts,
+    "🗑️ 刪除合約": remove_contract,
+    "🗂️ 清除對話": clear_command,
+}
+
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
     if not is_authorized(chat_id):
         await update.message.reply_text("抱歉，您沒有使用此機器人的權限。")
+        return
+
+    # 按鈕觸發
+    text = update.message.text or ""
+    if text in BUTTON_MAP:
+        result = await BUTTON_MAP[text](update, context)
+        # addcontract_start 回傳 state，需要 ConversationHandler 接手，不中斷
         return
 
     # 處理刪除合約的號碼輸入
@@ -392,9 +409,12 @@ def main() -> None:
 
     app = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
 
-    # 新增合約對話流程
+    # 新增合約對話流程（支援指令與按鈕兩種入口）
     add_contract_handler = ConversationHandler(
-        entry_points=[CommandHandler("addcontract", addcontract_start)],
+        entry_points=[
+            CommandHandler("addcontract", addcontract_start),
+            MessageHandler(filters.Regex("^➕ 新增合約$"), addcontract_start),
+        ],
         states={
             ASK_NAME: [MessageHandler(filters.TEXT & ~filters.COMMAND, got_name)],
             ASK_COMPANY: [MessageHandler(filters.TEXT & ~filters.COMMAND, got_company)],
