@@ -524,17 +524,12 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 # ── 定時通知邏輯 ──────────────────────────────────────────────
 
 def _contract_card(c: dict) -> tuple[str, InlineKeyboardMarkup]:
-    """產生單筆合約的訊息文字與複製按鈕鍵盤。"""
+    """產生單筆合約的訊息文字與單一複製按鈕。"""
     name = c.get("name", "—")
     uid = c.get("unified_id") or "—"
     start = to_roc_str(c.get("_start_date_obj"))
     end = to_roc_str(c.get("_end_date_obj"))
     days_left = c.get("days_left", "")
-    end_obj = c.get("_end_date_obj")
-    end_copy = (
-        f"民國{end_obj.year - 1911}年{end_obj.month}月{end_obj.day}日"
-        if end_obj else "—"
-    )
 
     text = (
         f"公司名稱：{name}\n"
@@ -543,10 +538,10 @@ def _contract_card(c: dict) -> tuple[str, InlineKeyboardMarkup]:
         f"剩餘天數：還有 {days_left} 天"
     )
 
+    copy_content = f"{name}\n統編：{uid}\n到期日：{end}"
+
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(f"📋 {name}", copy_text=CopyTextButton(text=name))],
-        [InlineKeyboardButton(f"🔢 {uid}", copy_text=CopyTextButton(text=uid))],
-        [InlineKeyboardButton(f"📅 {end_copy}", copy_text=CopyTextButton(text=end_copy))],
+        [InlineKeyboardButton("📋 複製資訊", copy_text=CopyTextButton(text=copy_content))],
     ])
     return text, keyboard
 
