@@ -41,10 +41,14 @@
 .hero-scroll::after{content:'';width:1px;height:36px;background:rgba(255,248,240,.4);}
 @keyframes hscroll{0%,100%{transform:translateX(-50%) translateY(0)}55%{transform:translateX(-50%) translateY(8px)}}
 /* alert */
-.alert-banner{background:linear-gradient(135deg,#f6efe5 0%,#f0e3d4 48%,#ead8c3 100%);border-top:1px solid rgba(166,123,69,.12);border-bottom:1px solid rgba(166,123,69,.12);}
-.alert-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:22px 0 26px;text-align:center;}
-.alert-text{color:#6e4d2c;font-size:.92rem;line-height:1.7;}
-.alert-text strong{display:block;color:#8a5b2a;font-size:clamp(1.1rem,2vw,1.5rem);margin-bottom:6px;letter-spacing:.01em;}
+.alert-banner{position:relative;overflow:hidden;padding:52px 0;background:linear-gradient(135deg,#7a4e28 0%,#c9a96e 50%,#9e7848 100%);}
+.alert-banner::before{content:'';position:absolute;inset:0;background:url('images/hero-bg-mobile.webp') center/cover no-repeat;opacity:.13;filter:saturate(.9);}
+@media(min-width:769px){.alert-banner::before{background-image:url('images/hero-bg.webp');}}
+.alert-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;text-align:center;position:relative;z-index:1;}
+.alert-glass-panel{background:rgba(255,251,244,.16);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border:1px solid rgba(255,248,235,.38);border-radius:28px;box-shadow:0 8px 40px rgba(70,38,10,.25),inset 0 1px 0 rgba(255,252,240,.45);padding:38px 56px;display:flex;flex-direction:column;align-items:center;gap:22px;max-width:720px;width:100%;}
+.alert-text{color:rgba(255,248,232,.96);font-size:.95rem;line-height:1.75;}
+.alert-text strong{display:block;color:#fff;font-size:clamp(1.1rem,2vw,1.45rem);margin-bottom:8px;letter-spacing:.01em;text-shadow:0 2px 14px rgba(70,38,10,.35);}
+@media(max-width:768px){.alert-glass-panel{padding:28px 22px;border-radius:20px;}}
 /* sp-prev */
 .sp-prev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 .sp-prev-card{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-xs);transition:transform var(--dur),box-shadow var(--dur);}
@@ -121,11 +125,13 @@
 </section>
 <div class="alert-banner" role="alert">
 <div class="container alert-inner">
+<div class="alert-glass-panel">
 <div class="alert-text">
 <strong>🔔 日青・青埔館｜借址登記名額所剩不多！</strong>
-<span>青埔館公司借址營業登記，名額有限，把握機會！。</span>
+<span>青埔館公司借址營業登記，名額有限，把握機會！</span>
 </div>
-<a class="btn btn-primary" href="contact.html" style="font-size:.9rem;padding:11px 26px;flex-shrink:0;">立即詢問</a>
+<a class="btn btn-ghost-white" href="contact.html" style="font-size:.95rem;padding:13px 32px;">立即與我們聯絡</a>
+</div>
 </div>
 </div>
 <section class="section" style="background:var(--off-white)">
