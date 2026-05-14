@@ -137,14 +137,14 @@
 <section class="section" style="background:var(--off-white)">
 <div class="container">
 <div class="about-grid">
-<div class="about-img-wrap reveal">
+<div class="about-img-wrap anim-left">
 <img alt="日日好日商務中心入口展示牆" loading="lazy" src="images/about-entrance.webp"/ width="900" height="600"/>
 <div class="about-badge glass">
 <span class="b-ico">📍</span>
 <div><strong>桃園市中壢區延平路 261 號</strong><span>9 樓・週一至週五 10:30–18:00</span></div>
 </div>
 </div>
-<div class="reveal">
+<div class="anim-right">
 <span class="eyebrow">關於我們</span>
 <h2 class="section-title">陪伴您創業的每一步</h2>
 <div class="divider"></div>
@@ -177,7 +177,7 @@
 </section>
 <section class="section-sm">
 <div class="container">
-<div class="stats-row reveal">
+<div class="stats-row anim-fade">
 <div class="stat-card glass-card"><div class="stat-num">100+</div><div class="stat-lbl">服務過的客戶</div></div>
 <div class="stat-card glass-card"><div class="stat-num">4</div><div class="stat-lbl">年在地經營</div></div>
 <div class="stat-card glass-card"><div class="stat-num">9</div><div class="stat-lbl">項專業服務</div></div>
@@ -241,7 +241,7 @@
 </section>
 <section class="section-sm" style="background:var(--off-white)">
 <div class="container">
-<div class="cta-banner reveal">
+<div class="cta-banner anim-fade">
 <div><h2>準備好開始了嗎？</h2><p>歡迎預約現場參觀，親眼感受日日好日的溫暖氛圍，我們在桃園中壢等您。</p></div>
 <div class="cta-banner-btns">
 <a class="btn btn-primary" href="contact.html">立即預約參觀</a>
@@ -290,7 +290,7 @@
       if(en.isIntersecting){setTimeout(function(){en.target.classList.add('visible');},(i%5)*85);ro.unobserve(en.target);}
     });
   },{threshold:0.1,rootMargin:'0px 0px -32px 0px'});
-  document.querySelectorAll('.reveal').forEach(function(el){ro.observe(el);});
+  document.querySelectorAll('.reveal,.anim-fade,.anim-left,.anim-right').forEach(function(el){ro.observe(el);});
 })();
 </script>
 </body>
