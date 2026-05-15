@@ -69,8 +69,8 @@
 .about-service-item span{color:var(--text-sub);font-size:.9rem;line-height:1.7;}
 /* loc-compare */
 .loc-compare{display:grid;grid-template-columns:1fr 1fr;gap:28px;max-width:900px;margin:0 auto;}
-.loc-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;box-shadow:var(--shadow-sm);display:flex;flex-direction:column;}
-.loc-card-alt{background:linear-gradient(160deg,#fdf8f2 0%,#f8f0e4 100%);}
+.loc-card{background:rgba(255,255,255,.62);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,.78);overflow:hidden;box-shadow:0 4px 24px rgba(46,42,38,.07),inset 0 1px 0 rgba(255,255,255,.9);display:flex;flex-direction:column;}
+.loc-card-alt{background:rgba(253,247,238,.55);}
 .loc-header{padding:28px 28px 20px;border-bottom:1px solid var(--border-lt);}
 .loc-badge{display:inline-block;font-size:.7rem;font-weight:700;letter-spacing:.18em;padding:5px 12px;border-radius:999px;background:var(--brand);color:#fff;margin-bottom:10px;}
 .loc-badge-alt{background:var(--oak-deep);}
@@ -87,7 +87,7 @@
 @media(max-width:768px){
   #hero{min-height:680px;align-items:flex-end;}
   .hero-overlay{background:linear-gradient(180deg,rgba(52,36,22,.2) 0%,rgba(73,50,28,.62) 100%) !important;}
-  .hero-copy{max-width:none;text-align:left;align-items:flex-start;padding-bottom:44px;}
+  .hero-copy{max-width:none;text-align:left;align-items:flex-start;padding-bottom:100px;}
   .hero-chip{margin-left:0;}
   .hero-btns{justify-content:flex-start;flex-direction:column;}
   .hero-btns .btn{width:100%;justify-content:center;}
@@ -108,16 +108,16 @@
 }
 /* plan-grid */
 .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;max-width:1000px;margin:0 auto;}
-.plan-card{background:#fff;border-radius:var(--radius-lg);border:1px solid var(--border);padding:32px 28px;display:flex;flex-direction:column;box-shadow:var(--shadow-xs);transition:transform var(--dur),box-shadow var(--dur);}
-.plan-card:hover{transform:translateY(-5px);box-shadow:var(--shadow-md);}
-.plan-card-featured{background:linear-gradient(160deg,var(--brand) 0%,var(--brand-deep) 100%);border-color:var(--brand-deep);color:#fff;}
+.plan-card{background:rgba(255,255,255,.65);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,.8);padding:32px 28px;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(46,42,38,.07),inset 0 1px 0 rgba(255,255,255,.9);transition:transform var(--dur),box-shadow var(--dur);}
+.plan-card:hover{transform:translateY(-5px);box-shadow:0 14px 40px rgba(46,42,38,.12),inset 0 1px 0 rgba(255,255,255,.9);}
+.plan-card-featured{background:linear-gradient(160deg,#c99040 0%,#a07030 100%);border-color:#a07030;color:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;}
 .plan-icon{font-size:2rem;margin-bottom:14px;}
 .plan-badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.18em;padding:4px 10px;border-radius:999px;background:var(--gray);color:var(--brand);margin-bottom:14px;}
 .plan-badge-featured{background:rgba(255,255,255,.2);color:#fff;}
 .plan-name{font-size:1.08rem;font-family:'Noto Serif TC',serif;color:var(--brand);margin:0 0 10px;line-height:1.4;}
 .plan-card-featured .plan-name{color:#fff;}
 .plan-fit{font-size:.84rem;color:var(--text-sub);margin:0 0 18px;line-height:1.7;padding-bottom:18px;border-bottom:1px solid var(--border-lt);}
-.plan-card-featured .plan-fit{color:rgba(255,248,232,.75);border-bottom-color:rgba(255,255,255,.15);}
+.plan-card-featured .plan-fit{color:rgba(255,248,232,.88);border-bottom-color:rgba(255,255,255,.2);}
 .plan-list{list-style:none;display:flex;flex-direction:column;gap:9px;flex:1;margin:0 0 24px;}
 .plan-list li{font-size:.88rem;color:var(--text);padding-left:16px;position:relative;}
 .plan-list li::before{content:'—';position:absolute;left:0;color:var(--oak);font-weight:700;}
@@ -418,7 +418,7 @@
 <span class="eyebrow">客戶評價</span>
 <h2 class="section-title">真實客戶怎麼說</h2>
 <div class="divider"></div>
-<p class="section-lead">目前 Google 評論 <strong>4.8 分 ★</strong>（21 則），感謝每一位選擇日日好日的夥伴。</p>
+<p class="section-lead">目前 Google 評論 <strong>4.8 分</strong>，感謝每一位選擇日日好日的夥伴。</p>
 </div>
 <div class="rv-grid reveal">
 <div class="rv-card">
@@ -426,7 +426,7 @@
 <p class="rv-text">「老闆的精心佈置，可以從角落裡看到各種溫馨小細節，各種設備齊全提供使用，是非常舒適的商用空間」</p>
 <div class="rv-footer">
 <div class="rv-avatar" style="background:linear-gradient(135deg,#5b8dee,#2d5fb5);">S</div>
-<div><div class="rv-name">Sunny</div><div class="rv-meta">Google 評論</div></div>
+<div><div class="rv-name">S***</div><div class="rv-meta">Google 評論</div></div>
 <div style="margin-left:auto;opacity:.7;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
 </div>
 </div>
@@ -435,7 +435,7 @@
 <p class="rv-text">「環境優美，磁場超好～是辦公洽商的好地方喔！福地福人居，推薦給需要貴人運的老闆們 ^^」</p>
 <div class="rv-footer">
 <div class="rv-avatar" style="background:linear-gradient(135deg,#c0392b,#922b21);">誠</div>
-<div><div class="rv-name">誠美稅務記帳士事務所</div><div class="rv-meta">Google 評論</div></div>
+<div><div class="rv-name">誠美稅務***</div><div class="rv-meta">Google 評論</div></div>
 <div style="margin-left:auto;opacity:.7;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
 </div>
 </div>
@@ -444,7 +444,7 @@
 <p class="rv-text">"Very helpful and well equipped with reasonable price. Love the cozy vibe and the neat environment."</p>
 <div class="rv-footer">
 <div class="rv-avatar" style="background:linear-gradient(135deg,#8e44ad,#6c3483);">T</div>
-<div><div class="rv-name">Tammy T</div><div class="rv-meta">Google 評論</div></div>
+<div><div class="rv-name">Tammy *</div><div class="rv-meta">Google 評論</div></div>
 <div style="margin-left:auto;opacity:.7;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
 </div>
 </div>
@@ -453,7 +453,7 @@
 <p class="rv-text">「羨慕這樣充滿質感的辦公環境，將家與咖啡廳的舒適感完美融合，氛圍感拉滿❤️ 坐在落地窗前觀看美景，賺錢的靈感都來了！！！」</p>
 <div class="rv-footer">
 <div class="rv-avatar" style="background:linear-gradient(135deg,#1e8449,#145a32);">B</div>
-<div><div class="rv-name">Bamboo Lin</div><div class="rv-meta">在地嚮導 · Google 評論</div></div>
+<div><div class="rv-name">Bamboo L**</div><div class="rv-meta">在地嚮導 · Google 評論</div></div>
 <div style="margin-left:auto;opacity:.7;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
 </div>
 </div>
@@ -462,7 +462,7 @@
 <p class="rv-text">「超美又舒適的好環境，如咖啡廳般的氛圍，非常適合辦公的空間。讓你日日都覺得美麗😍」</p>
 <div class="rv-footer">
 <div class="rv-avatar" style="background:linear-gradient(135deg,var(--oak),var(--brand));">吳</div>
-<div><div class="rv-name">吳好婕</div><div class="rv-meta">Google 評論</div></div>
+<div><div class="rv-name">吳好*</div><div class="rv-meta">Google 評論</div></div>
 <div style="margin-left:auto;opacity:.7;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
 </div>
 </div>
@@ -471,7 +471,7 @@
 <p class="rv-text">「參觀完發現，天啊！也太美！理想中的辦公空間耶～善待創作者的中壢共享辦公室 👍👍👍」</p>
 <div class="rv-footer">
 <div class="rv-avatar" style="background:linear-gradient(135deg,#c9a96e,#9e7848);">Y</div>
-<div><div class="rv-name">Yalan Hsing</div><div class="rv-meta">在地嚮導 · Google 評論</div></div>
+<div><div class="rv-name">Yalan H***</div><div class="rv-meta">在地嚮導 · Google 評論</div></div>
 <div style="margin-left:auto;opacity:.7;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg></div>
 </div>
 </div>
