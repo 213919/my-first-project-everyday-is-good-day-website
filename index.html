@@ -119,19 +119,19 @@
 @media(max-width:768px){.plan-grid{grid-template-columns:1fr;max-width:420px;}}
 .plan-card{background:rgba(255,255,255,.65);backdrop-filter:blur(14px) saturate(1.4);-webkit-backdrop-filter:blur(14px) saturate(1.4);border-radius:var(--radius-lg);border:1px solid rgba(255,255,255,.8);padding:32px 28px;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(46,42,38,.07),inset 0 1px 0 rgba(255,255,255,.9);transition:transform var(--dur),box-shadow var(--dur);}
 .plan-card:hover{transform:translateY(-5px);box-shadow:0 14px 40px rgba(46,42,38,.12),inset 0 1px 0 rgba(255,255,255,.9);}
-.plan-card-featured{background:linear-gradient(160deg,#c99040 0%,#a07030 100%);border-color:#a07030;color:#fff;backdrop-filter:none;-webkit-backdrop-filter:none;}
+.plan-card-featured{background:linear-gradient(160deg,#EDD9B8 0%,#D9C09A 100%);border-color:#C9A96E;color:var(--brand);backdrop-filter:none;-webkit-backdrop-filter:none;}
 .plan-icon{font-size:2rem;margin-bottom:14px;}
 .plan-badge{display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.18em;padding:4px 10px;border-radius:999px;background:var(--gray);color:var(--brand);margin-bottom:14px;}
-.plan-badge-featured{background:rgba(255,255,255,.2);color:#fff;}
+.plan-badge-featured{background:rgba(107,79,58,.14);color:var(--brand);}
 .plan-name{font-size:1.08rem;font-family:'Noto Serif TC',serif;color:var(--brand);margin:0 0 10px;line-height:1.4;}
-.plan-card-featured .plan-name{color:#fff;}
+.plan-card-featured .plan-name{color:var(--brand);}
 .plan-fit{font-size:.84rem;color:var(--text-sub);margin:0 0 18px;line-height:1.7;padding-bottom:18px;border-bottom:1px solid var(--border-lt);}
-.plan-card-featured .plan-fit{color:rgba(255,248,232,.88);border-bottom-color:rgba(255,255,255,.2);}
+.plan-card-featured .plan-fit{color:var(--text-sub);border-bottom-color:rgba(107,79,58,.18);}
 .plan-list{list-style:none;display:flex;flex-direction:column;gap:9px;flex:1;margin:0 0 24px;}
 .plan-list li{font-size:.88rem;color:var(--text);padding-left:16px;position:relative;}
 .plan-list li::before{content:'—';position:absolute;left:0;color:var(--oak);font-weight:700;}
-.plan-card-featured .plan-list li{color:rgba(255,248,232,.9);}
-.plan-card-featured .plan-list li::before{color:var(--oak-soft);}
+.plan-card-featured .plan-list li{color:var(--text);}
+.plan-card-featured .plan-list li::before{color:var(--oak-deep);}
 .plan-cta{width:100%;justify-content:center;margin-top:auto;}
 /* ── Flip Counter ── */
 .fc-wrap{display:flex;align-items:center;justify-content:center;gap:4px;min-height:3.8rem;}
