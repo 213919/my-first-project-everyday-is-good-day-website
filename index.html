@@ -24,7 +24,7 @@
 
 /* ===== HOURS BAR ===== */
 :root{--hours-h:40px;}
-#hours-bar{position:fixed;top:0;left:0;right:0;z-index:901;height:var(--hours-h);background:var(--brand);color:rgba(255,248,240,.96);display:flex;align-items:center;justify-content:center;font-size:.84rem;font-weight:600;letter-spacing:.12em;text-align:center;}
+#hours-bar{position:fixed;top:0;left:0;right:0;z-index:901;height:var(--hours-h);background:rgba(255,255,255,.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:var(--text-sub);border-bottom:1px solid var(--border-lt);display:flex;align-items:center;justify-content:center;font-size:.76rem;font-weight:500;letter-spacing:.06em;text-align:center;}
 #nav{top:var(--hours-h) !important;}
 .mobile-menu{top:calc(var(--hours-h) + var(--nav-h)) !important;}
 
@@ -46,7 +46,9 @@
 .hero-content-wrap{background:var(--off-white);padding:44px 0 48px;border-bottom:1px solid var(--border-lt);}
 .hero-content{display:flex;flex-direction:column;align-items:flex-start;}
 .hero-title{font-size:clamp(1.85rem,3.2vw,2.6rem);color:var(--brand);line-height:1.32;letter-spacing:.04em;margin-bottom:20px;text-shadow:none;}
-.hero-title .accent{color:var(--terracotta);}
+.hero-title .accent{color:var(--brand);}
+.hero-line{width:28px;height:2px;background:var(--oak);margin-bottom:18px;}
+.hero-btns .btn{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
 .hero-desc{font-size:clamp(.98rem,1.4vw,1.06rem);color:var(--text-sub);max-width:38em;line-height:2.0;margin-bottom:32px;}
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
 .hero-notice-inline{display:flex;align-items:center;gap:10px;margin-top:28px;padding:14px 20px;border-radius:var(--radius);background:rgba(184,160,122,.12);border:1px solid rgba(184,160,122,.38);font-size:.9rem;color:var(--text-sub);line-height:1.65;}
@@ -201,7 +203,7 @@
 <meta name="theme-color" content="#6B4F3A"/>
 </head>
 <body>
-<div id="hours-bar">當天營業時間　10:30 ～ 19:00</div>
+<div id="hours-bar">⏱ 營業時間　10:30 – 19:00　（週一至週五）</div>
 <nav id="nav">
 <div class="container nav-wrap">
 <a class="nav-logo" href="index.html"><img alt="日日好日商務中心 Logo" height="52" src="images/logo.webp" width="52" fetchpriority="high"/><div class="nav-logo-text"><span class="nav-logo-zh">日日好日商務中心</span><span class="nav-logo-en">Every Day Good Day</span></div></a>
@@ -237,6 +239,7 @@
 </div>
 <div class="hero-content-wrap">
 <div class="container hero-content">
+<div class="hero-line"></div>
 <h1 class="hero-title">中壢・青埔<br><span class="accent">公司借址登記</span><br>獨立辦公室</h1>
 <p class="hero-desc">適合 SOHO、新創、接案工作者與 2～5 人團隊，提供公司借址登記、小型辦公室、公司設立、會計記帳與創業初期支援。</p>
 <div class="hero-btns">
