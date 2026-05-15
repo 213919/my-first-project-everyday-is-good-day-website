@@ -24,8 +24,8 @@
 
 /* hero */
 #hero{position:relative;height:100svh;min-height:680px;display:flex;align-items:center;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background:url('images/hero-bg-test.jpg') center/cover no-repeat;filter:saturate(1.1) brightness(1.05);}@media(min-width:769px){.hero-bg{background-image:url('images/hero-bg-test.jpg')}}
-.hero-overlay{position:absolute;inset:0;background:linear-gradient(115deg,rgba(48,34,20,.52) 0%,rgba(73,50,28,.28) 46%,rgba(255,248,239,.06) 100%);}
+.hero-bg{position:absolute;inset:0;background:url('images/hero-bg-test.jpg') center/cover no-repeat;filter:saturate(0.95) brightness(0.78);}@media(min-width:769px){.hero-bg{background-image:url('images/hero-bg-test.jpg');background-position:center 30%;}}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(12,8,5,.80) 0%,rgba(12,8,5,.52) 38%,rgba(12,8,5,.18) 70%,rgba(12,8,5,.06) 100%);}
 .hero-copy{position:relative;z-index:2;padding-top:calc(var(--nav-h)+20px);max-width:700px;text-align:left;margin:0;display:flex;flex-direction:column;align-items:flex-start;}
 .hero-chip{display:inline-flex;align-items:center;gap:8px;padding:8px 20px;border-radius:999px;background:rgba(255,250,244,.18);border:1px solid rgba(232,202,156,.75);color:rgba(255,248,239,.96);font-size:.78rem;letter-spacing:.16em;margin-bottom:22px;backdrop-filter:blur(10px) saturate(1.3);-webkit-backdrop-filter:blur(10px) saturate(1.3);}
 .hero-chip::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--oak-soft);animation:hpulse 2s infinite;}
@@ -86,7 +86,7 @@
 .stat-card.stat-feature .stat-num,.stat-card.stat-feature .stat-lbl,.stat-card.glass-card .stat-num,.stat-card.glass-card .stat-lbl{color:inherit !important;-webkit-text-fill-color:inherit !important;}
 @media(max-width:768px){
   #hero{min-height:100svh;align-items:flex-start;}
-  .hero-overlay{background:linear-gradient(180deg,rgba(52,36,22,.2) 0%,rgba(73,50,28,.62) 100%) !important;}
+  .hero-overlay{background:linear-gradient(180deg,rgba(12,8,5,.82) 0%,rgba(12,8,5,.42) 32%,rgba(12,8,5,.22) 58%,rgba(12,8,5,.78) 100%) !important;}
   .hero-copy{max-width:none;text-align:left;align-items:flex-start;padding-top:calc(var(--nav-h) + 48px);padding-bottom:96px;min-height:100svh;box-sizing:border-box;}
   .hero-title{font-size:clamp(1.72rem,7.8vw,2.15rem);line-height:1.28;margin-bottom:28px;letter-spacing:.02em;}
   .hero-btns{justify-content:flex-start;flex-direction:column;gap:12px;}
