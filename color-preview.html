@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>色彩系統預覽</title>
+<style>
+  body{font-family:'Noto Sans TC',sans-serif;background:#f5f0ea;margin:0;padding:24px;}
+  h2{font-size:1rem;font-weight:700;letter-spacing:.12em;color:#444;margin:32px 0 14px;}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .swatch{border-radius:12px;overflow:hidden;width:140px;box-shadow:0 2px 12px rgba(0,0,0,.1);}
+  .swatch-color{height:80px;}
+  .swatch-info{background:#fff;padding:10px 12px;}
+  .swatch-name{font-size:.72rem;font-weight:700;color:#333;margin-bottom:2px;}
+  .swatch-hex{font-size:.68rem;color:#888;font-family:monospace;}
+  .swatch-change{font-size:.62rem;color:#B5402A;margin-top:3px;}
+  .divider{border:none;border-top:1px solid #ddd;margin:28px 0;}
+  .label-old{color:#999;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;}
+  .label-new{color:#5C4033;font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;font-weight:700;}
+
+  /* Mock button preview */
+  .mock{margin-top:32px;background:#FAF7F2;border-radius:16px;padding:28px;border:1px solid #DDD6CA;}
+  .mock-title{font-size:.8rem;font-weight:700;color:#9A7E58;letter-spacing:.14em;margin-bottom:16px;}
+  .mock-btns{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn-a{padding:12px 28px;border-radius:999px;background:#5C4033;color:#fff;font-size:.9rem;font-weight:700;border:none;cursor:default;}
+  .btn-b{padding:12px 28px;border-radius:999px;background:rgba(255,255,255,.6);color:#5C4033;font-size:.9rem;font-weight:700;border:1.5px solid #5C4033;cursor:default;}
+  .btn-c{padding:12px 28px;border-radius:999px;background:#7D1E30;color:#fff;font-size:.9rem;font-weight:700;border:none;cursor:default;}
+  .mock-text{margin-top:20px;}
+  .mock-h{font-size:1.4rem;font-weight:700;color:#282018;margin-bottom:8px;}
+  .mock-accent{color:#5C4033;}
+  .mock-sub{font-size:.88rem;color:#68625A;line-height:1.8;}
+  .mock-line{width:40px;height:2px;background:#B8A07A;margin:10px 0 16px;}
+  .mock-card{background:rgba(255,255,255,.7);border:1px solid #DDD6CA;border-radius:12px;padding:16px 20px;margin-top:16px;font-size:.85rem;color:#68625A;line-height:1.8;}
+  .tag{display:inline-block;background:#F0EAE0;color:#9A7E58;font-size:.68rem;font-weight:700;padding:4px 10px;border-radius:999px;letter-spacing:.08em;margin-bottom:10px;}
+  .mock-hours{background:#5C4033;color:rgba(255,248,240,.92);text-align:center;padding:10px;border-radius:8px;font-size:.82rem;font-weight:600;letter-spacing:.12em;margin-top:16px;}
+  .sticky-bar{background:rgba(40,24,16,.55);backdrop-filter:blur(20px);border-radius:12px;padding:12px 16px;display:flex;gap:10px;margin-top:12px;}
+  .s-btn{flex:1;padding:10px;border-radius:999px;text-align:center;font-size:.8rem;font-weight:700;color:#fff;}
+  .s-mail{background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.4);}
+  .s-call{background:rgba(125,30,48,.68);border:1.5px solid rgba(160,50,65,.7);}
+</style>
+</head>
+<body>
+
+<h2 style="font-size:1.1rem;color:#282018;margin-top:0;">🎨 新版色彩系統預覽　日式溫暖・禪意</h2>
+
+<h2>主色 Primary</h2>
+<div class="row">
+  <div class="swatch">
+    <div class="swatch-color" style="background:#5C4033;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">深棕・茶色</div>
+      <div class="swatch-hex">#5C4033</div>
+      <div class="swatch-change">原 #6B4F3A（加深）</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#483226;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">深茶 Deep</div>
+      <div class="swatch-hex">#483226</div>
+      <div class="swatch-change">原 #573F2D（加深）</div>
+    </div>
+  </div>
+</div>
+
+<h2>輔助色 Secondary　黄土色系</h2>
+<div class="row">
+  <div class="swatch">
+    <div class="swatch-color" style="background:#B8A07A;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">黄土色</div>
+      <div class="swatch-hex">#B8A07A</div>
+      <div class="swatch-change">原 #C9A96E（降飽和）</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#D8C9AE;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">砂色 Soft</div>
+      <div class="swatch-hex">#D8C9AE</div>
+      <div class="swatch-change">原 #E5D0AD</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#9A7E58;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">深黄土 Deep</div>
+      <div class="swatch-hex">#9A7E58</div>
+      <div class="swatch-change">原 #9E7848</div>
+    </div>
+  </div>
+</div>
+
+<h2>背景色 Background　白磁・生成色系</h2>
+<div class="row">
+  <div class="swatch">
+    <div class="swatch-color" style="background:#FAF7F2;border:1px solid #ddd;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">白磁色</div>
+      <div class="swatch-hex">#FAF7F2</div>
+      <div class="swatch-change">原 #FDFBF8（更暖）</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#F0EAE0;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">生成色</div>
+      <div class="swatch-hex">#F0EAE0</div>
+      <div class="swatch-change">原 #F6F3EE</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#E5DDD0;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">砂底色</div>
+      <div class="swatch-hex">#E5DDD0</div>
+      <div class="swatch-change">原 #EDE8DF</div>
+    </div>
+  </div>
+</div>
+
+<h2>強調色 Accent　葡萄色（全站限用一處）</h2>
+<div class="row">
+  <div class="swatch">
+    <div class="swatch-color" style="background:#7D1E30;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">葡萄色</div>
+      <div class="swatch-hex">#7D1E30</div>
+      <div class="swatch-change">原 #B5402A（和風化）</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#5E1624;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">深葡萄 Deep</div>
+      <div class="swatch-hex">#5E1624</div>
+      <div class="swatch-change">新增</div>
+    </div>
+  </div>
+</div>
+
+<h2>文字色 Typography　墨色系</h2>
+<div class="row">
+  <div class="swatch">
+    <div class="swatch-color" style="background:#282018;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">墨色</div>
+      <div class="swatch-hex">#282018</div>
+      <div class="swatch-change">原 #2E2A26（更暖）</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#68625A;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">次文字</div>
+      <div class="swatch-hex">#68625A</div>
+      <div class="swatch-change">原 #6B6560</div>
+    </div>
+  </div>
+  <div class="swatch">
+    <div class="swatch-color" style="background:#9A948C;"></div>
+    <div class="swatch-info">
+      <div class="swatch-name">輔助文字</div>
+      <div class="swatch-hex">#9A948C</div>
+      <div class="swatch-change">原 #9E9994</div>
+    </div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<h2 style="margin-top:0;">實際應用效果模擬</h2>
+
+<div class="mock">
+  <div class="mock-title">TYPOGRAPHY & BUTTONS</div>
+  <div class="mock-text">
+    <div class="mock-h">中壢・青埔　<span class="mock-accent">公司借址登記</span></div>
+    <div class="mock-line"></div>
+    <div class="mock-sub">適合 SOHO、新創、接案工作者與 2～5 人團隊，提供公司借址登記、小型辦公室、公司設立、會計記帳與創業初期支援。</div>
+  </div>
+  <div class="mock-btns" style="margin-top:20px;">
+    <button class="btn-a">立即預約參觀 →</button>
+    <button class="btn-b">立即來電諮詢</button>
+    <button class="btn-c">緊急提示用色</button>
+  </div>
+  <div class="tag" style="margin-top:20px;">借址登記</div>
+  <div class="mock-card">
+    🔔 <strong style="color:#5C4033;">日青・青埔館</strong>｜借址登記名額所剩不多，歡迎來電洽詢目前可用方案。
+  </div>
+  <div class="mock-hours">當天營業時間　10:30 ～ 19:00</div>
+  <div class="sticky-bar">
+    <div class="s-btn s-mail">✉ 立即來信</div>
+    <div class="s-btn s-call">📞 立即來電</div>
+  </div>
+</div>
+
+</body>
+</html>
