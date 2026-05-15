@@ -85,7 +85,36 @@
   .photo-strip{grid-template-columns:1fr 1fr;}
   .about-service-list{grid-template-columns:1fr;}
 }
-
+/* ── Flip Counter ── */
+.fc-wrap{display:flex;align-items:center;justify-content:center;gap:4px;min-height:3.8rem;}
+.fc-card{perspective:300px;}
+.fc-seg{position:relative;width:2.5rem;height:3.8rem;border-radius:8px;overflow:hidden;box-shadow:0 3px 12px rgba(46,42,38,.14);}
+.fc-half{position:absolute;left:0;right:0;overflow:hidden;}
+.fc-half.top{top:0;height:50%;background:#EDE8DF;}
+.fc-half.bot{bottom:0;height:50%;background:#F0EBE3;}
+.fc-half span,.fc-flap span{position:absolute;left:0;right:0;line-height:3.8rem;text-align:center;font-family:'Noto Serif TC',serif;font-size:2rem;font-weight:700;color:var(--brand);}
+.fc-half.top span{top:0;}
+.fc-half.bot span{top:-1.9rem;}
+.fc-seg::after{content:'';position:absolute;left:0;right:0;top:calc(50% - 1px);height:2px;background:rgba(0,0,0,.16);z-index:5;pointer-events:none;}
+.fc-flap{position:absolute;left:0;right:0;height:50%;overflow:hidden;z-index:3;backface-visibility:hidden;}
+.fc-flap.top{top:0;background:#EDE8DF;transform-origin:bottom center;animation:fcT .32s ease-in forwards;}
+.fc-flap.bot{bottom:0;background:#F0EBE3;transform:rotateX(90deg);transform-origin:top center;animation:fcB .32s .3s ease-out forwards;}
+.fc-flap.top span{top:0;}
+.fc-flap.bot span{top:-1.9rem;}
+@keyframes fcT{to{transform:rotateX(-90deg)}}
+@keyframes fcB{to{transform:rotateX(0)}}
+.fc-suffix-char{font-family:'Noto Serif TC',serif;font-size:2rem;font-weight:700;color:var(--oak-deep);line-height:1;align-self:center;margin-left:2px;}
+/* ── Map Grid ── */
+.map-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+@media(max-width:768px){
+  .map-grid{grid-template-columns:1fr;gap:20px;}
+  .map-grid iframe{height:260px!important;}
+  .fc-seg{width:2.1rem;height:3.2rem;}
+  .fc-half span,.fc-flap span{font-size:1.7rem;line-height:3.2rem;}
+  .fc-half.bot span{top:-1.6rem;}
+  .fc-flap.bot span{top:-1.6rem;}
+  .fc-suffix-char{font-size:1.7rem;}
+}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":["LocalBusiness","BusinessCenter"],"name":"日日好日商務中心","alternateName":"Every Day Good Day Business Center","description":"桃園中壢商務中心，提供公司借址登記、年租共享辦公室、會計師帳務、公司設立等九項一站式創業服務","url":"https://edgd2619.com","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","postalCode":"320","addressCountry":"TW"},"openingHours":"Mo-Fr 10:30-18:00","sameAs":["https://www.facebook.com/everydaygooddaybc","https://www.instagram.com/edgd2619"],"image":"https://edgd2619.com/images/hero-bg.webp","logo":{"@type":"ImageObject","url":"https://edgd2619.com/images/logo.webp"},"priceRange":"$$","geo":{"@type":"GeoCoordinates","latitude":24.9540,"longitude":121.2237},"hasMap":"https://maps.google.com/?q=桃園市中壢區延平路261號","areaServed":["桃園市","新北市","台北市"],"aggregateRating":{"@type":"AggregateRating","ratingValue":"4.7","reviewCount":"14","bestRating":"5"},"keywords":"中壢商務中心,中壢借址登記,桃園共享辦公室,公司設立,青埔商務中心,借址營業登記"}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"中壢借址登記費用是多少？","acceptedAnswer":{"@type":"Answer","text":"日日好日商務中心的借址登記費用依方案與需求不同，歡迎直接聯絡我們取得最新報價。我們提供中壢與青埔兩館可選，每年費用清楚透明，無隱藏費用。"}},{"@type":"Question","name":"借址登記合法嗎？有沒有風險？","acceptedAnswer":{"@type":"Answer","text":"借址登記完全合法，依公司法及商業登記法規定，公司登記地址與實際辦公地點可以不同。選擇專業商務中心借址，比使用住宅地址更穩定且符合法規。"}},{"@type":"Question","name":"借址登記可以用來報稅、開立發票嗎？","acceptedAnswer":{"@type":"Answer","text":"可以。使用日日好日商務中心地址完成公司登記後，可正常用於稅務申報、開立統一發票，以及各項政府機關往來。"}},{"@type":"Question","name":"日日好日商務中心有哪些服務？","acceptedAnswer":{"@type":"Answer","text":"提供九項一站式創業服務：公司借址登記、年租共享辦公室（免費使用會議室）、公司設立登記、Logo 名片設計、會計師帳務、律師諮詢、地政士服務、裝修設計、公司命名命理。"}},{"@type":"Question","name":"桃園青埔也有商務中心嗎？","acceptedAnswer":{"@type":"Answer","text":"是的，日日好日商務中心設有中壢館與青埔館兩個據點，青埔館借址登記名額有限，歡迎儘早預約洽詢。"}}]}</script>
@@ -192,10 +221,10 @@
 <section class="section-sm">
 <div class="container">
 <div class="stats-row anim-fade">
-<div class="stat-card glass-card"><div class="stat-num">100+</div><div class="stat-lbl">服務過的客戶</div></div>
-<div class="stat-card glass-card"><div class="stat-num">4</div><div class="stat-lbl">年在地經營</div></div>
-<div class="stat-card glass-card"><div class="stat-num">9</div><div class="stat-lbl">項專業服務</div></div>
-<div class="stat-card glass-card"><div class="stat-num">1</div><div class="stat-lbl">一條龍服務</div></div>
+<div class="stat-card glass-card"><div class="stat-num fc-wrap" data-target="100" data-suffix="+"></div><div class="stat-lbl">服務過的客戶</div></div>
+<div class="stat-card glass-card"><div class="stat-num fc-wrap" data-target="4"></div><div class="stat-lbl">年在地經營</div></div>
+<div class="stat-card glass-card"><div class="stat-num fc-wrap" data-target="9"></div><div class="stat-lbl">項專業服務</div></div>
+<div class="stat-card glass-card"><div class="stat-num fc-wrap" data-target="1"></div><div class="stat-lbl">一條龍服務</div></div>
 </div>
 </div>
 </section>
@@ -286,7 +315,7 @@
 <div class="divider"></div>
 <p class="section-lead">桃園市中壢區延平路 261 號 9 樓，鄰近中壢火車站，交通便利。</p>
 </div>
-<div class="reveal" style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+<div class="reveal map-grid">
 <div style="border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-md);line-height:0;">
 <iframe src="https://maps.google.com/maps?q=桃園市中壢區延平路261號&output=embed&hl=zh-TW&z=16" width="100%" height="380" style="border:0;display:block;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="日日好日商務中心地圖位置"></iframe>
 </div>
@@ -305,7 +334,6 @@
 <a class="btn btn-primary" href="contact.html" style="width:fit-content;">預約參觀 →</a>
 </div>
 </div>
-<style>@media(max-width:768px){.map-grid{grid-template-columns:1fr!important;}}</style>
 </div>
 </section>
 <section class="section-sm" style="background:var(--off-white)">
@@ -354,6 +382,71 @@
       window.scrollTo({top:t.getBoundingClientRect().top+window.pageYOffset-88,behavior:'smooth'});
     });
   });
+  // Flip counter
+  (function(){
+    function makeSeg(d){
+      var seg=document.createElement('div');
+      seg.className='fc-seg';
+      seg.innerHTML='<div class="fc-half top"><span>'+d+'</span></div><div class="fc-half bot"><span>'+d+'</span></div>';
+      return seg;
+    }
+    function flipSeg(seg,from,to){
+      seg.querySelector('.fc-half.top span').textContent=to;
+      seg.querySelector('.fc-half.bot span').textContent=to;
+      var ft=document.createElement('div');
+      ft.className='fc-flap top';
+      ft.innerHTML='<span>'+from+'</span>';
+      var fb=document.createElement('div');
+      fb.className='fc-flap bot';
+      fb.innerHTML='<span>'+to+'</span>';
+      seg.appendChild(ft);seg.appendChild(fb);
+      setTimeout(function(){ft.remove();fb.remove();},700);
+    }
+    var wrappers=document.querySelectorAll('.fc-wrap');
+    if(!wrappers.length)return;
+    var fio=new IntersectionObserver(function(entries){
+      entries.forEach(function(en){
+        if(!en.isIntersecting)return;
+        fio.unobserve(en.target);
+        var wrap=en.target;
+        var target=parseInt(wrap.dataset.target)||0;
+        var suffix=wrap.dataset.suffix||'';
+        var dlen=String(target).length;
+        var cards=[];
+        for(var i=0;i<dlen;i++){
+          var card=document.createElement('div');
+          card.className='fc-card';
+          card.appendChild(makeSeg('0'));
+          wrap.appendChild(card);
+          cards.push(card);
+        }
+        if(suffix){
+          var s=document.createElement('span');
+          s.className='fc-suffix-char';
+          s.textContent=suffix;
+          wrap.appendChild(s);
+        }
+        var prev=0,startTs=null,dur=1800;
+        function step(ts){
+          if(!startTs)startTs=ts;
+          var p=Math.min((ts-startTs)/dur,1);
+          var ease=1-Math.pow(1-p,3);
+          var val=Math.round(ease*target);
+          if(val!==prev){
+            var str=String(val).padStart(dlen,'0');
+            var pstr=String(prev).padStart(dlen,'0');
+            str.split('').forEach(function(c,i){
+              if(c!==pstr[i])flipSeg(cards[i].querySelector('.fc-seg'),pstr[i],c);
+            });
+            prev=val;
+          }
+          if(p<1)requestAnimationFrame(step);
+        }
+        setTimeout(function(){requestAnimationFrame(step);},200);
+      });
+    },{threshold:0.5});
+    wrappers.forEach(function(w){fio.observe(w);});
+  })();
   var ro=new IntersectionObserver(function(entries){
     entries.forEach(function(en,i){
       if(en.isIntersecting){setTimeout(function(){en.target.classList.add('visible');},(i%5)*85);ro.unobserve(en.target);}
