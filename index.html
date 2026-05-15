@@ -38,18 +38,15 @@
 .hero-stats{display:flex;justify-content:flex-start;align-items:flex-end;gap:56px;flex-wrap:wrap;margin-top:52px;padding-top:32px;border-top:1px solid rgba(255,247,236,.28);}.hero-stats>div{min-width:auto;text-align:left;display:flex;align-items:baseline;gap:10px;}.hstat-n{font-family:'Noto Serif TC',serif;font-size:clamp(3rem,5.6vw,5.25rem);line-height:.88;font-weight:700;letter-spacing:-.04em;color:#f3e3c1;text-shadow:0 8px 28px rgba(0,0,0,.12);}.hstat-l{font-size:clamp(1rem,1.55vw,1.28rem);line-height:1.15;font-weight:600;letter-spacing:-.01em;color:rgba(255,248,238,.96);text-shadow:0 4px 18px rgba(0,0,0,.14);white-space:nowrap;}
 .hstat-n{font-family:'Noto Serif TC',serif;font-size:2rem;font-weight:700;color:var(--oak-soft);line-height:1;}
 .hstat-l{font-size:.9rem;color:rgba(255,248,240,.9);margin-top:8px;letter-spacing:.02em;line-height:1.45;}
-.hero-scroll{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);color:rgba(255,248,240,.42);font-size:.64rem;letter-spacing:.16em;display:flex;flex-direction:column;align-items:center;gap:6px;animation:hscroll 2.4s ease infinite;}
-.hero-scroll::after{content:'';width:1px;height:36px;background:rgba(255,248,240,.4);}
-@keyframes hscroll{0%,100%{transform:translateX(-50%) translateY(0)}55%{transform:translateX(-50%) translateY(8px)}}
-/* alert */
-.alert-banner{position:relative;overflow:hidden;padding:0;background:linear-gradient(135deg,#7a4e28 0%,#c9a96e 50%,#9e7848 100%);}
-.alert-banner::before{content:'';position:absolute;inset:0;background:url('images/hero-bg-mobile.webp') center/cover no-repeat;opacity:.13;filter:saturate(.9);}
-@media(min-width:769px){.alert-banner::before{background-image:url('images/hero-bg.webp');}}
-.alert-inner{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;text-align:center;position:relative;z-index:1;}
-.alert-glass-panel{background:rgba(255,251,244,.16);backdrop-filter:blur(24px) saturate(1.8);-webkit-backdrop-filter:blur(24px) saturate(1.8);border:1px solid rgba(255,248,235,.38);border-radius:0;box-shadow:0 8px 40px rgba(70,38,10,.25),inset 0 1px 0 rgba(255,252,240,.45);padding:38px 56px;display:flex;flex-direction:column;align-items:center;gap:22px;max-width:none;width:100%;}
-.alert-text{color:rgba(255,248,232,.96);font-size:.95rem;line-height:1.75;}
-.alert-text strong{display:block;color:#fff;font-size:clamp(1.1rem,2vw,1.45rem);margin-bottom:8px;letter-spacing:.01em;text-shadow:0 2px 14px rgba(70,38,10,.35);}
-@media(max-width:768px){.alert-glass-panel{padding:28px 22px;}}
+/* hero notice */
+.hero-notice{position:absolute;bottom:0;left:0;right:0;background:rgba(20,14,8,.32);backdrop-filter:blur(20px) saturate(1.5);-webkit-backdrop-filter:blur(20px) saturate(1.5);border-top:1px solid rgba(255,255,255,.18);padding:13px 0;z-index:4;}
+.hero-notice-inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.hero-notice-pulse{width:8px;height:8px;border-radius:50%;background:var(--oak-soft);flex-shrink:0;animation:hpulse 2s infinite;}
+.hero-notice-text{flex:1;font-size:.9rem;color:rgba(255,248,235,.9);text-shadow:0 1px 6px rgba(0,0,0,.2);min-width:0;}
+.hero-notice-text strong{color:#fff;font-weight:700;}
+.hero-notice-btn{display:inline-flex;align-items:center;padding:8px 20px;border-radius:999px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.32);color:#fff;font-size:.84rem;font-weight:700;white-space:nowrap;transition:background var(--dur),border-color var(--dur);flex-shrink:0;}
+.hero-notice-btn:hover{background:rgba(255,255,255,.24);border-color:rgba(255,255,255,.5);}
+@media(max-width:768px){.hero-notice-text{font-size:.82rem;}.hero-notice-btn{padding:7px 15px;font-size:.8rem;}}
 /* sp-prev */
 .sp-prev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 .sp-prev-card{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-xs);transition:transform var(--dur),box-shadow var(--dur);}
@@ -95,7 +92,6 @@
   .hero-btns{justify-content:flex-start;flex-direction:column;}
   .hero-btns .btn{width:100%;justify-content:center;}
   .hero-stats{justify-content:flex-start;gap:18px;padding-top:24px;margin-top:36px;}.hero-stats>div{width:100%;gap:8px;}.hstat-n{font-size:2.5rem;}.hstat-l{font-size:1rem;white-space:normal;}
-  .hero-scroll{left:50%;transform:translateX(-50%);}
   .sp-prev-grid{grid-template-columns:1fr;}
   .photo-strip{grid-template-columns:1fr 1fr;}
   .about-service-list{grid-template-columns:1fr;}
@@ -222,7 +218,6 @@
 <div aria-label="日日好日商務中心採光空間" class="hero-bg" role="img"></div>
 <div class="hero-overlay"></div>
 <div class="container hero-copy">
-<div class="hero-chip">✦ 桃園・中壢 ｜ 青埔兩館</div>
 <h1 class="hero-title">中壢・青埔<br><span class="accent">公司借址登記</span>與小型辦公室</h1>
 <p class="hero-desc">適合 SOHO、新創、接案工作者與 2～5 人團隊，提供公司借址登記、小型辦公室、公司設立、會計記帳與創業初期支援。</p>
 <div class="hero-btns">
@@ -231,19 +226,14 @@
 </div>
 <div class="hero-stats"><div><div class="hstat-n">2</div><div class="hstat-l">｜兩館：中壢＆青埔</div></div><div><div class="hstat-n">1</div><div class="hstat-l">｜壹條龍專業服務</div></div><div><div class="hstat-n">3</div><div class="hstat-l">｜三步驟立即開始</div></div></div>
 </div>
-<div aria-hidden="true" class="hero-scroll">SCROLL</div>
+<div class="hero-notice" role="alert">
+<div class="container hero-notice-inner">
+<span class="hero-notice-pulse"></span>
+<span class="hero-notice-text">🔔 <strong>日青・青埔館</strong>｜借址登記名額所剩不多，把握機會！</span>
+<a class="hero-notice-btn" href="contact.html">立即洽詢 →</a>
+</div>
+</div>
 </section>
-<div class="alert-banner" role="alert">
-<div class="container alert-inner">
-<div class="alert-glass-panel">
-<div class="alert-text">
-<strong>🔔 日青・青埔館｜借址登記名額所剩不多！</strong>
-<span>青埔館公司借址營業登記，名額有限，把握機會！</span>
-</div>
-<a class="btn btn-ghost-white" href="contact.html" style="font-size:.95rem;padding:13px 32px;">立即與我們聯絡</a>
-</div>
-</div>
-</div>
 <section class="section" style="background:var(--off-white)">
 <div class="container">
 <div class="about-grid">
@@ -487,7 +477,7 @@
 </div>
 </div>
 <div class="text-center reveal" style="margin-top:40px;">
-<a href="https://g.page/r/CbihQ4bp6tRaEAI/review" target="_blank" rel="noopener" class="btn btn-outline-dark">在 Google 留下評論 ★</a>
+<a href="https://maps.google.com/?q=日日好日商務中心+桃園市中壢區延平路261號9樓" target="_blank" rel="noopener" class="btn btn-outline-dark">在 Google Maps 查看我們 ★</a>
 </div>
 </div>
 </section>
