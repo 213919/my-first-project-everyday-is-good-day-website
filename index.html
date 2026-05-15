@@ -49,12 +49,13 @@
 .hero-title .accent{color:var(--brand);}
 .hero-line{width:28px;height:2px;background:var(--oak);margin-bottom:18px;}
 .hero-btns .btn{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
-.btn-outline-warm{background:transparent;color:#6A584D;border-color:#8E7763;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.btn-outline-warm{background:transparent;color:#6A584D;border-color:#8E7763;border-radius:12px;}
 .btn-outline-warm:hover{background:rgba(142,119,99,.08);}
-.btn-solid-warm{background:#6A584D;color:#F7F3EE;border-color:#6A584D;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.btn-solid-warm{background:#6A584D;color:#F7F3EE;border-color:#6A584D;border-radius:12px;}
 .btn-solid-warm:hover{background:#574840;border-color:#574840;}
-.hero-desc{font-size:clamp(.98rem,1.4vw,1.06rem);color:var(--text-sub);max-width:38em;line-height:1.8;margin-bottom:32px;}
-.hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
+.btn-ico{font-size:.85rem;opacity:.75;}
+.hero-desc{font-size:clamp(.98rem,1.4vw,1.06rem);color:var(--text-sub);max-width:38em;line-height:1.8;margin-bottom:28px;}
+.hero-btns{display:flex;gap:12px;flex-wrap:wrap;}
 .hero-notice-inline{display:flex;align-items:center;gap:10px;margin-top:28px;padding:14px 20px;border-radius:var(--radius);background:rgba(142,119,99,.12);border:1px solid rgba(142,119,99,.38);font-size:.9rem;color:var(--text-sub);line-height:1.65;}
 .hero-notice-inline strong{color:var(--brand);}
 .hero-notice-inline a{color:var(--oak-deep);font-weight:700;text-decoration:underline;text-underline-offset:3px;}
@@ -97,14 +98,13 @@
 .stat-card.stat-feature .stat-num,.stat-card.stat-feature .stat-lbl,.stat-card.glass-card .stat-num,.stat-card.glass-card .stat-lbl{color:inherit !important;-webkit-text-fill-color:inherit !important;}
 @media(max-width:768px){
   :root{--hours-h:28px;}
-  .hs-wrap{height:28svh;max-height:none;min-height:150px;}
+  .hs-wrap{height:44svh;max-height:none;min-height:180px;}
   .hs-btn{display:none;}
-  .hs-btn{width:38px;height:38px;font-size:1.2rem;}
-  .hero-content-wrap{padding:32px 0 36px;}
+  .hero-content-wrap{padding:32px 0 40px;}
   .hero-title{font-size:clamp(1.72rem,7.2vw,2.1rem);line-height:1.38;margin-bottom:18px;}
-  .hero-desc{margin-bottom:26px;line-height:1.95;}
-  .hero-btns{flex-direction:column;gap:12px;}
-  .hero-btns .btn{width:100%;justify-content:center;padding:15px 30px;}
+  .hero-desc{margin-bottom:24px;line-height:1.95;}
+  .hero-btns{flex-direction:row;gap:10px;}
+  .hero-btns .btn{flex:1;justify-content:center;padding:14px 12px;font-size:.88rem;}
   .hero-notice-inline{margin-top:20px;font-size:.87rem;}
   .hero-stats{display:none;}
   .sp-prev-grid{grid-template-columns:1fr;}
@@ -247,6 +247,10 @@
 <div class="hero-line"></div>
 <h1 class="hero-title">中壢・青埔<br><span class="accent">公司借址登記</span><br>獨立辦公室</h1>
 <p class="hero-desc">適合 SOHO、新創、接案工作者與 2～5 人團隊，提供公司借址登記、小型辦公室、公司設立、會計記帳與創業初期支援。</p>
+<div class="hero-btns">
+<a class="btn btn-outline-warm" href="mailto:edgd2619@gmail.com"><span class="btn-ico">✉</span>來信詢問</a>
+<a class="btn btn-solid-warm" href="tel:032759489"><span class="btn-ico">✆</span>電話洽詢</a>
+</div>
 <div class="hero-notice-inline">🔔 <strong>日青・青埔館</strong>｜借址登記名額所剩不多，把握機會！<a href="contact.html">立即洽詢 →</a></div>
 </div>
 </div>
