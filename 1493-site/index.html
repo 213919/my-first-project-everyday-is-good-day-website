@@ -54,34 +54,37 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* ── 固定背景，完全覆蓋，不留深色邊緣 ── */
-    html, body { min-height: 100%; }
+    html, body {
+      width: 100%;
+      min-height: 100%;
+    }
 
     body {
       font-family: 'Noto Sans TC', sans-serif;
-      background: #1a2a1e;
+      background: #2a3d2e;
       display: flex;
       justify-content: center;
       min-height: 100vh;
-      position: relative;
     }
 
-    /* 背景圖：固定在視窗，永遠填滿 */
-    body::before {
-      content: '';
+    /* 背景圖：用實體 div，iOS Safari 最可靠 */
+    .bg-img {
       position: fixed;
-      inset: 0;
-      background-image: url('images/background.jpg');
-      background-size: cover;
-      background-position: center top;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: url('images/background.jpg') center center / cover no-repeat;
       z-index: 0;
     }
 
     /* 淡暗遮罩 */
-    body::after {
-      content: '';
+    .bg-overlay {
       position: fixed;
-      inset: 0;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
       background: rgba(8, 12, 8, 0.18);
       z-index: 1;
     }
@@ -422,6 +425,10 @@
   </style>
 </head>
 <body>
+<!-- 背景圖層（實體 div，iOS Safari 相容）-->
+<div class="bg-img" aria-hidden="true"></div>
+<div class="bg-overlay" aria-hidden="true"></div>
+
 <div class="page">
 
   <!-- Logo -->
