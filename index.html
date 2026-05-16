@@ -53,9 +53,13 @@
 .btn-solid-warm:hover{background:#574840;border-color:#574840;}
 .hero-desc{font-size:clamp(.98rem,1.4vw,1.06rem);color:var(--text-sub);max-width:38em;line-height:2;margin-bottom:36px;}
 .hero-btns{display:flex;gap:14px;flex-wrap:wrap;}
-.hero-notice-inline{display:flex;align-items:center;gap:10px;margin-top:28px;padding:14px 20px;border-radius:var(--radius);background:rgba(142,119,99,.12);border:1px solid rgba(142,119,99,.38);font-size:.9rem;color:var(--text-sub);line-height:1.65;}
-.hero-notice-inline strong{color:var(--brand);}
-.hero-notice-inline a{color:var(--oak-deep);font-weight:700;text-decoration:underline;text-underline-offset:3px;}
+.hero-notice-inline{display:flex;align-items:center;gap:12px;margin-top:28px;padding:14px 16px 14px 18px;border-radius:var(--radius);background:rgba(142,119,99,.12);border:1px solid rgba(142,119,99,.38);font-size:.9rem;color:var(--text-sub);line-height:1.5;}
+.hni-bell{font-size:1.1rem;flex-shrink:0;line-height:1;}
+.hni-body{display:flex;flex-direction:column;gap:2px;flex:1;}
+.hni-body strong{color:var(--brand);font-size:.91rem;}
+.hni-sub{font-size:.85rem;color:var(--text-sub);}
+.hni-btn{flex-shrink:0;display:inline-flex;align-items:center;padding:8px 16px;border-radius:999px;background:#F7F3EE;border:1px solid #C8B8A8;color:var(--brand);font-size:.83rem;font-weight:700;letter-spacing:.03em;white-space:nowrap;transition:background .2s,border-color .2s;}
+.hni-btn:hover{background:#EFE8DE;border-color:#A89078;}
 /* sp-prev */
 .sp-prev-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
 .sp-prev-card{border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);box-shadow:var(--shadow-xs);transition:transform var(--dur),box-shadow var(--dur);}
@@ -244,7 +248,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--oak);outline-offset
 <div class="hero-line"></div>
 <h1 class="hero-title">中壢・青埔<br><span class="accent">公司借址登記</span><br>獨立辦公室</h1>
 <p class="hero-desc">適合 SOHO、新創、接案工作者與 2～5 人團隊，提供公司借址登記、小型辦公室、公司設立、會計記帳與創業初期支援。</p>
-<div class="hero-notice-inline">🔔 <strong>日青・青埔館</strong>｜借址登記名額所剩不多，把握機會！<a href="contact.html">立即洽詢 →</a></div>
+<div class="hero-notice-inline">
+  <span class="hni-bell">🔔</span>
+  <span class="hni-body">
+    <strong>日青・青埔館</strong>
+    <span class="hni-sub">借址登記名額所剩不多，把握機會！</span>
+  </span>
+  <a href="contact.html" class="hni-btn">立即洽詢 →</a>
+</div>
 </div>
 </div>
 </section>
