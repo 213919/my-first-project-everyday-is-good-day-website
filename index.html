@@ -185,6 +185,8 @@
 .hp-faq-item{background:rgba(255,255,255,.68);backdrop-filter:blur(12px) saturate(1.3);-webkit-backdrop-filter:blur(12px) saturate(1.3);border:1px solid rgba(255,255,255,.82);border-radius:var(--radius);overflow:hidden;margin-bottom:10px;box-shadow:0 4px 16px rgba(46,42,38,.06),inset 0 1px 0 rgba(255,255,255,.9);}
 .hp-faq-q{width:100%;text-align:left;padding:18px 22px;font-size:.97rem;font-weight:700;color:var(--brand);background:rgba(255,255,255,.85);display:flex;justify-content:space-between;align-items:center;gap:16px;cursor:pointer;transition:background var(--dur);}
 .hp-faq-q:hover{background:var(--off-white);}
+.hp-faq-q:focus-visible{outline:2px solid var(--oak);outline-offset:2px;}
+a:focus-visible,button:focus-visible{outline:2px solid var(--oak);outline-offset:3px;border-radius:4px;}
 .hp-faq-icon{flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--gray);display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:transform .28s var(--ease);}
 .hp-faq-a{max-height:0;overflow:hidden;transition:max-height .38s cubic-bezier(.22,.61,.36,1);}
 .hp-faq-a.open{max-height:300px;}
@@ -255,7 +257,7 @@
 <div class="container">
 <div class="about-grid">
 <div class="about-img-wrap anim-left">
-<img alt="日日好日商務中心入口展示牆" loading="lazy" src="images/about-entrance.webp"/ width="900" height="600"/>
+<img alt="日日好日商務中心入口展示牆" loading="lazy" src="images/about-entrance.webp" width="900" height="600"/>
 <div class="about-badge glass">
 <span class="b-ico">📍</span>
 <div><strong>桃園市中壢區延平路 261 號</strong><span>9 樓・週一至週五 10:30–19:00</span></div>
@@ -406,23 +408,23 @@
 </div>
 <div class="sp-prev-grid">
 <div class="sp-prev-card reveal">
-<div class="sp-prev-img"><img alt="日日好日商務中心會議室" loading="lazy" src="images/meeting-room.webp"/ width="1100" height="733"/></div>
+<div class="sp-prev-img"><img alt="日日好日商務中心會議室" loading="lazy" src="images/meeting-room.webp" width="1100" height="733"/></div>
 <div class="sp-prev-body"><h3>🆓 會議室（辦公室租客免費使用）</h3><p>4～6 人會議室，配有大螢幕、白板筆、彈性空間，僅供辦公室租客使用，無對外開放。</p></div>
 </div>
 <div class="sp-prev-card reveal reveal-delay-1">
-<div class="sp-prev-img"><img alt="日日好日商務中心公共休憩區" loading="lazy" src="images/meeting-room-1.webp"/ width="1100" height="733"/></div>
+<div class="sp-prev-img"><img alt="日日好日商務中心公共休憩區" loading="lazy" src="images/meeting-room-1.webp" width="1100" height="733"/></div>
 <div class="sp-prev-body"><h3>採光公共休憩區</h3><p>落地玻璃窗引入自然光線，可俯瞰中壢城市景觀，是工作之餘放鬆休息的最佳角落。</p></div>
 </div>
 <div class="sp-prev-card reveal reveal-delay-2">
-<div class="sp-prev-img"><img alt="日日好日商務中心年租辦公室" loading="lazy" src="images/lounge.webp"/ width="900" height="600"/></div>
+<div class="sp-prev-img"><img alt="日日好日商務中心年租辦公室" loading="lazy" src="images/lounge.webp" width="900" height="600"/></div>
 <div class="sp-prev-body"><h3>2～5 人辦公室</h3><p>多種尺寸獨立辦公室，日式溫暖木質設計，採年租制讓您安心規劃長期業務發展。</p></div>
 </div>
 </div>
 <div class="photo-strip reveal" style="margin-top:20px;">
-<div class="photo-strip-item"><img alt="入口展示牆" loading="lazy" src="images/about-entrance.webp"/ width="900" height="600"/></div>
-<div class="photo-strip-item"><img alt="日日好日品牌文化" loading="lazy" src="images/brand-culture.webp"/ width="700" height="467"/></div>
-<div class="photo-strip-item"><img alt="採光辦公室" loading="lazy" src="images/bright-office.webp"/ width="1100" height="733"/></div>
-<div class="photo-strip-item"><img alt="接待區展示" loading="lazy" src="images/reception.webp"/ width="1100" height="733"/></div>
+<div class="photo-strip-item"><img alt="入口展示牆" loading="lazy" src="images/about-entrance.webp" width="900" height="600"/></div>
+<div class="photo-strip-item"><img alt="日日好日品牌文化" loading="lazy" src="images/brand-culture.webp" width="700" height="467"/></div>
+<div class="photo-strip-item"><img alt="採光辦公室" loading="lazy" src="images/bright-office.webp" width="1100" height="733"/></div>
+<div class="photo-strip-item"><img alt="接待區展示" loading="lazy" src="images/reception.webp" width="1100" height="733"/></div>
 </div>
 <div class="text-center reveal" style="margin-top:36px;">
 <a class="btn btn-primary" href="space.html">參觀完整環境 →</a>
@@ -507,36 +509,36 @@
 </div>
 <div class="reveal">
 <div class="hp-faq-item">
-<button class="hp-faq-q">借址登記是否合法？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>完全合法。依公司法及商業登記法規定，公司登記地址與實際辦公地點可以不同。選擇合法商務中心借址，是許多創業者的常見做法，受法規保障。</p></div>
+<button class="hp-faq-q" aria-expanded="false">借址登記是否合法？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>完全合法。依公司法及商業登記法規定，公司登記地址與實際辦公地點可以不同。選擇合法商務中心借址，是許多創業者的常見做法，受法規保障。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">可以用日日好日地址登記公司嗎？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>可以。日日好日商務中心提供中壢館與青埔館兩個地址供選擇，皆可作為公司或行號的登記地址，並提供地址使用授權書供公司設立使用。</p></div>
+<button class="hp-faq-q" aria-expanded="false">可以用日日好日地址登記公司嗎？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>可以。日日好日商務中心提供中壢館與青埔館兩個地址供選擇，皆可作為公司或行號的登記地址，並提供地址使用授權書供公司設立使用。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">青埔館目前還有名額嗎？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>青埔館名額有限，建議直接來信（edgd2619@gmail.com）或來電（03-275-9489）確認目前是否仍有借址登記名額，以免向隅。</p></div>
+<button class="hp-faq-q" aria-expanded="false">青埔館目前還有名額嗎？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>青埔館名額有限，建議直接來信（edgd2619@gmail.com）或來電（03-275-9489）確認目前是否仍有借址登記名額，以免向隅。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">借址登記可以收信嗎？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>可以。日日好日提供公文與郵件代收服務，收到信件後會立即以電話或通訊軟體通知您，您可親自取件或安排轉寄。</p></div>
+<button class="hp-faq-q" aria-expanded="false">借址登記可以收信嗎？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>可以。日日好日提供公文與郵件代收服務，收到信件後會立即以電話或通訊軟體通知您，您可親自取件或安排轉寄。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">公司設立需要準備哪些資料？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>基本上需要準備：負責人身分證、公司名稱（建議準備 2～3 個備選）、資本額規劃、股東資料（若有）。我們可協助您確認流程與所需文件，歡迎來電或來信詢問。</p></div>
+<button class="hp-faq-q" aria-expanded="false">公司設立需要準備哪些資料？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>基本上需要準備：負責人身分證、公司名稱（建議準備 2～3 個備選）、資本額規劃、股東資料（若有）。我們可協助您確認流程與所需文件，歡迎來電或來信詢問。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">是否可以搭配會計記帳？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>可以。日日好日提供會計師帳務服務，借址登記客戶可同步安排記帳服務，不需要另外找會計師，一站式整合更方便。</p></div>
+<button class="hp-faq-q" aria-expanded="false">是否可以搭配會計記帳？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>可以。日日好日提供會計師帳務服務，借址登記客戶可同步安排記帳服務，不需要另外找會計師，一站式整合更方便。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">小型辦公室適合幾人使用？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>中壢館提供 2～5 人的獨立辦公室方案，適合小型工作室或初期團隊。空間溫暖採光好，並附設免費會議室供辦公室租客使用。</p></div>
+<button class="hp-faq-q" aria-expanded="false">小型辦公室適合幾人使用？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>中壢館提供 2～5 人的獨立辦公室方案，適合小型工作室或初期團隊。空間溫暖採光好，並附設免費會議室供辦公室租客使用。</p></div>
 </div>
 <div class="hp-faq-item">
-<button class="hp-faq-q">可以先參觀再決定嗎？<span class="hp-faq-icon">＋</span></button>
-<div class="hp-faq-a"><p>當然可以！歡迎先預約參觀中壢館，實際感受空間與環境，無任何壓力，再決定是否進一步洽談方案。請來電 03-275-9489 或填寫聯絡表單預約時間。</p></div>
+<button class="hp-faq-q" aria-expanded="false">可以先參觀再決定嗎？<span class="hp-faq-icon" aria-hidden="true">＋</span></button>
+<div class="hp-faq-a" role="region"><p>當然可以！歡迎先預約參觀中壢館，實際感受空間與環境，無任何壓力，再決定是否進一步洽談方案。請來電 03-275-9489 或填寫聯絡表單預約時間。</p></div>
 </div>
 </div>
 </div>
@@ -694,8 +696,9 @@
   document.querySelectorAll('.hp-faq-q').forEach(function(btn){
     btn.addEventListener('click',function(){
       var ans=btn.nextElementSibling;
-      btn.classList.toggle('open');
+      var isOpen=btn.classList.toggle('open');
       ans.classList.toggle('open');
+      btn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
     });
   });
 })();
