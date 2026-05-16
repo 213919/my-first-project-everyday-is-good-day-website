@@ -36,7 +36,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 
-  <!-- JSON-LD Structured Data -->
+  <!-- JSON-LD -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -54,38 +54,50 @@
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+    /* ── 固定背景，完全覆蓋，不留深色邊緣 ── */
+    html, body { min-height: 100%; }
+
     body {
       font-family: 'Noto Sans TC', sans-serif;
-      background-color: #1c2e22;
-      background-image: url('images/background.jpg');
-      background-size: cover;
-      background-position: center top;
-      background-attachment: scroll;
+      background: #1a2a1e;
       display: flex;
       justify-content: center;
       min-height: 100vh;
+      position: relative;
     }
 
+    /* 背景圖：固定在視窗，永遠填滿 */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
-      background: rgba(8, 14, 8, 0.20);
+      background-image: url('images/background.jpg');
+      background-size: cover;
+      background-position: center top;
       z-index: 0;
+    }
+
+    /* 淡暗遮罩 */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 12, 8, 0.18);
+      z-index: 1;
     }
 
     .page {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       width: 100%;
       max-width: 480px;
-      padding: 40px 18px 70px;
+      padding: 44px 18px 0;
       text-align: center;
     }
 
     /* ── Logo ── */
     .logo-wrap {
-      margin-bottom: 12px;
+      margin-bottom: 14px;
       animation: fadeDown 0.9s ease both;
     }
 
@@ -96,7 +108,7 @@
       object-fit: cover;
       box-shadow:
         0 0 28px rgba(100, 200, 150, 0.55),
-        0 0 60px rgba(100, 180, 140, 0.20);
+        0 0 56px rgba(100, 180, 140, 0.18);
       animation: float 4s ease-in-out infinite 1s;
     }
 
@@ -106,74 +118,39 @@
       font-weight: 700;
       color: #fff;
       letter-spacing: 2px;
-      margin-bottom: 7px;
-      text-shadow: 0 2px 14px rgba(0,0,0,0.5);
+      margin-bottom: 8px;
+      text-shadow: 0 2px 14px rgba(0,0,0,0.55);
       animation: fadeIn 0.8s ease 0.3s both;
     }
 
     .site-desc {
       font-size: 14px;
       color: rgba(255,255,255,0.95);
-      line-height: 1.75;
+      line-height: 1.8;
       margin-bottom: 4px;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.45);
+      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
       animation: fadeIn 0.8s ease 0.45s both;
     }
 
     .site-desc-en {
       font-size: 11px;
-      color: rgba(255,255,255,0.68);
+      color: rgba(255,255,255,0.65);
       font-style: italic;
       line-height: 1.6;
-      margin-bottom: 16px;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.35);
+      margin-bottom: 22px;
+      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
       animation: fadeIn 0.8s ease 0.6s both;
     }
 
-    /* ── Social Icons (liquid glass circles) ── */
-    .socials {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-bottom: 18px;
-      animation: fadeIn 0.8s ease 0.75s both;
-    }
-
-    .socials a {
-      width: 42px;
-      height: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,0.90);
-      font-size: 18px;
-      text-decoration: none;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.10);
-      backdrop-filter: blur(16px) saturate(180%);
-      -webkit-backdrop-filter: blur(16px) saturate(180%);
-      border: 1px solid rgba(255,255,255,0.25);
-      box-shadow:
-        0 4px 16px rgba(0,0,0,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.30);
-      transition: all 0.25s ease;
-    }
-
-    .socials a:hover {
-      color: #fff;
-      background: rgba(255,255,255,0.20);
-      transform: scale(1.15) translateY(-2px);
-    }
-
-    /* ── CTA Button (liquid glass) ── */
+    /* ── CTA Button ── */
     .cta-btn {
       display: block;
       width: 100%;
       padding: 17px 24px;
-      background: rgba(255,255,255,0.10);
-      backdrop-filter: blur(24px) saturate(200%);
-      -webkit-backdrop-filter: blur(24px) saturate(200%);
-      border: 1.5px solid rgba(255,255,255,0.38);
+      background: rgba(255,255,255,0.07);
+      backdrop-filter: blur(28px) saturate(150%);
+      -webkit-backdrop-filter: blur(28px) saturate(150%);
+      border: 1px solid rgba(255,255,255,0.32);
       border-radius: 50px;
       color: #fff;
       text-decoration: none;
@@ -182,24 +159,24 @@
       letter-spacing: 2px;
       margin-bottom: 14px;
       box-shadow:
-        0 8px 32px rgba(0,0,0,0.20),
-        inset 0 1.5px 0 rgba(255,255,255,0.32),
-        inset 0 -1px 0 rgba(255,255,255,0.08);
-      text-shadow: 0 1px 6px rgba(0,0,0,0.30);
+        0 8px 32px rgba(0,0,0,0.18),
+        inset 0 1.5px 0 rgba(255,255,255,0.28),
+        inset 0 -1px 0 rgba(255,255,255,0.06);
+      text-shadow: 0 1px 6px rgba(0,0,0,0.3);
       transition: all 0.3s ease;
-      animation: slideUp 0.7s ease 0.5s both;
+      animation: slideUp 0.7s ease 0.4s both;
     }
 
     .cta-btn:hover {
-      background: rgba(255,255,255,0.17);
-      border-color: rgba(255,255,255,0.58);
+      background: rgba(255,255,255,0.14);
+      border-color: rgba(255,255,255,0.50);
       transform: translateY(-3px);
       box-shadow:
-        0 14px 40px rgba(0,0,0,0.28),
-        inset 0 1.5px 0 rgba(255,255,255,0.42);
+        0 14px 40px rgba(0,0,0,0.24),
+        inset 0 1.5px 0 rgba(255,255,255,0.38);
     }
 
-    /* ── Holographic Card ── */
+    /* ── Holographic Card（放慢，不閃爍）── */
     .holo-card {
       position: relative;
       border-radius: 20px;
@@ -207,10 +184,10 @@
       margin-bottom: 14px;
       text-align: left;
       overflow: hidden;
-      animation: slideUp 0.7s ease 0.65s both;
+      animation: slideUp 0.7s ease 0.55s both;
     }
 
-    /* Rainbow layer */
+    /* 彩虹層：20s 緩慢移動 */
     .holo-card::before {
       content: '';
       position: absolute;
@@ -218,39 +195,37 @@
       background: linear-gradient(
         125deg,
         rgba(255,255,255,0.97) 0%,
-        rgba(215,225,255,0.90) 10%,
-        rgba(190,225,255,0.86) 20%,
-        rgba(255,255,255,0.94) 28%,
-        rgba(215,190,255,0.86) 36%,
-        rgba(255,210,240,0.84) 44%,
-        rgba(255,255,255,0.95) 52%,
-        rgba(190,255,225,0.87) 60%,
-        rgba(235,215,255,0.84) 68%,
-        rgba(255,255,255,0.94) 76%,
-        rgba(205,230,255,0.88) 85%,
-        rgba(255,235,190,0.86) 93%,
+        rgba(215,225,255,0.90) 12%,
+        rgba(190,225,255,0.86) 24%,
+        rgba(255,255,255,0.94) 34%,
+        rgba(215,190,255,0.86) 44%,
+        rgba(255,210,240,0.84) 54%,
+        rgba(255,255,255,0.95) 62%,
+        rgba(190,255,225,0.87) 72%,
+        rgba(235,215,255,0.84) 82%,
+        rgba(255,235,190,0.86) 92%,
         rgba(255,255,255,0.97) 100%
       );
       background-size: 400% 400%;
-      animation: holoShift 7s ease infinite;
+      animation: holoShift 20s ease infinite;
       z-index: 0;
     }
 
-    /* Silver shimmer layer */
+    /* 銀色光：8s 緩慢掃過一次 */
     .holo-card::after {
       content: '';
       position: absolute;
       inset: 0;
       background: linear-gradient(
         108deg,
-        transparent 25%,
-        rgba(255,255,255,0.40) 42%,
-        rgba(210,218,255,0.28) 50%,
-        rgba(255,255,255,0.40) 58%,
-        transparent 75%
+        transparent 20%,
+        rgba(255,255,255,0.32) 40%,
+        rgba(218,224,255,0.22) 50%,
+        rgba(255,255,255,0.32) 60%,
+        transparent 80%
       );
-      background-size: 200% 100%;
-      animation: silverShimmer 3.5s ease-in-out infinite;
+      background-size: 250% 100%;
+      animation: silverShimmer 8s ease-in-out infinite;
       z-index: 1;
       pointer-events: none;
     }
@@ -277,64 +252,63 @@
       line-height: 1.6;
     }
 
-    .service-item h3 .price {
-      white-space: nowrap;
-    }
+    .service-item h3 .price { white-space: nowrap; }
 
     .service-item p {
       font-size: 12px;
       color: #28283c;
-      line-height: 1.8;
+      line-height: 1.85;
     }
 
-    /* ── Link Buttons (liquid glass) ── */
+    /* ── Link Buttons（更透明、更流動）── */
     .links {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      margin-bottom: 40px;
+      margin-bottom: 0;
     }
 
     .link-btn {
       display: flex;
       align-items: center;
       padding: 13px 16px;
-      background: rgba(255,255,255,0.10);
-      backdrop-filter: blur(24px) saturate(200%);
-      -webkit-backdrop-filter: blur(24px) saturate(200%);
-      border: 1px solid rgba(255,255,255,0.22);
+      /* 降低不透明度讓背景透出來 */
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(28px) saturate(140%);
+      -webkit-backdrop-filter: blur(28px) saturate(140%);
+      border: 1px solid rgba(255,255,255,0.20);
       border-radius: 50px;
       color: #fff;
       text-decoration: none;
       box-shadow:
-        0 6px 24px rgba(0,0,0,0.16),
-        inset 0 1.5px 0 rgba(255,255,255,0.28),
-        inset 0 -1px 0 rgba(255,255,255,0.06);
+        0 4px 20px rgba(0,0,0,0.12),
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        inset 0 -1px 0 rgba(255,255,255,0.05);
       transition: all 0.3s ease;
     }
 
     .link-btn:hover {
-      background: rgba(255,255,255,0.18);
-      border-color: rgba(255,255,255,0.38);
+      background: rgba(255,255,255,0.13);
+      border-color: rgba(255,255,255,0.35);
       transform: translateY(-2px);
       box-shadow:
-        0 10px 32px rgba(0,0,0,0.22),
-        inset 0 1.5px 0 rgba(255,255,255,0.38);
+        0 10px 30px rgba(0,0,0,0.18),
+        inset 0 1px 0 rgba(255,255,255,0.32);
     }
 
-    /* Icon box: liquid glass with green tint */
+    /* Icon box：玻璃感，帶綠色暈染 */
     .link-btn .icon-box {
       width: 40px;
       height: 40px;
       background: linear-gradient(
         145deg,
-        rgba(130,195,160,0.45) 0%,
-        rgba(80,150,115,0.30) 50%,
-        rgba(100,170,140,0.40) 100%
+        rgba(140,210,170,0.30) 0%,
+        rgba(80,155,115,0.18) 60%,
+        rgba(110,180,145,0.28) 100%
       );
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.32);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.28);
       border-radius: 12px;
       display: flex;
       align-items: center;
@@ -343,22 +317,19 @@
       font-size: 16px;
       flex-shrink: 0;
       box-shadow:
-        inset 0 1.5px 0 rgba(255,255,255,0.50),
-        inset 0 -1px 0 rgba(0,0,0,0.10),
-        0 2px 8px rgba(0,0,0,0.16);
+        inset 0 1.5px 0 rgba(255,255,255,0.45),
+        inset 0 -1px 0 rgba(0,0,0,0.08),
+        0 2px 8px rgba(0,0,0,0.12);
       transition: all 0.3s ease;
     }
 
     .link-btn:hover .icon-box {
       background: linear-gradient(
         145deg,
-        rgba(150,215,178,0.55) 0%,
-        rgba(100,170,135,0.40) 50%,
-        rgba(120,190,158,0.50) 100%
+        rgba(160,225,185,0.40) 0%,
+        rgba(100,170,130,0.26) 60%,
+        rgba(130,198,160,0.36) 100%
       );
-      box-shadow:
-        inset 0 1.5px 0 rgba(255,255,255,0.60),
-        0 4px 14px rgba(0,0,0,0.18);
     }
 
     .link-btn .btn-label {
@@ -368,33 +339,56 @@
       font-weight: 500;
       letter-spacing: 0.8px;
       margin-right: 40px;
-      text-shadow: 0 1px 5px rgba(0,0,0,0.28);
+      text-shadow: 0 1px 5px rgba(0,0,0,0.3);
     }
 
-    .link-btn:nth-child(1) { animation: slideUp 0.6s ease 0.80s both; }
-    .link-btn:nth-child(2) { animation: slideUp 0.6s ease 0.90s both; }
-    .link-btn:nth-child(3) { animation: slideUp 0.6s ease 1.00s both; }
-    .link-btn:nth-child(4) { animation: slideUp 0.6s ease 1.10s both; }
-    .link-btn:nth-child(5) { animation: slideUp 0.6s ease 1.20s both; }
+    .link-btn:nth-child(1) { animation: slideUp 0.6s ease 0.70s both; }
+    .link-btn:nth-child(2) { animation: slideUp 0.6s ease 0.80s both; }
+    .link-btn:nth-child(3) { animation: slideUp 0.6s ease 0.90s both; }
+    .link-btn:nth-child(4) { animation: slideUp 0.6s ease 1.00s both; }
+    .link-btn:nth-child(5) { animation: slideUp 0.6s ease 1.10s both; }
 
-    /* ── Footer Quote ── */
+    /* ── 品牌標語（漸層遮罩底部）── */
+    .quote-section {
+      position: relative;
+      margin-top: 10px;
+      padding: 50px 20px 60px;
+    }
+
+    /* 漸層黑色遮罩從上到下 */
+    .quote-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(0,0,0,0.30) 30%,
+        rgba(0,0,0,0.55) 100%
+      );
+      border-radius: 0;
+      z-index: 0;
+    }
+
     .quote {
-      color: rgba(255,255,255,0.85);
-      font-size: 13.5px;
-      line-height: 2.3;
-      animation: fadeIn 1s ease 1.3s both;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.35);
+      position: relative;
+      z-index: 1;
+      color: rgba(255,255,255,0.95);
+      font-size: 14px;
+      line-height: 2.4;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.6);
     }
 
     .quote .en-quote {
-      margin-top: 12px;
+      margin-top: 14px;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 2.5px;
-      color: rgba(255,255,255,0.92);
+      color: #fff;
+      text-shadow: 0 1px 12px rgba(0,0,0,0.7);
     }
 
-    /* ── Animations ── */
+    /* ── Keyframes ── */
     @keyframes fadeIn {
       from { opacity: 0; }
       to   { opacity: 1; }
@@ -422,8 +416,8 @@
     }
 
     @keyframes silverShimmer {
-      0%   { background-position: 200% 0%; }
-      100% { background-position: -200% 0%; }
+      0%   { background-position: 250% 0%; }
+      100% { background-position: -250% 0%; }
     }
   </style>
 </head>
@@ -439,13 +433,6 @@
   <h1 class="site-title">1493仁昇設計塔羅森林</h1>
   <p class="site-desc">潛意識 塔羅占卜｜擴大療癒法｜催眠療癒</p>
   <p class="site-desc-en">Unconscious TAROT x Magnified Healing® x Relaxation Hypnosis</p>
-
-  <!-- Social Icons -->
-  <div class="socials">
-    <a href="#" aria-label="網站"><i class="fa-solid fa-globe"></i></a>
-    <a href="https://www.instagram.com/1493nco" target="_blank" rel="noopener" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-    <a href="https://www.facebook.com/x7fengtarot" target="_blank" rel="noopener" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-  </div>
 
   <!-- CTA -->
   <a href="https://reurl.cc/aMmk93" target="_blank" rel="noopener" class="cta-btn">🔮 1493 線上預約表單 ✡️</a>
@@ -498,12 +485,14 @@
     </a>
   </div>
 
-  <!-- Footer Quote -->
-  <div class="quote">
-    <p>當你所知道的科學知識與真實人生起了衝突</p>
-    <p>這時你所知的一切都遠比不上</p>
-    <p>單純為一個靈魂著想的體貼 ☕️</p>
-    <p class="en-quote">BE A LIGHT UNTO YOURSELF .</p>
+  <!-- 品牌標語（漸層遮罩）-->
+  <div class="quote-section">
+    <div class="quote">
+      <p>當你所知道的科學知識與真實人生起了衝突</p>
+      <p>這時你所知的一切都遠比不上</p>
+      <p>單純為一個靈魂著想的體貼 ☕️</p>
+      <p class="en-quote">BE A LIGHT UNTO YOURSELF .</p>
+    </div>
   </div>
 
 </div>
