@@ -25,13 +25,14 @@
   <meta name="twitter:description" content="潛意識塔羅占卜・擴大療癒法®・催眠療癒">
   <meta name="twitter:image" content="images/1493-logo.png">
 
-  <!-- 效能：只 preconnect 字體，移除 FA CDN -->
+  <!-- 效能：only preconnect fonts, removed FA CDN -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <!-- Logo 優先載入 -->
-  <link rel="preload" as="image" href="images/1493-logo.png">
-  <!-- 只載 400+700，display=optional 不阻塞渲染 -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=optional" rel="stylesheet">
+  <!-- Logo 優先載入 (WebP; 不支援 WebP 的瀏覽器自動 fallback 到 PNG) -->
+  <link rel="preload" as="image" href="images/1493-logo.webp" type="image/webp">
+  <!-- Non-blocking font load: media=print trick prevents render-blocking -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=optional" media="print" onload="this.media='all'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=optional"></noscript>
 
   <!-- JSON-LD -->
   <script type="application/ld+json">
@@ -277,7 +278,10 @@
 
   <!-- Logo -->
   <div class="logo-wrap">
-    <img src="images/1493-logo.png" alt="1493仁昇設計塔羅森林" width="110" height="110" fetchpriority="high">
+    <picture>
+      <source srcset="images/1493-logo.webp" type="image/webp">
+      <img src="images/1493-logo.png" alt="1493仁昇設計塔羅森林" width="110" height="110" fetchpriority="high">
+    </picture>
   </div>
 
   <!-- Header -->
@@ -348,17 +352,25 @@
 
 </div>
 
-<!-- 背景圖 Lazy Load：頁面渲染完成後才載入，不影響 FCP -->
+<!-- 背景圖 Lazy Load：WebP first, PNG fallback, 不影響 FCP -->
 <script>
 (function(){
   var bg=document.getElementById('bg');
-  var img=new Image();
-  img.onload=function(){
-    bg.style.backgroundImage="url('images/background.jpg')";
-    bg.style.backgroundSize='cover';
-    bg.style.backgroundPosition='center center';
-  };
-  img.src='images/background.jpg';
+  function load(src){
+    var img=new Image();
+    img.onload=function(){
+      bg.style.backgroundImage="url('"+src+"')";
+      bg.style.backgroundSize='cover';
+      bg.style.backgroundPosition='center center';
+    };
+    img.src=src;
+  }
+  var canvas=document.createElement('canvas');
+  if(canvas.toDataURL('image/webp').indexOf('data:image/webp')===0){
+    load('images/background.webp');
+  } else {
+    load('images/background.jpg');
+  }
 })();
 </script>
 
