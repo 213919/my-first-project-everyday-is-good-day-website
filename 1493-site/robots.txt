@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://stellular-bavarois-d5287d.netlify.app/sitemap.xml
