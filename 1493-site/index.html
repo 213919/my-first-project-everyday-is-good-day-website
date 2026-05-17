@@ -173,11 +173,16 @@
   <style>
     *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
-    html,body{width:100%;min-height:100%}
+    /* html 也要設背景色，iOS Safari 彈性捲動超出頁面時才不會露白 */
+    html{
+      background:#6b8177;
+      overscroll-behavior-y:none;
+    }
 
     body{
       font-family:'Noto Sans TC',-apple-system,'PingFang TC',sans-serif;
       background:#6b8177;
+      overscroll-behavior-y:none;
       display:flex;
       justify-content:center;
       min-height:100vh;
