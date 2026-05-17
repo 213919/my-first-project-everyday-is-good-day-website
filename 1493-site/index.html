@@ -10,12 +10,12 @@
   <meta name="keywords" content="塔羅占卜,擴大療癒法,催眠療癒,潛意識,1493,仁昇,身心靈,塔羅牌,中壢塔羅,祈願魔法">
   <meta name="author" content="1493仁昇設計塔羅森林">
   <meta name="robots" content="index, follow">
-  <meta name="theme-color" content="#1a2a1e">
+  <meta name="theme-color" content="#4a7a5e">
 
   <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="1493仁昇設計塔羅森林｜潛意識塔羅占卜・擴大療癒・催眠療癒">
-  <meta property="og:description" content="潛意識塔羅占卜・擴大療癒法®・催眠療癒。透過身心靈療癒陪伴你找到答案。線上預約表單開放中。">
+  <meta property="og:description" content="潛意識塔羅占卜・擴大療癒法®・催眠療癒。透過身心靈療癒陪伴你找到答案。">
   <meta property="og:image" content="images/1493-logo.png">
   <meta property="og:locale" content="zh_TW">
 
@@ -25,403 +25,253 @@
   <meta name="twitter:description" content="潛意識塔羅占卜・擴大療癒法®・催眠療癒">
   <meta name="twitter:image" content="images/1493-logo.png">
 
-  <!-- Performance -->
+  <!-- 效能：只 preconnect 字體，移除 FA CDN -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://cdnjs.cloudflare.com">
-  <link rel="preload" as="image" href="images/background.jpg">
+  <!-- Logo 優先載入 -->
   <link rel="preload" as="image" href="images/1493-logo.png">
-
-  <!-- Fonts & Icons -->
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <!-- 只載 400+700，display=optional 不阻塞渲染 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=optional" rel="stylesheet">
 
   <!-- JSON-LD -->
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "1493仁昇設計塔羅森林",
-    "description": "提供潛意識塔羅占卜、擴大療癒法®、催眠療癒等身心靈療癒服務",
-    "image": "images/1493-logo.png",
-    "sameAs": [
-      "https://www.instagram.com/1493nco",
-      "https://www.facebook.com/x7fengtarot"
-    ]
-  }
+  {"@context":"https://schema.org","@type":"LocalBusiness","name":"1493仁昇設計塔羅森林","description":"提供潛意識塔羅占卜、擴大療癒法®、催眠療癒等身心靈療癒服務","image":"images/1493-logo.png","sameAs":["https://www.instagram.com/1493nco","https://www.facebook.com/x7fengtarot"]}
   </script>
 
   <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 
-    html, body {
-      width: 100%;
-      min-height: 100%;
+    html,body{width:100%;min-height:100%}
+
+    body{
+      font-family:'Noto Sans TC',-apple-system,'PingFang TC',sans-serif;
+      /* 備用色貼近圖片邊緣，過捲不穿幫 */
+      background:#4a7a5e;
+      display:flex;
+      justify-content:center;
+      min-height:100vh;
     }
 
-    body {
-      font-family: 'Noto Sans TC', sans-serif;
-      /* 備用色對齊圖片邊緣色，過捲也看不出破綻 */
-      background: #4a6a52;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
+    /* ── 背景層：先顯示漸層，JS lazy load 真實圖片 ── */
+    #bg{
+      position:fixed;
+      top:0;left:0;
+      width:100vw;height:100vh;
+      /* 神社圖片色調的近似漸層，FCP 立即顯示 */
+      background:linear-gradient(160deg,#c8a060 0%,#7abfa8 45%,#3a6a50 100%);
+      z-index:0;
+      -webkit-transform:translateZ(0);
+      transform:translateZ(0);
+      will-change:transform;
+      transition:background-image .4s ease;
     }
 
-    /* 背景圖：100vw/100vh + GPU layer，iOS Safari 完整覆蓋 */
-    .bg-img {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: url('images/background.jpg') center center / cover no-repeat;
-      z-index: 0;
-      /* 強制 GPU 合成層，解決 iOS 渲染缺口 */
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-      will-change: transform;
+    /* 暗遮罩 */
+    #bg-overlay{
+      position:fixed;
+      top:0;left:0;
+      width:100vw;height:100vh;
+      background:rgba(8,12,8,.18);
+      z-index:1;
+      -webkit-transform:translateZ(0);
+      transform:translateZ(0);
     }
 
-    /* 淡暗遮罩 */
-    .bg-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(8, 12, 8, 0.18);
-      z-index: 1;
-      -webkit-transform: translateZ(0);
-      transform: translateZ(0);
-    }
-
-    .page {
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: 480px;
-      padding: 44px 18px 0;
-      text-align: center;
+    .page{
+      position:relative;
+      z-index:2;
+      width:100%;
+      max-width:480px;
+      padding:44px 18px 0;
+      text-align:center;
     }
 
     /* ── Logo ── */
-    .logo-wrap {
-      margin-bottom: 14px;
-      animation: fadeDown 0.9s ease both;
-    }
-
-    .logo-wrap img {
-      width: 110px;
-      height: 110px;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow:
-        0 0 28px rgba(100, 200, 150, 0.55),
-        0 0 56px rgba(100, 180, 140, 0.18);
-      animation: float 4s ease-in-out infinite 1s;
+    .logo-wrap{margin-bottom:12px;animation:fadeDown .9s ease both}
+    .logo-wrap img{
+      width:110px;height:110px;
+      border-radius:50%;object-fit:cover;
+      box-shadow:0 0 28px rgba(100,200,150,.55),0 0 56px rgba(100,180,140,.18);
+      animation:float 4s ease-in-out infinite 1s;
     }
 
     /* ── Header ── */
-    .site-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-      letter-spacing: 2px;
-      margin-bottom: 8px;
-      text-shadow: 0 2px 14px rgba(0,0,0,0.55);
-      animation: fadeIn 0.8s ease 0.3s both;
+    .site-title{
+      font-size:22px;font-weight:700;color:#fff;
+      letter-spacing:2px;margin-bottom:7px;
+      text-shadow:0 2px 14px rgba(0,0,0,.55);
+      animation:fadeIn .8s ease .3s both;
     }
-
-    .site-desc {
-      font-size: 14px;
-      color: rgba(255,255,255,0.95);
-      line-height: 1.8;
-      margin-bottom: 4px;
-      text-shadow: 0 1px 8px rgba(0,0,0,0.5);
-      animation: fadeIn 0.8s ease 0.45s both;
+    .site-desc{
+      font-size:14px;color:rgba(255,255,255,.95);
+      line-height:1.8;margin-bottom:4px;
+      text-shadow:0 1px 8px rgba(0,0,0,.5);
+      animation:fadeIn .8s ease .45s both;
     }
-
-    .site-desc-en {
-      font-size: 11px;
-      color: rgba(255,255,255,0.65);
-      font-style: italic;
-      line-height: 1.6;
-      margin-bottom: 22px;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.4);
-      animation: fadeIn 0.8s ease 0.6s both;
+    .site-desc-en{
+      font-size:11px;color:rgba(255,255,255,.65);
+      font-style:italic;line-height:1.6;margin-bottom:22px;
+      text-shadow:0 1px 6px rgba(0,0,0,.4);
+      animation:fadeIn .8s ease .6s both;
     }
 
     /* ── CTA Button ── */
-    .cta-btn {
-      display: block;
-      width: 100%;
-      padding: 17px 24px;
-      background: rgba(255,255,255,0.07);
-      backdrop-filter: blur(28px) saturate(150%);
-      -webkit-backdrop-filter: blur(28px) saturate(150%);
-      border: 1px solid rgba(255,255,255,0.32);
-      border-radius: 50px;
-      color: #fff;
-      text-decoration: none;
-      font-size: 16px;
-      font-weight: 600;
-      letter-spacing: 2px;
-      margin-bottom: 14px;
-      box-shadow:
-        0 8px 32px rgba(0,0,0,0.18),
-        inset 0 1.5px 0 rgba(255,255,255,0.28),
-        inset 0 -1px 0 rgba(255,255,255,0.06);
-      text-shadow: 0 1px 6px rgba(0,0,0,0.3);
-      transition: all 0.3s ease;
-      animation: slideUp 0.7s ease 0.4s both;
+    .cta-btn{
+      display:block;width:100%;
+      padding:17px 24px;
+      background:rgba(255,255,255,.07);
+      border:1.5px solid rgba(255,255,255,.38);
+      border-radius:50px;
+      color:#fff;text-decoration:none;
+      font-size:16px;font-weight:700;letter-spacing:2px;
+      margin-bottom:14px;
+      box-shadow:0 8px 32px rgba(0,0,0,.18),inset 0 1.5px 0 rgba(255,255,255,.28);
+      text-shadow:0 1px 6px rgba(0,0,0,.3);
+      transition:all .3s ease;
+      animation:slideUp .7s ease .4s both;
+    }
+    @supports(backdrop-filter:blur(1px)){
+      .cta-btn{backdrop-filter:blur(28px) saturate(150%);-webkit-backdrop-filter:blur(28px) saturate(150%)}
+    }
+    .cta-btn:hover{
+      background:rgba(255,255,255,.14);
+      border-color:rgba(255,255,255,.55);
+      transform:translateY(-3px);
     }
 
-    .cta-btn:hover {
-      background: rgba(255,255,255,0.14);
-      border-color: rgba(255,255,255,0.50);
-      transform: translateY(-3px);
-      box-shadow:
-        0 14px 40px rgba(0,0,0,0.24),
-        inset 0 1.5px 0 rgba(255,255,255,0.38);
+    /* ── 全息服務卡 ── */
+    .holo-card{
+      position:relative;border-radius:20px;
+      padding:22px 20px 20px;
+      margin-bottom:14px;text-align:left;overflow:hidden;
+      animation:slideUp .7s ease .55s both;
+    }
+    .holo-card::before{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(125deg,
+        rgba(255,255,255,.97) 0%,rgba(215,225,255,.90) 12%,
+        rgba(190,225,255,.86) 24%,rgba(255,255,255,.94) 34%,
+        rgba(215,190,255,.86) 44%,rgba(255,210,240,.84) 54%,
+        rgba(255,255,255,.95) 62%,rgba(190,255,225,.87) 72%,
+        rgba(235,215,255,.84) 82%,rgba(255,235,190,.86) 92%,
+        rgba(255,255,255,.97) 100%);
+      background-size:400% 400%;
+      animation:holoShift 20s ease infinite;z-index:0;
+    }
+    .holo-card::after{
+      content:'';position:absolute;inset:0;
+      background:linear-gradient(108deg,
+        transparent 20%,rgba(255,255,255,.32) 40%,
+        rgba(218,224,255,.22) 50%,rgba(255,255,255,.32) 60%,
+        transparent 80%);
+      background-size:250% 100%;
+      animation:silverShimmer 8s ease-in-out infinite;
+      z-index:1;pointer-events:none;
+    }
+    .holo-card>*{position:relative;z-index:2}
+
+    .service-item{margin-bottom:14px;padding-bottom:13px;border-bottom:1px solid rgba(30,30,60,.08)}
+    .service-item:last-child{margin-bottom:0;padding-bottom:0;border-bottom:none}
+    .service-item h3{font-size:14.5px;font-weight:700;color:#1a1a30;margin-bottom:5px;line-height:1.6}
+    .service-item h3 .price{white-space:nowrap}
+    .service-item p{font-size:12px;color:#28283c;line-height:1.85}
+
+    /* ── 連結按鈕 ── */
+    .links{display:flex;flex-direction:column;gap:10px;margin-bottom:0}
+
+    .link-btn{
+      display:flex;align-items:center;
+      padding:13px 16px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:50px;color:#fff;text-decoration:none;
+      box-shadow:0 4px 20px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.22);
+      transition:all .3s ease;
+    }
+    @supports(backdrop-filter:blur(1px)){
+      .link-btn{backdrop-filter:blur(28px) saturate(140%);-webkit-backdrop-filter:blur(28px) saturate(140%)}
+    }
+    .link-btn:hover{
+      background:rgba(255,255,255,.13);
+      border-color:rgba(255,255,255,.35);
+      transform:translateY(-2px);
     }
 
-    /* ── Holographic Card（放慢，不閃爍）── */
-    .holo-card {
-      position: relative;
-      border-radius: 20px;
-      padding: 22px 20px 20px;
-      margin-bottom: 14px;
-      text-align: left;
-      overflow: hidden;
-      animation: slideUp 0.7s ease 0.55s both;
+    .icon-box{
+      width:40px;height:40px;flex-shrink:0;margin-right:14px;
+      display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(145deg,rgba(140,210,170,.30),rgba(80,155,115,.18) 60%,rgba(110,180,145,.28));
+      border:1px solid rgba(255,255,255,.28);border-radius:12px;
+      box-shadow:inset 0 1.5px 0 rgba(255,255,255,.45),0 2px 8px rgba(0,0,0,.12);
+      color:#fff;
+      transition:all .3s ease;
+    }
+    @supports(backdrop-filter:blur(1px)){
+      .icon-box{backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+    }
+    .link-btn:hover .icon-box{background:linear-gradient(145deg,rgba(160,225,185,.40),rgba(100,170,130,.26) 60%,rgba(130,198,160,.36))}
+
+    .icon-box svg{width:17px;height:17px}
+
+    .btn-label{
+      flex:1;text-align:center;font-size:16px;font-weight:500;
+      letter-spacing:.8px;margin-right:40px;
+      text-shadow:0 1px 5px rgba(0,0,0,.3);
     }
 
-    /* 彩虹層：20s 緩慢移動 */
-    .holo-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        125deg,
-        rgba(255,255,255,0.97) 0%,
-        rgba(215,225,255,0.90) 12%,
-        rgba(190,225,255,0.86) 24%,
-        rgba(255,255,255,0.94) 34%,
-        rgba(215,190,255,0.86) 44%,
-        rgba(255,210,240,0.84) 54%,
-        rgba(255,255,255,0.95) 62%,
-        rgba(190,255,225,0.87) 72%,
-        rgba(235,215,255,0.84) 82%,
-        rgba(255,235,190,0.86) 92%,
-        rgba(255,255,255,0.97) 100%
-      );
-      background-size: 400% 400%;
-      animation: holoShift 20s ease infinite;
-      z-index: 0;
-    }
-
-    /* 銀色光：8s 緩慢掃過一次 */
-    .holo-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        108deg,
-        transparent 20%,
-        rgba(255,255,255,0.32) 40%,
-        rgba(218,224,255,0.22) 50%,
-        rgba(255,255,255,0.32) 60%,
-        transparent 80%
-      );
-      background-size: 250% 100%;
-      animation: silverShimmer 8s ease-in-out infinite;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .holo-card > * { position: relative; z-index: 2; }
-
-    .service-item {
-      margin-bottom: 14px;
-      padding-bottom: 13px;
-      border-bottom: 1px solid rgba(30,30,60,0.08);
-    }
-
-    .service-item:last-child {
-      margin-bottom: 0;
-      padding-bottom: 0;
-      border-bottom: none;
-    }
-
-    .service-item h3 {
-      font-size: 14.5px;
-      font-weight: 700;
-      color: #1a1a30;
-      margin-bottom: 5px;
-      line-height: 1.6;
-    }
-
-    .service-item h3 .price { white-space: nowrap; }
-
-    .service-item p {
-      font-size: 12px;
-      color: #28283c;
-      line-height: 1.85;
-    }
-
-    /* ── Link Buttons（更透明、更流動）── */
-    .links {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-bottom: 0;
-    }
-
-    .link-btn {
-      display: flex;
-      align-items: center;
-      padding: 13px 16px;
-      /* 降低不透明度讓背景透出來 */
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(28px) saturate(140%);
-      -webkit-backdrop-filter: blur(28px) saturate(140%);
-      border: 1px solid rgba(255,255,255,0.20);
-      border-radius: 50px;
-      color: #fff;
-      text-decoration: none;
-      box-shadow:
-        0 4px 20px rgba(0,0,0,0.12),
-        inset 0 1px 0 rgba(255,255,255,0.22),
-        inset 0 -1px 0 rgba(255,255,255,0.05);
-      transition: all 0.3s ease;
-    }
-
-    .link-btn:hover {
-      background: rgba(255,255,255,0.13);
-      border-color: rgba(255,255,255,0.35);
-      transform: translateY(-2px);
-      box-shadow:
-        0 10px 30px rgba(0,0,0,0.18),
-        inset 0 1px 0 rgba(255,255,255,0.32);
-    }
-
-    /* Icon box：玻璃感，帶綠色暈染 */
-    .link-btn .icon-box {
-      width: 40px;
-      height: 40px;
-      background: linear-gradient(
-        145deg,
-        rgba(140,210,170,0.30) 0%,
-        rgba(80,155,115,0.18) 60%,
-        rgba(110,180,145,0.28) 100%
-      );
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.28);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-right: 14px;
-      font-size: 16px;
-      flex-shrink: 0;
-      box-shadow:
-        inset 0 1.5px 0 rgba(255,255,255,0.45),
-        inset 0 -1px 0 rgba(0,0,0,0.08),
-        0 2px 8px rgba(0,0,0,0.12);
-      transition: all 0.3s ease;
-    }
-
-    .link-btn:hover .icon-box {
-      background: linear-gradient(
-        145deg,
-        rgba(160,225,185,0.40) 0%,
-        rgba(100,170,130,0.26) 60%,
-        rgba(130,198,160,0.36) 100%
-      );
-    }
-
-    .link-btn .btn-label {
-      flex: 1;
-      text-align: center;
-      font-size: 16px;
-      font-weight: 500;
-      letter-spacing: 0.8px;
-      margin-right: 40px;
-      text-shadow: 0 1px 5px rgba(0,0,0,0.3);
-    }
-
-    .link-btn:nth-child(1) { animation: slideUp 0.6s ease 0.70s both; }
-    .link-btn:nth-child(2) { animation: slideUp 0.6s ease 0.80s both; }
-    .link-btn:nth-child(3) { animation: slideUp 0.6s ease 0.90s both; }
-    .link-btn:nth-child(4) { animation: slideUp 0.6s ease 1.00s both; }
-    .link-btn:nth-child(5) { animation: slideUp 0.6s ease 1.10s both; }
+    .link-btn:nth-child(1){animation:slideUp .6s ease .70s both}
+    .link-btn:nth-child(2){animation:slideUp .6s ease .80s both}
+    .link-btn:nth-child(3){animation:slideUp .6s ease .90s both}
+    .link-btn:nth-child(4){animation:slideUp .6s ease 1.00s both}
+    .link-btn:nth-child(5){animation:slideUp .6s ease 1.10s both}
 
     /* ── 品牌標語 ── */
-    .quote-section {
-      margin-top: 10px;
-      padding: 50px 20px 60px;
+    .quote-section{margin-top:10px;padding:50px 20px 60px}
+    .quote{
+      color:rgba(255,255,255,.95);font-size:14px;line-height:2.4;
+      text-shadow:0 0 12px rgba(0,0,0,.8),0 2px 6px rgba(0,0,0,.6);
     }
-
-    .quote {
-      color: rgba(255,255,255,0.95);
-      font-size: 14px;
-      line-height: 2.4;
-      /* 文字陰影確保在任何背景都清晰 */
-      text-shadow:
-        0 0 12px rgba(0,0,0,0.8),
-        0 2px 6px rgba(0,0,0,0.6);
-    }
-
-    .quote .en-quote {
-      margin-top: 14px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      color: #fff;
-      text-shadow:
-        0 0 14px rgba(0,0,0,0.9),
-        0 2px 8px rgba(0,0,0,0.7);
+    .quote .en-quote{
+      margin-top:14px;font-size:13px;font-weight:700;
+      letter-spacing:2.5px;color:#fff;
+      text-shadow:0 0 14px rgba(0,0,0,.9),0 2px 8px rgba(0,0,0,.7);
     }
 
     /* ── Keyframes ── */
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-
-    @keyframes fadeDown {
-      from { opacity: 0; transform: translateY(-20px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(22px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0px); }
-      50%       { transform: translateY(-8px); }
-    }
-
-    @keyframes holoShift {
-      0%   { background-position: 0% 50%; }
-      50%  { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
-    @keyframes silverShimmer {
-      0%   { background-position: 250% 0%; }
-      100% { background-position: -250% 0%; }
-    }
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    @keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    @keyframes holoShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+    @keyframes silverShimmer{0%{background-position:250% 0%}100%{background-position:-250% 0%}}
   </style>
 </head>
 <body>
-<!-- 背景圖層（實體 div，iOS Safari 相容）-->
-<div class="bg-img" aria-hidden="true"></div>
-<div class="bg-overlay" aria-hidden="true"></div>
+
+<!-- 內嵌 SVG 圖示（取代 Font Awesome CDN，省 ~400KB）-->
+<svg style="display:none" aria-hidden="true">
+  <defs>
+    <symbol id="i-ig" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+    </symbol>
+    <symbol id="i-fb" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M24 12.073C24 5.446 18.627 0 12 0S0 5.446 0 12.073c0 6.03 4.388 11.024 10.125 11.927v-8.437H7.078v-3.49h3.047V9.43c0-3.025 1.792-4.697 4.533-4.697 1.312 0 2.686.236 2.686.236v2.97H15.83c-1.491 0-1.956.93-1.956 1.886v2.247h3.328l-.532 3.49h-2.796v8.437C19.612 23.097 24 18.103 24 12.073z"/>
+    </symbol>
+    <symbol id="i-map" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 0C7.802 0 4 3.4 4 7.6 4 13.4 12 24 12 24s8-10.6 8-16.4C20 3.4 16.199 0 12 0zm0 11a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/>
+    </symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12 21.593c-.525-.445-4.973-4.57-6.6-6.3a5 5 0 0 1 7.14-6.993 5 5 0 0 1 7.14 6.992c-1.63 1.73-6.075 5.856-7.68 6.301z"/>
+    </symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M19 4h-1V2h-2v2H8V2H6v2H5C3.9 4 3 4.9 3 6v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5zM7 12h2v2H7v-2zm4 0h2v2h-2v-2zm4 0h2v2h-2v-2zm-8 4h2v2H7v-2zm4 0h2v2h-2v-2z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- 背景（漸層先顯示，JS 載完圖後替換）-->
+<div id="bg" aria-hidden="true"></div>
+<div id="bg-overlay" aria-hidden="true"></div>
 
 <div class="page">
 
@@ -438,7 +288,7 @@
   <!-- CTA -->
   <a href="https://reurl.cc/aMmk93" target="_blank" rel="noopener" class="cta-btn">🔮 1493 線上預約表單 ✡️</a>
 
-  <!-- Holographic Services Card -->
+  <!-- 全息服務卡 -->
   <div class="holo-card">
     <div class="service-item">
       <h3>潛意識塔羅占卜　<span class="price">NT 1000</span></h3>
@@ -462,31 +312,31 @@
     </div>
   </div>
 
-  <!-- Link Buttons -->
+  <!-- 連結按鈕 -->
   <div class="links">
     <a href="https://www.instagram.com/1493nco" target="_blank" rel="noopener" class="link-btn">
-      <span class="icon-box"><i class="fa-brands fa-instagram"></i></span>
+      <span class="icon-box"><svg aria-hidden="true"><use href="#i-ig"/></svg></span>
       <span class="btn-label">Instagram</span>
     </a>
     <a href="https://www.facebook.com/x7fengtarot" target="_blank" rel="noopener" class="link-btn">
-      <span class="icon-box"><i class="fa-brands fa-facebook-f"></i></span>
+      <span class="icon-box"><svg aria-hidden="true"><use href="#i-fb"/></svg></span>
       <span class="btn-label">Facebook</span>
     </a>
     <a href="https://maps.app.goo.gl/TU7vnE8aghjgC4h5A?g_st=il" target="_blank" rel="noopener" class="link-btn">
-      <span class="icon-box"><i class="fa-solid fa-map-location-dot"></i></span>
+      <span class="icon-box"><svg aria-hidden="true"><use href="#i-map"/></svg></span>
       <span class="btn-label">Google Maps</span>
     </a>
     <a href="https://reurl.cc/MM5k03" target="_blank" rel="noopener" class="link-btn">
-      <span class="icon-box"><i class="fa-solid fa-heart"></i></span>
+      <span class="icon-box"><svg aria-hidden="true"><use href="#i-heart"/></svg></span>
       <span class="btn-label">擴大療癒法課程</span>
     </a>
     <a href="https://reurl.cc/aMmk93" target="_blank" rel="noopener" class="link-btn">
-      <span class="icon-box"><i class="fa-solid fa-calendar-days"></i></span>
+      <span class="icon-box"><svg aria-hidden="true"><use href="#i-cal"/></svg></span>
       <span class="btn-label">占卜預約表單</span>
     </a>
   </div>
 
-  <!-- 品牌標語（漸層遮罩）-->
+  <!-- 品牌標語 -->
   <div class="quote-section">
     <div class="quote">
       <p>當你所知道的科學知識與真實人生起了衝突</p>
@@ -497,5 +347,20 @@
   </div>
 
 </div>
+
+<!-- 背景圖 Lazy Load：頁面渲染完成後才載入，不影響 FCP -->
+<script>
+(function(){
+  var bg=document.getElementById('bg');
+  var img=new Image();
+  img.onload=function(){
+    bg.style.backgroundImage="url('images/background.jpg')";
+    bg.style.backgroundSize='cover';
+    bg.style.backgroundPosition='center center';
+  };
+  img.src='images/background.jpg';
+})();
+</script>
+
 </body>
 </html>
