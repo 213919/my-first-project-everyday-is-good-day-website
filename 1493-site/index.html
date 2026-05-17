@@ -177,33 +177,31 @@
 
     body{
       font-family:'Noto Sans TC',-apple-system,'PingFang TC',sans-serif;
-      /* 備用色貼近圖片邊緣，過捲不穿幫 */
-      background:#4a7a5e;
+      background:#1a0a2a;
       display:flex;
       justify-content:center;
       min-height:100vh;
     }
 
-    /* ── 背景層：先顯示漸層，JS lazy load 真實圖片 ── */
+    /* ── 背景層：inset:0 比 100vw/100vh 更可靠（iOS Safari 不跑版）── */
     #bg{
       position:fixed;
-      top:0;left:0;
-      width:100vw;height:100vh;
-      /* 神社圖片色調的近似漸層，FCP 立即顯示 */
-      background:linear-gradient(160deg,#c8a060 0%,#7abfa8 45%,#3a6a50 100%);
+      inset:0;
+      background:linear-gradient(160deg,#2a1a2e 0%,#4a2060 40%,#1a0a2a 100%);
+      background-size:cover;
+      background-position:center center;
+      background-repeat:no-repeat;
       z-index:0;
       -webkit-transform:translateZ(0);
       transform:translateZ(0);
       will-change:transform;
-      transition:background-image .4s ease;
     }
 
     /* 暗遮罩 */
     #bg-overlay{
       position:fixed;
-      top:0;left:0;
-      width:100vw;height:100vh;
-      background:rgba(8,12,8,.18);
+      inset:0;
+      background:rgba(8,5,15,.22);
       z-index:1;
       -webkit-transform:translateZ(0);
       transform:translateZ(0);
