@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>SEO 提升指南｜日日好日商務中心</title>
+<style>
+:root{
+  --brand:#6A584D;--oak:#8E7763;--terracotta:#8A4E4E;
+  --off-white:#F7F3EE;--gray:#F4EEE7;--white:#FFFFFF;
+  --text:#5E5148;--text-sub:#7A6F67;--border:#D8CFC5;
+  --green:#3D8B6E;--green-bg:#EBF7F2;
+  --radius:16px;--ease:cubic-bezier(.22,.61,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',Arial,sans-serif;
+  background:var(--off-white);color:var(--text);line-height:1.75;min-height:100vh;}
+
+/* ── Header ── */
+.header{background:var(--brand);color:#fff;padding:28px 24px 24px;text-align:center;}
+.header-logo{font-size:.78rem;opacity:.75;letter-spacing:.18em;text-transform:uppercase;margin-bottom:6px;}
+.header h1{font-family:'Noto Serif TC',serif;font-size:clamp(1.4rem,4vw,2rem);font-weight:700;line-height:1.3;}
+.header p{font-size:.88rem;opacity:.8;margin-top:8px;}
+
+/* ── Progress ── */
+.progress-wrap{background:#fff;border-bottom:1px solid var(--border);padding:16px 24px;}
+.progress-inner{max-width:680px;margin:0 auto;}
+.progress-label{display:flex;justify-content:space-between;font-size:.8rem;color:var(--text-sub);margin-bottom:8px;}
+.progress-bar{height:8px;background:var(--gray);border-radius:99px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--oak),var(--terracotta));
+  border-radius:99px;transition:width .5s var(--ease);width:0%;}
+
+/* ── Container ── */
+.main{max-width:680px;margin:0 auto;padding:24px 16px 80px;}
+
+/* ── Step Card ── */
+.step-card{background:#fff;border-radius:var(--radius);border:1.5px solid var(--border);
+  margin-bottom:16px;overflow:hidden;transition:box-shadow .25s;}
+.step-card.active{border-color:var(--oak);box-shadow:0 8px 32px rgba(142,119,99,.13);}
+.step-card.done{border-color:#B2DAC8;background:var(--green-bg);}
+.step-card.locked{opacity:.45;pointer-events:none;}
+
+/* Card header button */
+.step-head{width:100%;text-align:left;padding:20px 22px;display:flex;align-items:center;
+  gap:14px;background:none;border:none;cursor:pointer;font-family:inherit;}
+.step-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;
+  background:var(--gray);color:var(--oak);font-weight:700;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;transition:background .25s,color .25s;}
+.step-card.active .step-num{background:var(--oak);color:#fff;}
+.step-card.done .step-num{background:var(--green);color:#fff;}
+.step-head-text{flex:1;}
+.step-title{font-weight:700;font-size:1rem;color:var(--brand);}
+.step-card.done .step-title{color:var(--green);}
+.step-subtitle{font-size:.8rem;color:var(--text-sub);margin-top:2px;}
+.step-tag{flex-shrink:0;font-size:.72rem;font-weight:700;padding:4px 10px;
+  border-radius:99px;letter-spacing:.06em;}
+.tag-now{background:#FEF3E2;color:#B45309;}
+.tag-week{background:#EDE9FE;color:#5B21B6;}
+.tag-month{background:#E0F2FE;color:#0369A1;}
+.tag-done{background:var(--green-bg);color:var(--green);}
+.step-check{font-size:1.2rem;flex-shrink:0;}
+
+/* Card body */
+.step-body{display:none;padding:0 22px 22px;}
+.step-card.active .step-body{display:block;}
+.step-card.done .step-body.show-done{display:block;}
+
+.step-body h3{font-size:.95rem;font-weight:700;color:var(--brand);margin:12px 0 8px;}
+.step-body p{font-size:.9rem;color:var(--text-sub);margin-bottom:10px;line-height:1.85;}
+.step-body ul{padding-left:18px;margin-bottom:12px;}
+.step-body ul li{font-size:.9rem;color:var(--text-sub);line-height:1.85;margin-bottom:4px;}
+.step-body ul li::marker{color:var(--oak);}
+.step-body a{color:var(--terracotta);text-decoration:underline;word-break:break-all;}
+
+/* Highlight box */
+.tip-box{background:var(--gray);border-left:3px solid var(--oak);border-radius:8px;
+  padding:12px 16px;margin:12px 0;font-size:.88rem;color:var(--text);}
+.tip-box strong{color:var(--brand);}
+
+/* Action link */
+.action-link{display:inline-flex;align-items:center;gap:6px;background:var(--brand);
+  color:#fff;font-size:.88rem;font-weight:700;padding:10px 18px;border-radius:10px;
+  text-decoration:none;margin:4px 6px 4px 0;transition:background .2s;}
+.action-link:hover{background:var(--oak);}
+.action-link.secondary{background:transparent;color:var(--brand);border:1.5px solid var(--border);}
+.action-link.secondary:hover{background:var(--gray);}
+
+/* Done button */
+.done-btn{display:block;width:100%;margin-top:16px;padding:14px;
+  background:var(--green);color:#fff;font-family:inherit;font-size:.95rem;font-weight:700;
+  border:none;border-radius:10px;cursor:pointer;transition:background .2s;letter-spacing:.04em;}
+.done-btn:hover{background:#2E7A5E;}
+.done-msg{display:flex;align-items:center;gap:10px;background:var(--green-bg);
+  border-radius:10px;padding:14px 16px;margin-top:12px;font-size:.9rem;color:var(--green);font-weight:700;}
+
+/* All done */
+.all-done{text-align:center;padding:40px 24px;background:#fff;border-radius:var(--radius);
+  border:2px solid #B2DAC8;display:none;}
+.all-done .trophy{font-size:3rem;margin-bottom:12px;}
+.all-done h2{font-family:'Noto Serif TC',serif;color:var(--green);font-size:1.4rem;margin-bottom:8px;}
+.all-done p{color:var(--text-sub);font-size:.9rem;}
+
+/* Reset */
+.reset-btn{display:block;margin:24px auto 0;background:none;border:none;
+  color:var(--border);font-size:.78rem;cursor:pointer;text-decoration:underline;}
+.reset-btn:hover{color:var(--text-sub);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">日日好日商務中心 · 專屬工具</div>
+  <h1>SEO 提升任務清單</h1>
+  <p>逐步完成，讓官網在 Google 排到更前面的位置</p>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-inner">
+    <div class="progress-label">
+      <span id="progressText">開始第一個任務</span>
+      <span id="progressCount">0 / 8 完成</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ───── Step 1 ───── -->
+<div class="step-card" id="step-1">
+  <button class="step-head" onclick="toggleStep(1)">
+    <div class="step-num">1</div>
+    <div class="step-head-text">
+      <div class="step-title">在 Google 商家檔案發一篇貼文</div>
+      <div class="step-subtitle">現在就做・約 10 分鐘</div>
+    </div>
+    <span class="step-tag tag-now">立刻做</span>
+    <span class="step-check" id="check-1"></span>
+  </button>
+  <div class="step-body" id="body-1">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      Google 商家檔案有持續活動的商家，搜尋排名會優先顯示。每發一篇貼文，Google 就知道你的商家是活躍的。
+    </div>
+    <h3>步驟一：進入 Google 商家後台</h3>
+    <p>點下方按鈕，用你的 Google 帳號登入，找到「日日好日商務中心」。</p>
+    <a class="action-link" href="https://business.google.com" target="_blank" rel="noopener">→ 開啟 Google 商家後台</a>
+
+    <h3>步驟二：點「新增最新動態」</h3>
+    <ul>
+      <li>進入後台後，點左側選單的「<strong>貼文</strong>」或首頁的「新增最新動態」</li>
+      <li>選擇類型：「<strong>最新消息</strong>」即可</li>
+    </ul>
+
+    <h3>步驟三：貼文內容（直接複製使用）</h3>
+    <div class="tip-box">
+      🏢 <strong>【中壢・青埔 借址登記名額有限】</strong><br><br>
+      日日好日商務中心提供桃園中壢與青埔兩個據點的公司借址登記服務，費用透明、流程簡單，適合剛創業或 SOHO 族。<br><br>
+      ✅ 可正常用於稅務申報、開立發票<br>
+      ✅ 免費使用會議室（年租方案）<br>
+      ✅ 一站式創業支援：公司設立、會計、設計一次搞定<br><br>
+      📞 歡迎來電洽詢：03-275-9489<br>
+      🔗 官網：edgd2619.com
+    </div>
+    <ul>
+      <li>加上 1-2 張辦公室實景照片效果更好</li>
+      <li>點「發布」完成</li>
+    </ul>
+
+    <button class="done-btn" onclick="markDone(1)">✓ 我已發布貼文，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 2 ───── -->
+<div class="step-card locked" id="step-2">
+  <button class="step-head" onclick="toggleStep(2)">
+    <div class="step-num">2</div>
+    <div class="step-head-text">
+      <div class="step-title">邀請顧客在 Google 留下評論</div>
+      <div class="step-subtitle">本週・約 15 分鐘整理</div>
+    </div>
+    <span class="step-tag tag-now">立刻做</span>
+    <span class="step-check" id="check-2"></span>
+  </button>
+  <div class="step-body" id="body-2">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      Google 評論數量和評分是本地搜尋排名最重要的因素之一。你目前有 4.9 星，持續增加評論數可以讓排名更穩固。
+    </div>
+    <h3>步驟一：取得你的評論連結</h3>
+    <p>進入 Google 商家後台，找到「取得更多評論」，複製你的專屬短連結。</p>
+    <a class="action-link" href="https://business.google.com" target="_blank" rel="noopener">→ 開啟 Google 商家後台</a>
+
+    <h3>步驟二：傳訊息給現有顧客</h3>
+    <p>把以下訊息複製後，透過 LINE、Email 或當面傳給你的客戶：</p>
+    <div class="tip-box">
+      您好，感謝您選擇日日好日商務中心！<br><br>
+      如果我們的服務有幫助到您，歡迎幫我們在 Google 留下評價，對我們非常重要！<br>
+      👉 評論連結：<strong>（貼上你複製的短連結）</strong><br><br>
+      非常感謝您的支持！🙏
+    </div>
+
+    <h3>步驟三：回覆所有既有評論</h3>
+    <ul>
+      <li>進入後台 → 評論，對每一則評論都寫一句感謝回應</li>
+      <li>有回覆的商家在 Google 上顯示更活躍，排名更好</li>
+      <li>就算是負評，也要禮貌回應</li>
+    </ul>
+
+    <button class="done-btn" onclick="markDone(2)">✓ 已傳送邀請並回覆評論，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 3 ───── -->
+<div class="step-card locked" id="step-3">
+  <button class="step-head" onclick="toggleStep(3)">
+    <div class="step-num">3</div>
+    <div class="step-head-text">
+      <div class="step-title">發布一篇新的 SEO 文章</div>
+      <div class="step-subtitle">本月・告訴我主題，我幫你寫</div>
+    </div>
+    <span class="step-tag tag-week">本週</span>
+    <span class="step-check" id="check-3"></span>
+  </button>
+  <div class="step-body" id="body-3">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      你目前有 13 篇文章。每增加一篇，Google 就多一個收錄你的機會。建議目標 20 篇以上，以長尾關鍵字持續積累流量。
+    </div>
+    <h3>推薦的下一篇文章主題</h3>
+    <ul>
+      <li>「桃園青埔創業資源整理 2025」</li>
+      <li>「公司設立費用懶人包：自己辦 vs 找代辦」</li>
+      <li>「中壢租辦公室注意事項：5 個新手必看重點」</li>
+      <li>「SOHO 族適合借址登記嗎？完整分析」</li>
+    </ul>
+    <h3>如何讓我幫你寫</h3>
+    <p>直接在我們的對話裡說：</p>
+    <div class="tip-box">
+      「幫我寫一篇關於『＿＿＿』的 SEO 文章，放到官網上」
+    </div>
+    <p>我會幫你寫完整文章內容、加上結構化資料、更新 sitemap，並發布到網站。</p>
+
+    <button class="done-btn" onclick="markDone(3)">✓ 新文章已發布，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 4 ───── -->
+<div class="step-card locked" id="step-4">
+  <button class="step-head" onclick="toggleStep(4)">
+    <div class="step-num">4</div>
+    <div class="step-head-text">
+      <div class="step-title">查看 Google Search Console 成效報告</div>
+      <div class="step-subtitle">本月・約 10 分鐘</div>
+    </div>
+    <span class="step-tag tag-week">本週</span>
+    <span class="step-check" id="check-4"></span>
+  </button>
+  <div class="step-body" id="body-4">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      Search Console 告訴你哪些關鍵字帶來流量，哪些頁面被點最多。找出「曝光多、點擊少」的關鍵字，加強那些頁面，排名就會提升。
+    </div>
+    <h3>步驟一：進入 Search Console</h3>
+    <a class="action-link" href="https://search.google.com/search-console" target="_blank" rel="noopener">→ 開啟 Google Search Console</a>
+
+    <h3>步驟二：查看成效報告</h3>
+    <ul>
+      <li>左側點「<strong>成效</strong>」→「<strong>搜尋結果</strong>」</li>
+      <li>時間範圍選「<strong>過去 3 個月</strong>」</li>
+      <li>勾選「<strong>曝光次數</strong>」和「<strong>點擊率</strong>」</li>
+    </ul>
+
+    <h3>步驟三：找出機會點</h3>
+    <ul>
+      <li>找「曝光次數高但點擊率低（CTR &lt; 5%）」的關鍵字</li>
+      <li>把這些關鍵字截圖或記下來</li>
+      <li>回到對話告訴我：「這些關鍵字的點擊率很低，幫我優化」</li>
+    </ul>
+
+    <button class="done-btn" onclick="markDone(4)">✓ 已查看報告，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 5 ───── -->
+<div class="step-card locked" id="step-5">
+  <button class="step-head" onclick="toggleStep(5)">
+    <div class="step-num">5</div>
+    <div class="step-head-text">
+      <div class="step-title">在台灣商業目錄登錄</div>
+      <div class="step-subtitle">建立外部連結・約 30 分鐘</div>
+    </div>
+    <span class="step-tag tag-month">本月</span>
+    <span class="step-check" id="check-5"></span>
+  </button>
+  <div class="step-body" id="body-5">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      外部連結（其他網站連到你）是 Google 排名的重要信號。登錄商業目錄可以快速取得可信的外部連結，同時也讓更多人找到你。
+    </div>
+    <h3>建議登錄的平台（免費）</h3>
+    <ul>
+      <li><strong>1111 人力銀行商業目錄</strong>：知名度高，Google 會抓取</li>
+      <li><strong>104 創業加盟網</strong>：適合商務中心</li>
+      <li><strong>蝦皮商城 / 台灣 Yellow Pages</strong></li>
+      <li><strong>桃園市政府商業處</strong>：官方平台，可信度高</li>
+    </ul>
+
+    <div class="tip-box">
+      ⚠️ <strong>注意：NAP 一致性</strong><br>
+      在所有平台上，確保名稱、地址、電話完全一樣：<br>
+      名稱：<strong>日日好日商務中心</strong><br>
+      地址：<strong>桃園市中壢區延平路261號9樓</strong><br>
+      電話：<strong>03-275-9489</strong>
+    </div>
+
+    <h3>步驟</h3>
+    <ul>
+      <li>每個平台填寫公司資訊時，複製上方的名稱/地址/電話</li>
+      <li>官網網址填：<strong>https://edgd2619.com</strong></li>
+      <li>登錄後把連結記下來（可以傳給我存檔）</li>
+    </ul>
+
+    <button class="done-btn" onclick="markDone(5)">✓ 已登錄商業目錄，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 6 ───── -->
+<div class="step-card locked" id="step-6">
+  <button class="step-head" onclick="toggleStep(6)">
+    <div class="step-num">6</div>
+    <div class="step-head-text">
+      <div class="step-title">確認社群媒體都有官網連結</div>
+      <div class="step-subtitle">FB・IG・確認一次</div>
+    </div>
+    <span class="step-tag tag-month">本月</span>
+    <span class="step-check" id="check-6"></span>
+  </button>
+  <div class="step-body" id="body-6">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      Facebook 和 Instagram 都是高權威的網站，從這些平台連回你官網，對 Google 排名有正面影響。
+    </div>
+    <h3>Facebook 粉絲頁</h3>
+    <ul>
+      <li>進入粉絲頁 → 「關於」→「聯絡資訊」</li>
+      <li>確認網站欄位填有：<strong>https://edgd2619.com</strong></li>
+      <li>確認地址與電話正確</li>
+    </ul>
+    <a class="action-link secondary" href="https://www.facebook.com/everydaygooddaybc" target="_blank" rel="noopener">→ 開啟 Facebook 粉絲頁</a>
+
+    <h3>Instagram</h3>
+    <ul>
+      <li>進入個人檔案 → 「編輯個人檔案」</li>
+      <li>在「網站」欄位填入：<strong>https://edgd2619.com</strong></li>
+      <li>個人簡介加上地址：桃園中壢 · 青埔</li>
+    </ul>
+    <a class="action-link secondary" href="https://www.instagram.com/naosace9" target="_blank" rel="noopener">→ 開啟 Instagram</a>
+
+    <button class="done-btn" onclick="markDone(6)">✓ 已確認所有社群連結，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 7 ───── -->
+<div class="step-card locked" id="step-7">
+  <button class="step-head" onclick="toggleStep(7)">
+    <div class="step-num">7</div>
+    <div class="step-head-text">
+      <div class="step-title">繼續累積 Google 商家貼文</div>
+      <div class="step-subtitle">每 1-2 週一篇・長期維護</div>
+    </div>
+    <span class="step-tag tag-month">長期</span>
+    <span class="step-check" id="check-7"></span>
+  </button>
+  <div class="step-body" id="body-7">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      Google 商家貼文超過 7 天後就不顯示了，需要持續更新才能維持活躍度。建議把它變成固定習慣。
+    </div>
+    <h3>建立固定發文習慣</h3>
+    <ul>
+      <li>每 1-2 週，花 5 分鐘發一篇貼文</li>
+      <li>題材：最新消息、服務介紹、辦公室照片、活動邀請</li>
+    </ul>
+    <h3>貼文素材建議</h3>
+    <ul>
+      <li>辦公室實景照（會議室、座位、採光）</li>
+      <li>青埔館 / 中壢館的特色介紹</li>
+      <li>創業小知識（例如：「公司設立幾步驟？」）</li>
+      <li>季節性：新年、新學期、年底結帳季</li>
+    </ul>
+    <div class="tip-box">
+      💡 需要貼文文案嗎？直接在對話裡說「幫我寫一篇 Google 貼文」，我幫你寫好！
+    </div>
+
+    <button class="done-btn" onclick="markDone(7)">✓ 已發布第二篇貼文，建立習慣，完成！</button>
+  </div>
+</div>
+
+<!-- ───── Step 8 ───── -->
+<div class="step-card locked" id="step-8">
+  <button class="step-head" onclick="toggleStep(8)">
+    <div class="step-num">8</div>
+    <div class="step-head-text">
+      <div class="step-title">每月 SEO 例行檢查</div>
+      <div class="step-subtitle">固定維護・每月一次</div>
+    </div>
+    <span class="step-tag tag-month">長期</span>
+    <span class="step-check" id="check-8"></span>
+  </button>
+  <div class="step-body" id="body-8">
+    <div class="tip-box">
+      <strong>為什麼重要？</strong><br>
+      SEO 不是一次性的工作，需要持續維護。建議每個月做一次快速檢查，確保網站持續進步。
+    </div>
+    <h3>每月例行清單</h3>
+    <ul>
+      <li>☐ 查看 Search Console 成效，確認流量有沒有異常</li>
+      <li>☐ 發布至少 1 篇新文章</li>
+      <li>☐ 在 Google 商家發 2-4 篇貼文</li>
+      <li>☐ 回覆新增的 Google 評論</li>
+      <li>☐ 如果評分有更新，告訴我，我更新網頁上的數字</li>
+    </ul>
+    <h3>要怎麼做到這些？</h3>
+    <p>隨時在我們的對話裡說，例如：</p>
+    <ul>
+      <li>「幫我寫一篇新的 SEO 文章，主題是＿＿」</li>
+      <li>「幫我寫一篇 Google 商家貼文」</li>
+      <li>「我的 Google 評分現在是 5.0，幫我更新網頁」</li>
+      <li>「Search Console 說這個關鍵字的點擊率低，幫我優化」</li>
+    </ul>
+
+    <button class="done-btn" onclick="markDone(8)">✓ 完成！我已建立每月例行維護習慣</button>
+  </div>
+</div>
+
+<!-- All Done -->
+<div class="all-done" id="allDone">
+  <div class="trophy">🏆</div>
+  <h2>太棒了！全部任務完成！</h2>
+  <p>你已經完成所有 SEO 優化任務。<br>持續維護、定期發文，排名會越來越好。<br>有任何問題，隨時回到對話裡找我！</p>
+</div>
+
+<button class="reset-btn" onclick="resetAll()">重置進度（從頭開始）</button>
+
+</div><!-- /main -->
+
+<script>
+const TOTAL = 8;
+
+function getProgress(){
+  try{ return JSON.parse(localStorage.getItem('seo_progress')||'{}'); }
+  catch(e){ return {}; }
+}
+function saveProgress(p){ localStorage.setItem('seo_progress', JSON.stringify(p)); }
+
+function updateProgressBar(){
+  const p = getProgress();
+  const done = Object.values(p).filter(Boolean).length;
+  document.getElementById('progressFill').style.width = (done/TOTAL*100)+'%';
+  document.getElementById('progressCount').textContent = done+' / '+TOTAL+' 完成';
+  const labels = ['開始第一個任務','做得很好，繼續！','一半了，加油！','快完成了！','恭喜你，全部完成！'];
+  const idx = done===0?0:done<3?1:done<5?2:done<TOTAL?3:4;
+  document.getElementById('progressText').textContent = labels[idx];
+  if(done===TOTAL) document.getElementById('allDone').style.display='block';
+}
+
+function toggleStep(n){
+  const card = document.getElementById('step-'+n);
+  if(card.classList.contains('locked')||card.classList.contains('done')) return;
+  // already active, do nothing (keep it open)
+}
+
+function markDone(n){
+  const p = getProgress();
+  p['step'+n] = true;
+  saveProgress(p);
+
+  const card = document.getElementById('step-'+n);
+  card.classList.remove('active');
+  card.classList.add('done');
+  document.getElementById('check-'+n).textContent = '✓';
+  const tag = card.querySelector('.step-tag');
+  tag.className='step-tag tag-done';
+  tag.textContent='完成';
+
+  // hide body, show done msg
+  const body = document.getElementById('body-'+n);
+  body.querySelector('.done-btn').style.display='none';
+  const msg = document.createElement('div');
+  msg.className='done-msg';
+  msg.innerHTML='✅ 完成！做得很好。';
+  body.appendChild(msg);
+
+  // unlock next
+  if(n < TOTAL){
+    const next = document.getElementById('step-'+(n+1));
+    next.classList.remove('locked');
+    next.classList.add('active');
+    setTimeout(()=>{
+      next.scrollIntoView({behavior:'smooth',block:'center'});
+    }, 300);
+  }
+
+  updateProgressBar();
+}
+
+function resetAll(){
+  if(!confirm('確定要重置所有進度嗎？')) return;
+  localStorage.removeItem('seo_progress');
+  location.reload();
+}
+
+// Init on load
+function init(){
+  const p = getProgress();
+  let lastDone = 0;
+
+  for(let n=1; n<=TOTAL; n++){
+    const card = document.getElementById('step-'+n);
+    if(p['step'+n]){
+      card.classList.remove('active','locked');
+      card.classList.add('done');
+      document.getElementById('check-'+n).textContent='✓';
+      const tag = card.querySelector('.step-tag');
+      tag.className='step-tag tag-done';
+      tag.textContent='完成';
+      const body = document.getElementById('body-'+n);
+      const btn = body.querySelector('.done-btn');
+      if(btn){ btn.style.display='none'; }
+      const msg = document.createElement('div');
+      msg.className='done-msg';
+      msg.innerHTML='✅ 完成！做得很好。';
+      body.appendChild(msg);
+      lastDone = n;
+    }
+  }
+
+  // unlock next after last done
+  const nextActive = lastDone + 1;
+  for(let n=1; n<=TOTAL; n++){
+    const card = document.getElementById('step-'+n);
+    if(!p['step'+n]){
+      if(n === nextActive){
+        card.classList.remove('locked');
+        card.classList.add('active');
+      } else if(n > nextActive){
+        // stays locked
+      }
+    }
+  }
+  // if nothing done yet, activate step 1
+  if(lastDone === 0){
+    document.getElementById('step-1').classList.remove('locked');
+    document.getElementById('step-1').classList.add('active');
+  }
+
+  updateProgressBar();
+}
+
+init();
+</script>
+</body>
+</html>
