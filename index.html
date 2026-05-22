@@ -42,9 +42,13 @@
 .hs-dot.active{background:#8E7763;transform:scale(1.25);}
 
 /* ===== HERO CONTENT (below slider) ===== */
-.hero-content-wrap{background:var(--off-white);padding:32px 0 60px;border-bottom:1px solid var(--border-lt);}
+.hero-content-wrap{background:var(--off-white);padding:32px 0 60px;border-bottom:1px solid var(--border-lt);overflow:hidden;}
 .hero-amp{color:#8A4E4E;font-style:italic;}
-.hero-content{display:flex;flex-direction:column;align-items:flex-start;}
+.hero-content{display:grid;grid-template-columns:1fr 280px;align-items:center;gap:32px;}
+.hero-left{display:flex;flex-direction:column;align-items:flex-start;}
+.hero-visual{display:flex;align-items:center;justify-content:center;position:relative;}
+.hero-visual::before{content:'';position:absolute;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(142,119,99,.09) 0%,transparent 68%);pointer-events:none;}
+.hero-logo-bg{width:240px;height:240px;object-fit:contain;opacity:.13;filter:sepia(.6) brightness(1.25) saturate(.5);mix-blend-mode:multiply;position:relative;z-index:1;user-select:none;pointer-events:none;}
 .hero-title{font-size:clamp(1.85rem,3.2vw,2.6rem);color:var(--brand);line-height:1.38;letter-spacing:.04em;margin-bottom:64px;text-shadow:none;}
 .hero-title .accent{color:var(--brand);}
 .hero-line{width:32px;height:2px;background:var(--oak);margin-bottom:28px;}
@@ -103,6 +107,8 @@
   .hs-wrap{aspect-ratio:5/2;height:auto;max-height:none;min-height:150px;}
   .hs-btn{display:none;}
   .hero-content-wrap{padding:26px 0 56px;}
+  .hero-content{grid-template-columns:1fr;gap:0;}
+  .hero-visual{display:none;}
   .hero-title{font-size:clamp(1.72rem,7.2vw,2.1rem);line-height:1.42;margin-bottom:52px;}
   .hero-desc{margin-bottom:0;line-height:2.05;}
   .hero-notice-inline{margin-top:36px;font-size:.87rem;}
@@ -244,6 +250,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--oak);outline-offset
 </div>
 <div class="hero-content-wrap">
 <div class="container hero-content">
+<div class="hero-left">
 <div class="hero-line"></div>
 <h1 class="hero-title">中壢・青埔<br>公司借址登記<br><span class="hero-amp">&</span> 獨立辦公室</h1>
 <p class="hero-desc">適合 SOHO、新創、接案工作者與 2～5 人團隊，提供公司借址登記、小型辦公室、公司設立、會計記帳與創業初期支援。</p>
@@ -254,6 +261,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--oak);outline-offset
     <span class="hni-sub">借址登記名額所剩不多，把握機會！</span>
   </span>
   <a href="tel:032759489" class="hni-btn">立即來電 →</a>
+</div>
+</div>
+<div class="hero-visual" aria-hidden="true">
+  <img src="images/logo.webp" alt="" class="hero-logo-bg" width="240" height="240" draggable="false">
 </div>
 </div>
 </div>
