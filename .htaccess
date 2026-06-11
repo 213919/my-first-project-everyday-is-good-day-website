@@ -1,0 +1,18 @@
+RewriteEngine On
+
+# 舊版網址 → 新版對應頁面
+RewriteRule ^最新消息-1/f/日日好日商務中心-中壢最溫馨的共享辦公室/?$ /index.html [R=301,L]
+RewriteRule ^最新消息-1/f/中壢日日好日商務中心/?$ /index.html [R=301,L]
+RewriteRule ^最新消息-1/f/專業-臺勤會計師事務所-攜手聯合/?$ /services.html [R=301,L]
+RewriteRule ^最新消息-1/f/獨立辦公室-人氣出租中/?$ /space.html [R=301,L]
+RewriteRule ^最新消息-1/f/如同無印良品般地質感共享辦公室/?$ /space.html [R=301,L]
+RewriteRule ^最新消息-1/f/高規格商業攝影.*/?$ /space.html [R=301,L]
+RewriteRule ^最新消息-1/f/共享辦公室：創業新趨勢.*/?$ /news.html [R=301,L]
+RewriteRule ^最新消息-1/?$ /news.html [R=301,L]
+RewriteRule ^最新消息-1/.*$ /news.html [R=301,L]
+
+# 萬用：其他所有舊版未知路徑 → 首頁
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} ^/最新消息
+RewriteRule ^.*$ /index.html [R=301,L]
