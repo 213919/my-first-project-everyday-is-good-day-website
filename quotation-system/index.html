@@ -191,11 +191,15 @@
 
   <!-- 預覽頁 -->
   <main id="view-preview" class="view">
-    <div class="page-header no-print">
-      <h1>報價單預覽</h1>
+    <div class="page-header no-print" id="preview-toolbar">
+      <h1 id="preview-title">報價單預覽</h1>
       <div class="header-actions">
-        <button class="btn btn-outline" id="btn-back-to-list" onclick="showView('list')">返回列表</button>
-        <button class="btn btn-outline" id="btn-edit-from-preview" onclick="editFromPreview()">編輯</button>
+        <button class="btn btn-outline owner-only" id="btn-back-to-list" onclick="showView('list')">返回列表</button>
+        <button class="btn btn-outline owner-only" id="btn-edit-from-preview" onclick="editFromPreview()">編輯</button>
+        <button class="btn btn-outline" onclick="copyShareLink()" id="btn-share">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+          複製分享連結
+        </button>
         <button class="btn btn-primary" onclick="window.print()">列印 / 匯出 PDF</button>
       </div>
     </div>
@@ -204,6 +208,9 @@
       <!-- 由 JS 動態產生 -->
     </div>
   </main>
+
+  <!-- Toast 提示 -->
+  <div id="toast" class="toast"></div>
 
   <script src="app.js"></script>
 </body>

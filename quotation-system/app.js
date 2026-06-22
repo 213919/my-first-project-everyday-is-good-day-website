@@ -15,6 +15,7 @@ function saveData(data) {
 // ===== State =====
 let quotes = loadData();
 let currentPreviewId = null;
+let isReadonlyMode = false; // 客戶端唯讀模式
 
 // ===== Utilities =====
 function genId() {
@@ -53,8 +54,47 @@ function autoQuoteNo() {
   return `QT-${y}-${String(next).padStart(3, '0')}`;
 }
 
+// ===== Share Link (encode/decode) =====
+function encodeQuote(q) {
+  try {
+    const json = JSON.stringify(q);
+    return btoa(encodeURIComponent(json));
+  } catch { return null; }
+}
+
+function decodeQuote(str) {
+  try {
+    return JSON.parse(decodeURIComponent(atob(str)));
+  } catch { return null; }
+}
+
+function copyShareLink() {
+  const q = quotes.find(x => x.id === currentPreviewId);
+  if (!q) return;
+  const encoded = encodeQuote(q);
+  if (!encoded) { showToast('產生連結失敗'); return; }
+  const url = `${location.origin}${location.pathname}?q=${encoded}`;
+  navigator.clipboard.writeText(url).then(() => {
+    showToast('分享連結已複製！傳給客戶即可查看報價單');
+  }).catch(() => {
+    // fallback: select text
+    prompt('複製以下連結並傳給客戶：', url);
+  });
+}
+
+// ===== Toast =====
+let toastTimer = null;
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 3000);
+}
+
 // ===== View Switching =====
 function showView(name) {
+  if (isReadonlyMode && name !== 'preview') return; // 唯讀模式鎖定在 preview
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(`view-${name}`).classList.add('active');
 
@@ -205,7 +245,6 @@ function addItem() {
   items.push({ name: '', desc: '', qty: 1, unit: '式', price: 0 });
   renderItemsTable(items);
   recalc();
-  // focus new row
   const rows = document.querySelectorAll('#items-tbody tr');
   const lastRow = rows[rows.length - 1];
   if (lastRow) lastRow.querySelector('input').focus();
@@ -247,7 +286,6 @@ function recalc() {
 
   const discount = parseFloat(document.getElementById('f-discount').value) || 0;
   const tax = parseFloat(document.getElementById('f-tax').value) || 0;
-
   const afterDiscount = subtotal * (1 - discount / 100);
   const total = afterDiscount * (1 + tax / 100);
 
@@ -308,11 +346,7 @@ function saveQuote() {
 }
 
 // ===== Preview =====
-function previewQuote(id) {
-  const q = quotes.find(x => x.id === id);
-  if (!q) return;
-  currentPreviewId = id;
-
+function renderPreviewHTML(q) {
   const subtotal = q.subtotal ?? 0;
   const discount = q.discount ?? 0;
   const tax = q.tax ?? 0;
@@ -330,8 +364,8 @@ function previewQuote(id) {
     </tr>
   `).join('');
 
-  const discountRow = discount > 0 ? `<tr><td colspan="5" style="text-align:right">折扣 (${discount}%)</td><td>- ${fmtMoney(subtotal * discount / 100)}</td></tr>` : '';
-  const taxRow = tax > 0 ? `<tr><td colspan="5" style="text-align:right">稅金 (${tax}%)</td><td>${fmtMoney(afterDiscount * tax / 100)}</td></tr>` : '';
+  const discountRow = discount > 0 ? `<tr><td colspan="5" style="text-align:right">折扣 (${discount}%)</td><td style="text-align:right">- ${fmtMoney(subtotal * discount / 100)}</td></tr>` : '';
+  const taxRow = tax > 0 ? `<tr><td colspan="5" style="text-align:right">稅金 (${tax}%)</td><td style="text-align:right">${fmtMoney(afterDiscount * tax / 100)}</td></tr>` : '';
 
   const notesSection = q.notes ? `
     <div class="preview-notes">
@@ -339,7 +373,7 @@ function previewQuote(id) {
       <p>${esc(q.notes)}</p>
     </div>` : '';
 
-  const html = `
+  return `
     <div class="preview-header">
       <div class="preview-company">
         <h1>報價單</h1>
@@ -392,9 +426,35 @@ function previewQuote(id) {
       此報價單由報價系統自動產生・如有疑問請聯繫我們
     </div>
   `;
+}
 
-  document.getElementById('quote-preview-content').innerHTML = html;
+function previewQuote(id) {
+  const q = quotes.find(x => x.id === id);
+  if (!q) return;
+  currentPreviewId = id;
+  document.getElementById('quote-preview-content').innerHTML = renderPreviewHTML(q);
   showView('preview');
+}
+
+// ===== Readonly mode (client view from share link) =====
+function enterReadonlyMode(q) {
+  isReadonlyMode = true;
+
+  // 隱藏導覽列，改顯示唯讀提示
+  document.querySelector('.topbar').style.display = 'none';
+  const banner = document.createElement('div');
+  banner.className = 'readonly-banner no-print';
+  banner.textContent = '您正在查看報價單 · 此頁面為唯讀';
+  document.body.insertBefore(banner, document.body.firstChild);
+
+  // 隱藏編輯和返回按鈕
+  document.querySelectorAll('.owner-only').forEach(el => el.style.display = 'none');
+
+  currentPreviewId = null;
+  document.getElementById('quote-preview-content').innerHTML = renderPreviewHTML(q);
+  document.getElementById('view-preview').classList.add('active');
+  document.getElementById('preview-title').textContent = `報價單 ${q.number || ''}`;
+  document.title = `報價單 ${q.number || ''} - ${q.clientName || ''}`;
 }
 
 function esc(s) {
@@ -403,5 +463,18 @@ function esc(s) {
 
 // ===== Init =====
 document.addEventListener('DOMContentLoaded', () => {
-  showView('list');
+  const params = new URLSearchParams(location.search);
+  const qParam = params.get('q');
+
+  if (qParam) {
+    const q = decodeQuote(qParam);
+    if (q) {
+      enterReadonlyMode(q);
+    } else {
+      showToast('連結已損毀，無法載入報價單');
+      showView('list');
+    }
+  } else {
+    showView('list');
+  }
 });
