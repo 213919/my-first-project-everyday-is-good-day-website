@@ -357,5 +357,20 @@ h1{margin:16px 0 12px;font-size:clamp(34px,4.6vw,52px);line-height:1.2;letter-sp
     mobileMenu?.classList.remove('open');
   }));
 </script>
+<style>
+.callbar{display:none}
+@media(max-width:768px){
+.callbar{display:flex;gap:10px;position:fixed;bottom:0;left:0;right:0;z-index:850;padding:9px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(255,252,248,.9);backdrop-filter:blur(18px) saturate(1.4);-webkit-backdrop-filter:blur(18px) saturate(1.4);border-top:1px solid rgba(216,207,197,.5);box-shadow:0 -4px 20px rgba(46,42,38,.1)}
+.callbar a{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;font-weight:700;text-decoration:none;letter-spacing:.03em;transition:transform .18s}
+.callbar .cb-call{flex:1 1 auto;padding:14px 12px;font-size:1rem;background:var(--brand,#2D5016);color:#fff;box-shadow:0 6px 18px rgba(45,80,22,.32)}
+.callbar .cb-call:active{transform:scale(.97)}
+.callbar .cb-mail{flex:0 0 auto;width:52px;padding:14px 0;font-size:1.2rem;background:#fff;color:var(--brand,#2D5016);border:1.5px solid rgba(45,80,22,.35)}
+body{padding-bottom:76px!important}
+}
+</style>
+<div class="callbar">
+<a class="cb-call" href="tel:032759489" aria-label="立即來電 03-275-9489">📞 立即來電諮詢</a>
+<a class="cb-mail" href="mailto:edgd2619@gmail.com" aria-label="來信詢問">✉️</a>
+</div>
 </body>
 </html>
