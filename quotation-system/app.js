@@ -73,11 +73,11 @@ function copyShareLink() {
   if (!q) return;
   const encoded = encodeQuote(q);
   if (!encoded) { showToast('產生連結失敗'); return; }
-  const url = `${location.origin}${location.pathname}?q=${encoded}`;
+  const number = encodeURIComponent(q.number || q.id);
+  const url = `${location.origin}${location.pathname}?q=${number}&d=${encoded}`;
   navigator.clipboard.writeText(url).then(() => {
     showToast('分享連結已複製！傳給客戶即可查看報價單');
   }).catch(() => {
-    // fallback: select text
     prompt('複製以下連結並傳給客戶：', url);
   });
 }
@@ -464,10 +464,10 @@ function esc(s) {
 // ===== Init =====
 document.addEventListener('DOMContentLoaded', () => {
   const params = new URLSearchParams(location.search);
-  const qParam = params.get('q');
+  const dParam = params.get('d'); // 報價資料（base64）
 
-  if (qParam) {
-    const q = decodeQuote(qParam);
+  if (dParam) {
+    const q = decodeQuote(dParam);
     if (q) {
       enterReadonlyMode(q);
     } else {
