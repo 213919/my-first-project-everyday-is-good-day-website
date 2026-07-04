@@ -51,8 +51,8 @@ def main():
             elif n < 10: add(f, 'M', f'title 僅 {n} 字（過短）')
 
         # description
-        d = (grab(r'<meta[^>]*name=["\']description["\'][^>]*content=["\'](.*?)["\']', h)
-             or grab(r'<meta[^>]*content=["\'](.*?)["\'][^>]*name=["\']description["\']', h))
+        d = (grab(r'<meta[^>]*name=["\']description["\'][^>]*content=["\']([^"\']*)["\']', h)
+             or grab(r'<meta[^>]*content=["\']([^"\']*)["\'][^>]*name=["\']description["\']', h))
         if not d:
             add(f, 'H', '缺 meta description')
         else:
