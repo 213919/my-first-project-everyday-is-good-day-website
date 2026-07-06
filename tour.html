@@ -202,7 +202,7 @@ button{font-family:inherit;cursor:pointer;background:none;border:none;-webkit-ta
 var SCENES=[
  {img:'images/tour/tour-1.webp',name:'大門入口',code:'ENTRANCE'},
  {img:'images/tour/tour-2.webp',name:'接待 ‧ 展示區',code:'RECEPTION'},
- {img:'images/tour/tour-3.webp',name:'會議長桌區',code:'MEETING AREA'},
+ {img:'images/tour/tour-3.webp',name:'會議長桌區',code:'MEETING AREA',start:'center'},
  {img:'images/tour/tour-4.webp',name:'日式走廊',code:'CORRIDOR'},
  {img:'images/tour/tour-5.webp',name:'休憩交流區',code:'LOUNGE'},
  {img:'images/tour/tour-6.webp',name:'採光窗景吧台',code:'WINDOW VIEW'},
@@ -266,8 +266,8 @@ function show(i,walk){
     if(imgEl)imgEl.remove();
     imgEl=im.cloneNode();imgEl.className='';
     pano.appendChild(imgEl);
-    cover(im.naturalWidth,im.naturalHeight);
-    x=0;
+    var d=cover(im.naturalWidth,im.naturalHeight);
+    x=(SCENES[i].start==='center')?(d.vw-d.w)/2:0;
     fit();
     autoDir=-1;
     requestAnimationFrame(function(){imgEl.classList.add('ready');busy=false;});
