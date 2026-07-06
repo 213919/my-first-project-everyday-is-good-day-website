@@ -22,21 +22,22 @@
 <link rel="icon" href="/images/logo.webp" type="image/webp"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中壢館 360° 線上參觀","description":"日日好日商務中心中壢館環景線上參觀，含入口接待區、日式走廊、休憩區與城市窗景共八個站點。","url":"https://edgd2619.com/tour.html","primaryImageOfPage":"https://edgd2619.com/images/tour/tour-og.webp","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"about":{"@type":"LocalBusiness","name":"日日好日商務中心","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"}}}</script>
 <style>
-:root{--brand:#2D5016;--brand-deep:#1E3A0F;--off-white:#F7F3EE;--text:#5E5148;--border:#D8CFC5;}
+:root{--brand:#2D5016;--brand-deep:#1E3A0F;--off-white:#F7F3EE;--gray:#F4EEE7;--text:#5E5148;--text-sub:#7A6F67;--border:#D8CFC5;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Heiti TC',Arial,sans-serif;background:#171410;color:#fff;-webkit-font-smoothing:antialiased;touch-action:none}
+body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Heiti TC',Arial,sans-serif;background:#fff;color:var(--text);-webkit-font-smoothing:antialiased;touch-action:none}
 a{text-decoration:none;color:inherit}
-.stage{position:fixed;inset:0;display:flex;flex-direction:column}
-/* 頂欄 */
-.tbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:rgba(23,20,16,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);z-index:30}
+button{font-family:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.stage{position:fixed;inset:0;display:flex;flex-direction:column;background:#fff}
+/* 頂欄（白）*/
+.tbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:rgba(255,252,248,.94);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);z-index:30}
 .tbar img{width:34px;height:34px;border-radius:50%}
 .tbar-title{flex:1;min-width:0}
-.tbar-title h1{font-size:.92rem;font-weight:700;letter-spacing:.04em;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
-.tbar-title span{display:block;font-size:.66rem;color:rgba(255,255,255,.55);letter-spacing:.08em}
-.tbar-back{flex:0 0 auto;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.85);padding:7px 13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;white-space:nowrap}
+.tbar-title h1{font-size:.92rem;font-weight:700;letter-spacing:.04em;color:var(--brand);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
+.tbar-title span{display:block;font-size:.64rem;color:var(--text-sub);letter-spacing:.08em}
+.tbar-step{flex:0 0 auto;font-size:.72rem;font-weight:700;letter-spacing:.08em;color:var(--brand);background:var(--gray);padding:6px 12px;border-radius:999px;white-space:nowrap}
 /* 環景視窗 */
-.pano{flex:1 1 auto;position:relative;overflow:hidden;background:#0d0b08;cursor:grab}
+.pano{flex:1 1 auto;position:relative;overflow:hidden;background:#EFE8DE;cursor:grab}
 .pano.dragging{cursor:grabbing}
 .pano img{position:absolute;top:0;left:0;height:100%;width:auto;max-width:none;user-select:none;-webkit-user-drag:none;will-change:transform,opacity;opacity:0;
   filter:saturate(1.09) contrast(1.05) brightness(1.03);
@@ -46,59 +47,65 @@ a{text-decoration:none;color:inherit}
 /* 光影潤色層 */
 .grade{position:absolute;inset:0;z-index:5;pointer-events:none}
 .grade::before{content:'';position:absolute;inset:0;
-  background:radial-gradient(ellipse 118% 88% at 50% 46%,transparent 56%,rgba(12,9,5,.34) 100%)}
+  background:radial-gradient(ellipse 118% 88% at 50% 46%,transparent 58%,rgba(30,22,12,.28) 100%)}
 .grade::after{content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(12,9,5,.36) 0%,transparent 14%,transparent 78%,rgba(12,9,5,.5) 100%),
-  linear-gradient(115deg,rgba(255,238,205,.075) 0%,transparent 34%)}
+  background:linear-gradient(180deg,rgba(30,22,12,.2) 0%,transparent 12%,transparent 80%,rgba(30,22,12,.38) 100%),
+  linear-gradient(115deg,rgba(255,238,205,.07) 0%,transparent 34%)}
 /* 走入下一站的白光過場 */
-.flash{position:absolute;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(255,250,240,.85),rgba(255,250,240,.55) 45%,transparent 75%);opacity:0}
+.flash{position:absolute;inset:0;z-index:6;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,rgba(255,250,240,.9),rgba(255,250,240,.55) 45%,transparent 75%);opacity:0}
 .flash.go{animation:stepflash .72s ease}
-@keyframes stepflash{0%{opacity:0}38%{opacity:.9}100%{opacity:0}}
+@keyframes stepflash{0%{opacity:0}38%{opacity:.92}100%{opacity:0}}
 /* 場景資訊 */
-.scene-info{position:absolute;left:16px;bottom:92px;z-index:20;pointer-events:none}
+.scene-info{position:absolute;left:16px;bottom:18px;z-index:20;pointer-events:none}
 .scene-info.swap{animation:riseIn .6s ease}
 @keyframes riseIn{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
-.scene-step{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.14em;color:#D8E8C8;background:rgba(45,80,22,.82);padding:4px 12px;border-radius:999px;margin-bottom:7px}
-.scene-name{font-size:1.18rem;font-weight:700;letter-spacing:.05em;text-shadow:0 2px 14px rgba(0,0,0,.65)}
-.scene-desc{font-size:.78rem;color:rgba(255,255,255,.85);margin-top:3px;text-shadow:0 1px 8px rgba(0,0,0,.65);max-width:72vw}
+.scene-name{font-size:1.18rem;font-weight:700;letter-spacing:.05em;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.7)}
+.scene-desc{font-size:.78rem;color:rgba(255,255,255,.9);margin-top:3px;text-shadow:0 1px 8px rgba(0,0,0,.7);max-width:70vw}
 /* 拖曳提示 */
-.hint{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);z-index:20;display:flex;align-items:center;gap:10px;font-size:.82rem;letter-spacing:.1em;color:rgba(255,255,255,.92);background:rgba(0,0,0,.42);padding:11px 20px;border-radius:999px;pointer-events:none;transition:opacity .5s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint{position:absolute;left:50%;top:34%;transform:translate(-50%,-50%);z-index:20;display:flex;align-items:center;gap:10px;font-size:.82rem;letter-spacing:.1em;color:#fff;background:rgba(30,22,12,.45);padding:11px 20px;border-radius:999px;pointer-events:none;transition:opacity .5s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
 .hint.gone{opacity:0}
 .hint .arr{animation:sway 1.6s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
-/* 中央前進懸浮鈕 */
-.walk{position:absolute;left:50%;bottom:24%;transform:translateX(-50%);z-index:24;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.walk-ring{position:relative;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,252,246,.14);border:1.6px solid rgba(255,255,255,.75);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
-  box-shadow:0 4px 26px rgba(0,0,0,.35),inset 0 0 18px rgba(255,255,255,.12);transition:transform .18s}
-.walk:active .walk-ring{transform:scale(.9)}
-.walk-ring::before{content:'';position:absolute;inset:-9px;border-radius:50%;border:1.4px solid rgba(255,255,255,.45);animation:pulse 2.1s ease-out infinite}
+/* 脈動光圈（共用）*/
 @keyframes pulse{0%{transform:scale(.82);opacity:0}28%{opacity:.85}100%{transform:scale(1.22);opacity:0}}
+/* 中央前進懸浮鈕 */
+.walk{position:absolute;left:50%;bottom:22%;transform:translateX(-50%);z-index:24;display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:none}
+.walk-ring{position:relative;width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,252,246,.16);border:1.6px solid rgba(255,255,255,.8);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);
+  box-shadow:0 4px 26px rgba(0,0,0,.32),inset 0 0 18px rgba(255,255,255,.12);transition:transform .18s}
+.walk:active .walk-ring{transform:scale(.9)}
+.walk-ring::before{content:'';position:absolute;inset:-9px;border-radius:50%;border:1.4px solid rgba(255,255,255,.5);animation:pulse 2.1s ease-out infinite}
 .walk-ring svg{width:26px;height:26px;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5))}
-.walk-label{font-size:.72rem;font-weight:700;letter-spacing:.16em;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.8);background:rgba(0,0,0,.32);padding:4px 13px;border-radius:999px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-.walk.end .walk-ring{background:rgba(45,80,22,.5);border-color:rgba(216,232,200,.9)}
-/* 右側工具直欄 */
-.side{position:absolute;right:12px;bottom:92px;z-index:22;display:flex;flex-direction:column;gap:9px;align-items:flex-end}
-.side button{font-size:.7rem;font-weight:700;letter-spacing:.06em;color:#fff;background:rgba(23,20,16,.55);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 14px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer;font-family:inherit}
-.side button.on{background:var(--brand);border-color:var(--brand)}
-#soundBtn[hidden]{display:none}
-/* 前後站按鈕 */
-.step-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:22;width:44px;height:44px;border-radius:50%;background:rgba(23,20,16,.5);border:1px solid rgba(255,255,255,.2);color:#fff;font-size:1.15rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .2s;cursor:pointer}
-.step-btn:active{background:rgba(45,80,22,.85)}
-#prevBtn{left:10px}#nextBtn{right:10px}
-.step-btn[disabled]{opacity:.26;pointer-events:none}
-/* 站點列 */
-.stops{flex:0 0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 14px;background:rgba(23,20,16,.92);border-top:1px solid rgba(255,255,255,.08);scrollbar-width:none;z-index:30}
+.walk-label{font-size:.72rem;font-weight:700;letter-spacing:.16em;color:#fff;text-shadow:0 1px 10px rgba(0,0,0,.8);background:rgba(30,22,12,.35);padding:4px 13px;border-radius:999px;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+.walk.end .walk-ring{background:rgba(45,80,22,.55);border-color:rgba(216,232,200,.95)}
+/* 左右站按鈕（同款脈動）*/
+.step-btn{position:absolute;top:46%;transform:translateY(-50%);z-index:22;width:48px;height:48px;border-radius:50%;
+  background:rgba(255,252,246,.16);border:1.6px solid rgba(255,255,255,.8);color:#fff;font-size:1.2rem;display:flex;align-items:center;justify-content:center;
+  backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);box-shadow:0 4px 20px rgba(0,0,0,.3);transition:transform .18s}
+.step-btn::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1.3px solid rgba(255,255,255,.5);animation:pulse 2.1s ease-out infinite}
+#prevBtn::before{animation-delay:.7s}
+#nextBtn::before{animation-delay:1.4s}
+.step-btn:active{transform:translateY(-50%) scale(.9)}
+#prevBtn{left:12px}#nextBtn{right:12px}
+.step-btn[disabled]{opacity:.25;pointer-events:none}
+.step-btn[disabled]::before{animation:none;opacity:0}
+/* 站點列（白）*/
+.stops{flex:0 0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 14px;background:#fff;border-top:1px solid var(--border);scrollbar-width:none;z-index:30}
 .stops::-webkit-scrollbar{display:none}
-.stop{flex:0 0 auto;font-size:.72rem;font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.6);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 13px;white-space:nowrap;cursor:pointer;transition:all .2s;font-family:inherit}
+.stop{flex:0 0 auto;font-size:.72rem;font-weight:600;letter-spacing:.04em;color:var(--text-sub);background:var(--gray);border:1px solid var(--border);border-radius:999px;padding:7px 13px;white-space:nowrap;transition:all .2s}
 .stop.active{color:#fff;background:var(--brand);border-color:var(--brand)}
-/* 底部行動列 */
-.cta{flex:0 0 auto;display:flex;gap:10px;padding:9px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(255,252,248,.96);z-index:30}
-.cta a{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;font-weight:700;letter-spacing:.03em}
-.cta .cb-call{flex:1 1 auto;padding:13px 12px;font-size:.98rem;background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(45,80,22,.32)}
-.cta .cb-call:active{transform:scale(.97)}
-.cta .cb-visit{flex:0 0 auto;padding:13px 16px;font-size:.85rem;background:#fff;color:var(--brand);border:1.5px solid rgba(45,80,22,.4)}
-@media(min-width:769px){.scene-name{font-size:1.5rem}.scene-info{left:28px;bottom:100px}#gyroBtn{display:none}.walk{bottom:20%}}
+/* 底部整合功能列（白）*/
+.funcbar{flex:0 0 auto;display:flex;align-items:flex-end;justify-content:space-around;padding:6px 8px calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--border);z-index:30}
+.fn{display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--text-sub);min-width:56px;padding:4px 6px}
+.fn .ico{font-size:1.22rem;line-height:1.25}
+.fn .lbl{font-size:.62rem;font-weight:700;letter-spacing:.08em}
+.fn.on{color:var(--brand)}
+.fn:active{transform:scale(.92)}
+/* 來電：中央強調圓鈕 */
+.fn-call{position:relative;margin-top:-22px}
+.fn-call .ico{width:54px;height:54px;border-radius:50%;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.35rem;box-shadow:0 8px 20px rgba(45,80,22,.38);border:3px solid #fff}
+.fn-call .lbl{color:var(--brand)}
+@media(min-width:769px){.scene-name{font-size:1.5rem}.scene-info{left:28px;bottom:24px}.walk{bottom:18%}}
 </style>
 </head>
 <body>
@@ -109,7 +116,7 @@ a{text-decoration:none;color:inherit}
       <h1>中壢館 360° 線上參觀</h1>
       <span>日日好日商務中心 EVERY DAY GOOD DAY</span>
     </div>
-    <a class="tbar-back" href="index.html">返回官網</a>
+    <span class="tbar-step" id="sceneStep">1 / 8</span>
   </header>
 
   <div class="pano" id="pano">
@@ -117,7 +124,6 @@ a{text-decoration:none;color:inherit}
     <div class="flash" id="flash"></div>
     <div class="hint" id="hint"><span class="arr">⟵</span> 左右拖曳環顧四周 <span class="arr">⟶</span></div>
     <div class="scene-info" id="sceneInfo">
-      <span class="scene-step" id="sceneStep">第 1 站 / 共 8 站</span>
       <div class="scene-name" id="sceneName">入口・接待區</div>
       <div class="scene-desc" id="sceneDesc">推開大門的第一眼，溫暖木質接待空間</div>
     </div>
@@ -129,21 +135,18 @@ a{text-decoration:none;color:inherit}
     </button>
     <button class="step-btn" id="prevBtn" aria-label="上一站">‹</button>
     <button class="step-btn" id="nextBtn" aria-label="下一站">›</button>
-    <div class="side">
-      <button id="soundBtn" hidden>🔇 音樂</button>
-      <button id="gyroBtn">🧭 體感模式</button>
-    </div>
   </div>
 
   <nav class="stops" id="stops" aria-label="參觀站點"></nav>
 
-  <div class="cta">
-    <a class="cb-call" href="tel:032759489">📞 喜歡嗎？預約實地參觀</a>
-    <a class="cb-visit" href="contact.html">聯絡我們</a>
-  </div>
+  <nav class="funcbar" aria-label="功能列">
+    <a class="fn" href="index.html"><span class="ico">🏠</span><span class="lbl">返回首頁</span></a>
+    <a class="fn" href="contact.html"><span class="ico">📝</span><span class="lbl">記事</span></a>
+    <a class="fn fn-call" href="tel:032759489" aria-label="來電 03-275-9489"><span class="ico">📞</span><span class="lbl">來電</span></a>
+    <button class="fn" id="soundBtn"><span class="ico" id="soundIco">🔇</span><span class="lbl" id="soundLbl">音樂</span></button>
+    <button class="fn" id="gyroBtn"><span class="ico">🧭</span><span class="lbl" id="gyroLbl">體感模式</span></button>
+  </nav>
 </div>
-
-<audio id="bgm" src="music/tour-bgm.mp3" loop preload="metadata"></audio>
 
 <script>
 (function(){
@@ -158,18 +161,23 @@ var SCENES=[
  {img:'images/tour/tour-8.webp',name:'返回入口',desc:'一圈走完，歡迎親自來感受'}
 ];
 var pano=document.getElementById('pano'),hint=document.getElementById('hint'),
-    stopsEl=document.getElementById('stops'),gyroBtn=document.getElementById('gyroBtn'),
+    stopsEl=document.getElementById('stops'),gyroBtn=document.getElementById('gyroBtn'),gyroLbl=document.getElementById('gyroLbl'),
     walkBtn=document.getElementById('walkBtn'),walkLabel=document.getElementById('walkLabel'),
     flash=document.getElementById('flash'),sceneInfo=document.getElementById('sceneInfo'),
-    bgm=document.getElementById('bgm'),soundBtn=document.getElementById('soundBtn');
+    soundBtn=document.getElementById('soundBtn'),soundIco=document.getElementById('soundIco'),soundLbl=document.getElementById('soundLbl');
 var cur=0,x=0,minX=0,imgEl=null,interacted=false,gyroOn=false,lastAlpha=null,busy=false;
-var cache={};
+var cache={},lastInteract=Date.now(),autoDir=-1;
 
+function touch(){lastInteract=Date.now();}
 function loadImg(i,cb){
   if(cache[i]){cb&&cb(cache[i]);return;}
   var im=new Image();
   im.src=SCENES[i].img;im.alt='日日好日商務中心中壢館 '+SCENES[i].name+' 環景';
   im.onload=function(){cache[i]=im;cb&&cb(im);};
+}
+function setX(nx){
+  x=nx;if(x>0)x=0;if(x<minX)x=minX;
+  if(imgEl)imgEl.style.transform='translateX('+x+'px)';
 }
 function fit(){
   if(!imgEl)return;
@@ -177,13 +185,12 @@ function fit(){
   var iw=imgEl.naturalWidth*(vh/imgEl.naturalHeight);
   imgEl.style.height=vh+'px';
   minX=Math.min(0,vw-iw);
-  if(x<minX)x=minX;if(x>0)x=0;
-  imgEl.style.transform='translateX('+x+'px)';
+  setX(x);
 }
 function show(i,walk){
-  if(busy)return;busy=true;
-  cur=i;interacted=false;
-  document.getElementById('sceneStep').textContent='第 '+(i+1)+' 站 / 共 '+SCENES.length+' 站';
+  if(busy)return;busy=true;touch();
+  cur=i;
+  document.getElementById('sceneStep').textContent=(i+1)+' / '+SCENES.length;
   document.getElementById('sceneName').textContent=SCENES[i].name;
   document.getElementById('sceneDesc').textContent=SCENES[i].desc;
   sceneInfo.classList.remove('swap');void sceneInfo.offsetWidth;sceneInfo.classList.add('swap');
@@ -207,6 +214,7 @@ function show(i,walk){
     var iw=im.naturalWidth*(vh/im.naturalHeight);
     x=(vw-iw)/2;
     fit();
+    autoDir=(Math.random()<.5)?-1:1;
     requestAnimationFrame(function(){imgEl.classList.add('ready');busy=false;});
     if(i+1<SCENES.length)loadImg(i+1);
     if(i-1>=0)loadImg(i-1);
@@ -215,7 +223,7 @@ function show(i,walk){
 // 站點列
 SCENES.forEach(function(s,i){
   var b=document.createElement('button');b.className='stop';b.textContent=(i+1)+'. '+s.name;
-  b.addEventListener('click',function(){show(i);});
+  b.addEventListener('click',function(){tryMusic();show(i,true);});
   stopsEl.appendChild(b);
 });
 // 中央前進鈕
@@ -226,26 +234,24 @@ walkBtn.addEventListener('click',function(){
 // 拖曳
 var dragging=false,sx=0,ox=0,vx=0,lastT=0,lastX=0,raf=null;
 function onDown(e){
-  if(e.target.closest&&e.target.closest('button'))return;
-  dragging=true;pano.classList.add('dragging');
+  if(e.target.closest&&e.target.closest('button,a'))return;
+  dragging=true;pano.classList.add('dragging');touch();
   sx=(e.touches?e.touches[0].clientX:e.clientX);ox=x;vx=0;lastT=Date.now();lastX=sx;
   if(!interacted){interacted=true;hint.classList.add('gone');}
   if(raf){cancelAnimationFrame(raf);raf=null;}
 }
 function onMove(e){
-  if(!dragging)return;
+  if(!dragging)return;touch();
   var cx=(e.touches?e.touches[0].clientX:e.clientX);
   var now=Date.now();if(now-lastT>16){vx=(cx-lastX)/(now-lastT);lastT=now;lastX=cx;}
-  x=ox+(cx-sx);if(x>0)x=0;if(x<minX)x=minX;
-  if(imgEl)imgEl.style.transform='translateX('+x+'px)';
+  setX(ox+(cx-sx));
 }
 function onUp(){
-  if(!dragging)return;dragging=false;pano.classList.remove('dragging');
+  if(!dragging)return;dragging=false;pano.classList.remove('dragging');touch();
   var v=vx*14;
   (function glide(){
     if(Math.abs(v)<.5)return;
-    x+=v;v*=.93;if(x>0){x=0;v=0;}if(x<minX){x=minX;v=0;}
-    if(imgEl)imgEl.style.transform='translateX('+x+'px)';
+    touch();setX(x+v);v*=.93;if(x>=0||x<=minX)v=0;
     raf=requestAnimationFrame(glide);
   })();
 }
@@ -258,24 +264,57 @@ pano.addEventListener('touchend',onUp);
 // 前後站
 document.getElementById('prevBtn').addEventListener('click',function(){tryMusic();if(cur>0)show(cur-1,true);});
 document.getElementById('nextBtn').addEventListener('click',function(){tryMusic();if(cur<SCENES.length-1)show(cur+1,true);});
-// 背景音樂：檔案存在才顯示按鈕
-var musicReady=false,musicOn=false,musicTried=false;
-bgm.volume=.32;
-bgm.addEventListener('loadedmetadata',function(){musicReady=true;soundBtn.hidden=false;});
-bgm.addEventListener('error',function(){musicReady=false;soundBtn.hidden=true;});
-function tryMusic(){
-  if(!musicReady||musicTried)return;musicTried=true;
-  bgm.play().then(function(){musicOn=true;updateSound();}).catch(function(){musicTried=false;});
-}
+// 自動環顧漂移：閒置 2.6 秒後緩慢左右巡視
+(function drift(){
+  if(imgEl&&!dragging&&!busy&&!gyroOn&&Date.now()-lastInteract>2600&&minX<0){
+    x+=autoDir*.34;
+    if(x<=minX){x=minX;autoDir=1;}
+    if(x>=0){x=0;autoDir=-1;}
+    imgEl.style.transform='translateX('+x+'px)';
+  }
+  requestAnimationFrame(drift);
+})();
+// 背景音樂：Web Audio 無縫循環，音量 31%
+var actx=null,musicBuf=null,srcNode=null,gainNode=null,musicOn=false,musicLoading=false,musicFailed=false;
 function updateSound(){
-  soundBtn.textContent=musicOn?'🔊 音樂中':'🔇 音樂';
+  soundIco.textContent=musicOn?'🔊':'🔇';
+  soundLbl.textContent=musicOn?'音樂中':'音樂';
   soundBtn.classList.toggle('on',musicOn);
 }
+function startMusic(){
+  if(!actx||!musicBuf||musicOn)return;
+  srcNode=actx.createBufferSource();
+  srcNode.buffer=musicBuf;srcNode.loop=true;
+  gainNode=actx.createGain();gainNode.gain.value=.31;
+  srcNode.connect(gainNode).connect(actx.destination);
+  srcNode.start(0);musicOn=true;updateSound();
+}
+function stopMusic(){
+  if(srcNode){try{srcNode.stop();}catch(e){}srcNode=null;}
+  musicOn=false;updateSound();
+}
+function tryMusic(){
+  if(musicOn||musicFailed)return;
+  if(!actx){
+    var AC=window.AudioContext||window.webkitAudioContext;
+    if(!AC){musicFailed=true;return;}
+    actx=new AC();
+  }
+  if(actx.state==='suspended')actx.resume();
+  if(musicBuf){startMusic();return;}
+  if(musicLoading)return;
+  musicLoading=true;
+  fetch('music/tour-bgm.mp3').then(function(r){
+    if(!r.ok)throw new Error('http '+r.status);
+    return r.arrayBuffer();
+  }).then(function(ab){
+    return actx.decodeAudioData(ab);
+  }).then(function(buf){
+    musicBuf=buf;startMusic();
+  }).catch(function(){musicFailed=true;updateSound();});
+}
 soundBtn.addEventListener('click',function(){
-  if(!musicReady)return;
-  if(musicOn){bgm.pause();musicOn=false;}
-  else{bgm.play().then(function(){musicOn=true;updateSound();}).catch(function(){});musicTried=true;}
-  updateSound();
+  if(musicOn)stopMusic();else tryMusic();
 });
 // 體感模式
 function onOrient(e){
@@ -284,14 +323,13 @@ function onOrient(e){
   var d=e.alpha-lastAlpha;
   if(d>180)d-=360;if(d<-180)d+=360;
   lastAlpha=e.alpha;
-  x+=d*7;if(x>0)x=0;if(x<minX)x=minX;
-  if(imgEl)imgEl.style.transform='translateX('+x+'px)';
+  touch();setX(x+d*7);
   if(!interacted&&Math.abs(d)>.5){interacted=true;hint.classList.add('gone');}
 }
 gyroBtn.addEventListener('click',function(){
   tryMusic();
-  if(gyroOn){gyroOn=false;lastAlpha=null;gyroBtn.classList.remove('on');gyroBtn.textContent='🧭 體感模式';return;}
-  function enable(){gyroOn=true;gyroBtn.classList.add('on');gyroBtn.textContent='🧭 體感中・點擊關閉';window.addEventListener('deviceorientation',onOrient);}
+  if(gyroOn){gyroOn=false;lastAlpha=null;gyroBtn.classList.remove('on');gyroLbl.textContent='體感模式';return;}
+  function enable(){gyroOn=true;gyroBtn.classList.add('on');gyroLbl.textContent='體感中';window.addEventListener('deviceorientation',onOrient);}
   if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
     DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')enable();}).catch(function(){});
   }else{enable();}
