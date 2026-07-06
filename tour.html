@@ -8,7 +8,7 @@
 <meta content="website" property="og:type"/>
 <meta content="中壢館 360° 線上參觀｜日日好日商務中心" property="og:title"/>
 <meta content="用手機環顧日日好日商務中心中壢館：入口接待、日式走廊、休憩區與城市窗景，一路逛完全館，看完歡迎預約實地參觀。" property="og:description"/>
-<meta content="https://edgd2619.com/images/tour/tour-og.webp" property="og:image"/>
+<meta content="https://edgd2619.com/images/og-share.webp" property="og:image"/>
 <meta content="1200" property="og:image:width"/>
 <meta content="630" property="og:image:height"/>
 <meta content="zh_TW" property="og:locale"/>
@@ -17,10 +17,10 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="中壢館 360° 線上參觀｜日日好日商務中心"/>
 <meta name="twitter:description" content="用手機環顧日日好日商務中心中壢館：入口接待、日式走廊、休憩區與城市窗景，一路逛完全館。"/>
-<meta name="twitter:image" content="https://edgd2619.com/images/tour/tour-og.webp"/>
+<meta name="twitter:image" content="https://edgd2619.com/images/og-share.webp"/>
 <link rel="canonical" href="https://edgd2619.com/tour.html"/>
 <link rel="icon" href="/images/logo.webp" type="image/webp"/>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中壢館 360° 線上參觀","description":"日日好日商務中心中壢館環景線上參觀，含入口接待區、日式走廊、休憩區與城市窗景共八個站點。","url":"https://edgd2619.com/tour.html","primaryImageOfPage":"https://edgd2619.com/images/tour/tour-og.webp","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"about":{"@type":"LocalBusiness","name":"日日好日商務中心","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"}}}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中壢館 360° 線上參觀","description":"日日好日商務中心中壢館環景線上參觀，含入口接待區、日式走廊、休憩區與城市窗景共八個站點。","url":"https://edgd2619.com/tour.html","primaryImageOfPage":"https://edgd2619.com/images/og-share.webp","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"about":{"@type":"LocalBusiness","name":"日日好日商務中心","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"}}}</script>
 <style>
 :root{
   --ivory:#FBF9F4;--sand:#F3EEE5;--sand-deep:#EBE4D7;
@@ -233,12 +233,17 @@ function setX(nx){
   x=nx;if(x>0)x=0;if(x<minX)x=minX;
   if(imgEl)imgEl.style.transform='translateX('+x+'px)';
 }
+function cover(nw,nh){
+  var vw=pano.clientWidth,vh=pano.clientHeight;
+  var sc=Math.max(vh/nh,vw/nw);
+  return {w:nw*sc,h:nh*sc,vw:vw,vh:vh};
+}
 function fit(){
   if(!imgEl)return;
-  var vw=pano.clientWidth,vh=pano.clientHeight;
-  var iw=imgEl.naturalWidth*(vh/imgEl.naturalHeight);
-  imgEl.style.height=vh+'px';
-  minX=Math.min(0,vw-iw);
+  var d=cover(imgEl.naturalWidth,imgEl.naturalHeight);
+  imgEl.style.width=d.w+'px';imgEl.style.height=d.h+'px';
+  imgEl.style.top=((d.vh-d.h)/2)+'px';
+  minX=Math.min(0,d.vw-d.w);
   setX(x);
 }
 function show(i,walk){
@@ -266,9 +271,8 @@ function show(i,walk){
     if(imgEl)imgEl.remove();
     imgEl=im.cloneNode();imgEl.className='';
     pano.appendChild(imgEl);
-    var vw=pano.clientWidth,vh=pano.clientHeight;
-    var iw=im.naturalWidth*(vh/im.naturalHeight);
-    x=(vw-iw)/2;
+    var d=cover(im.naturalWidth,im.naturalHeight);
+    x=(d.vw-d.w)/2;
     fit();
     autoDir=(Math.random()<.5)?-1:1;
     requestAnimationFrame(function(){imgEl.classList.add('ready');busy=false;});
