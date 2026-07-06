@@ -19,6 +19,7 @@
 <meta name="twitter:description" content="用手機環顧日日好日商務中心中壢館：入口接待、日式走廊、休憩區與城市窗景，一路逛完全館。"/>
 <meta name="twitter:image" content="https://edgd2619.com/images/og-share.webp"/>
 <link rel="canonical" href="https://edgd2619.com/tour.html"/>
+<link rel="preload" href="images/tour/tour-1.webp" as="image" fetchpriority="high"/>
 <link rel="icon" href="/images/logo.webp" type="image/webp"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中壢館 360° 線上參觀","description":"日日好日商務中心中壢館環景線上參觀，含入口接待區、日式走廊、休憩區與城市窗景共八個站點。","url":"https://edgd2619.com/tour.html","primaryImageOfPage":"https://edgd2619.com/images/og-share.webp","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"about":{"@type":"LocalBusiness","name":"日日好日商務中心","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"}}}</script>
 <style>
@@ -396,8 +397,8 @@ gyroBtn.addEventListener('click',function(){
 });
 window.addEventListener('resize',fit);
 show(0);
-// 自動播放：載入即啟動（瀏覽器若先靜音，第一次觸碰畫面立刻出聲）
-tryMusic();
+// 自動播放：首圖先行，音樂延後 1.2 秒抓取避免搶頻寬
+setTimeout(tryMusic,1200);
 ['pointerdown','touchstart','keydown'].forEach(function(ev){
   document.addEventListener(ev,function(){
     if(musicFailed)return;
