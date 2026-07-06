@@ -336,8 +336,9 @@ document.getElementById('nextBtn').addEventListener('click',function(){tryMusic(
 // 背景音樂：Web Audio 無縫循環，音量 31%
 var actx=null,musicBuf=null,srcNode=null,gainNode=null,musicOn=false,musicLoading=false,musicFailed=false;
 function updateSound(){
-  soundLbl.textContent=musicOn?'播放中':'背景音樂';
-  soundBtn.classList.toggle('on',musicOn);
+  var audible=musicOn&&actx&&actx.state==='running';
+  soundLbl.textContent=audible?'播放中':'背景音樂';
+  soundBtn.classList.toggle('on',audible);
 }
 function startMusic(){
   if(!actx||!musicBuf||musicOn)return;
@@ -357,6 +358,7 @@ function tryMusic(){
     var AC=window.AudioContext||window.webkitAudioContext;
     if(!AC){musicFailed=true;return;}
     actx=new AC();
+    actx.onstatechange=updateSound;
   }
   if(actx.state==='suspended')actx.resume();
   if(musicBuf){startMusic();return;}
@@ -394,6 +396,15 @@ gyroBtn.addEventListener('click',function(){
 });
 window.addEventListener('resize',fit);
 show(0);
+// 自動播放：載入即啟動（瀏覽器若先靜音，第一次觸碰畫面立刻出聲）
+tryMusic();
+['pointerdown','touchstart','keydown'].forEach(function(ev){
+  document.addEventListener(ev,function(){
+    if(musicFailed)return;
+    if(actx&&actx.state==='suspended')actx.resume();
+    if(!musicOn)tryMusic();
+  },{passive:true});
+});
 })();
 </script>
 </body>
