@@ -69,14 +69,13 @@ button{font-family:inherit;cursor:pointer;background:none;border:none;-webkit-ta
 .hud-tag{flex:0 0 auto;font-size:.58rem;font-weight:500;letter-spacing:.18em;color:var(--charcoal-soft);white-space:nowrap;transition:opacity .2s var(--ease)}
 .hud-tag.dim{opacity:0}
 /* ===== 中央同心圓錨點 ===== */
-.anchor{position:fixed;left:50%;top:54%;transform:translate(-50%,-50%);z-index:24;display:flex;flex-direction:column;align-items:center;gap:14px}
-.anchor-core{position:relative;width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,253,247,.18);border:1px solid rgba(255,255,255,.55);
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  box-shadow:var(--shadow),inset 0 1px 0 rgba(255,255,255,.75);transition:transform .2s var(--ease)}
+.anchor{position:fixed;left:50%;top:63%;transform:translate(-50%,-50%);z-index:24;display:flex;flex-direction:column;align-items:center;gap:14px}
+.anchor-core{position:relative;width:58px;height:58px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,253,247,.06);border:1px solid rgba(255,255,255,.32);
+  transition:transform .2s var(--ease)}
 .anchor:active .anchor-core{transform:scale(.92)}
-.anchor-core::before{content:'';position:absolute;inset:-10px;border-radius:50%;border:1px solid rgba(255,255,255,.38);animation:breathe 3.2s var(--ease) infinite}
-.anchor-core svg{width:20px;height:20px;stroke:rgba(62,58,51,.75);animation:floatUp 2.3s var(--ease) infinite}
+.anchor-core::before{content:'';position:absolute;inset:-10px;border-radius:50%;border:1px solid rgba(255,255,255,.22);animation:breathe 3.2s var(--ease) infinite}
+.anchor-core svg{width:20px;height:20px;stroke:rgba(255,255,255,.9);filter:drop-shadow(0 1px 4px rgba(50,42,30,.45));animation:floatUp 2.3s var(--ease) infinite}
 @keyframes floatUp{0%,100%{transform:translateY(3px);opacity:.7}50%{transform:translateY(-3px);opacity:1}}
 @keyframes breathe{0%,100%{transform:scale(1);opacity:.85}50%{transform:scale(1.06);opacity:.45}}
 .anchor-label{display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none}
@@ -196,10 +195,6 @@ button{font-family:inherit;cursor:pointer;background:none;border:none;-webkit-ta
     <svg viewBox="0 0 24 24"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
     <span class="lbl" id="soundLbl">背景音樂</span>
   </button>
-  <button class="dk" id="gyroBtn">
-    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 8l-2.5 5.5L8 16l2.5-5.5z"/></svg>
-    <span class="lbl" id="gyroLbl">體感模式</span>
-  </button>
 </nav>
 
 <script>
@@ -215,11 +210,11 @@ var SCENES=[
  {img:'images/tour/tour-8.webp',name:'迴廊 ‧ 返回入口',code:'RETURN'}
 ];
 var pano=document.getElementById('pano'),hint=document.getElementById('hint'),
-    stopsEl=document.getElementById('stops'),gyroBtn=document.getElementById('gyroBtn'),gyroLbl=document.getElementById('gyroLbl'),
+    stopsEl=document.getElementById('stops'),
     walkBtn=document.getElementById('walkBtn'),walkSub=document.getElementById('walkSub'),anchorWrap=document.getElementById('anchorWrap'),
     flash=document.getElementById('flash'),hudTag=document.getElementById('hudTag'),
     soundBtn=document.getElementById('soundBtn'),soundLbl=document.getElementById('soundLbl');
-var cur=0,x=0,minX=0,imgEl=null,interacted=false,gyroOn=false,lastAlpha=null,busy=false;
+var cur=0,x=0,minX=0,imgEl=null,interacted=false,busy=false;
 var cache={},lastInteract=Date.now(),autoDir=-1;
 
 function touch(){lastInteract=Date.now();}
@@ -271,10 +266,10 @@ function show(i,walk){
     if(imgEl)imgEl.remove();
     imgEl=im.cloneNode();imgEl.className='';
     pano.appendChild(imgEl);
-    var d=cover(im.naturalWidth,im.naturalHeight);
-    x=(d.vw-d.w)/2;
+    cover(im.naturalWidth,im.naturalHeight);
+    x=0;
     fit();
-    autoDir=(Math.random()<.5)?-1:1;
+    autoDir=-1;
     requestAnimationFrame(function(){imgEl.classList.add('ready');busy=false;});
     if(i+1<SCENES.length)loadImg(i+1);
     if(i-1>=0)loadImg(i-1);
@@ -326,7 +321,7 @@ document.getElementById('prevBtn').addEventListener('click',function(){tryMusic(
 document.getElementById('nextBtn').addEventListener('click',function(){tryMusic();if(cur<SCENES.length-1)show(cur+1,true);});
 // 自動環顧漂移
 (function drift(){
-  if(imgEl&&!dragging&&!busy&&!gyroOn&&Date.now()-lastInteract>1000&&minX<0){
+  if(imgEl&&!dragging&&!busy&&Date.now()-lastInteract>1000&&minX<0){
     x+=autoDir*.34;
     if(x<=minX){x=minX;autoDir=1;}
     if(x>=0){x=0;autoDir=-1;}
@@ -376,24 +371,6 @@ function tryMusic(){
 }
 soundBtn.addEventListener('click',function(){
   if(musicOn)stopMusic();else tryMusic();
-});
-// 體感模式
-function onOrient(e){
-  if(!gyroOn||e.alpha==null)return;
-  if(lastAlpha==null){lastAlpha=e.alpha;return;}
-  var d=e.alpha-lastAlpha;
-  if(d>180)d-=360;if(d<-180)d+=360;
-  lastAlpha=e.alpha;
-  touch();setX(x+d*7);
-  if(!interacted&&Math.abs(d)>.5){interacted=true;hint.classList.add('gone');}
-}
-gyroBtn.addEventListener('click',function(){
-  tryMusic();
-  if(gyroOn){gyroOn=false;lastAlpha=null;gyroBtn.classList.remove('on');gyroLbl.textContent='體感模式';return;}
-  function enable(){gyroOn=true;gyroBtn.classList.add('on');gyroLbl.textContent='體感中';window.addEventListener('deviceorientation',onOrient);}
-  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
-    DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')enable();}).catch(function(){});
-  }else{enable();}
 });
 window.addEventListener('resize',fit);
 show(0);
