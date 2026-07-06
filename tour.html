@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
+<title>中壢館 360° 線上參觀｜日日好日商務中心</title>
+<meta content="日日好日商務中心中壢館 360° 環景線上參觀：入口接待、日式走廊、休憩區與城市窗景，用手機就能實地走訪一圈。喜歡歡迎預約參觀 03-275-9489。" name="description"/>
+<meta content="website" property="og:type"/>
+<meta content="中壢館 360° 線上參觀｜日日好日商務中心" property="og:title"/>
+<meta content="用手機環顧日日好日商務中心中壢館：入口接待、日式走廊、休憩區與城市窗景，一路逛完全館，看完歡迎預約實地參觀。" property="og:description"/>
+<meta content="https://edgd2619.com/images/tour/tour-og.webp" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="zh_TW" property="og:locale"/>
+<meta content="日日好日商務中心" property="og:site_name"/>
+<meta content="https://edgd2619.com/tour.html" property="og:url"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="中壢館 360° 線上參觀｜日日好日商務中心"/>
+<meta name="twitter:description" content="用手機環顧日日好日商務中心中壢館：入口接待、日式走廊、休憩區與城市窗景，一路逛完全館。"/>
+<meta name="twitter:image" content="https://edgd2619.com/images/tour/tour-og.webp"/>
+<link rel="canonical" href="https://edgd2619.com/tour.html"/>
+<link rel="icon" href="/images/logo.webp" type="image/webp"/>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中壢館 360° 線上參觀","description":"日日好日商務中心中壢館環景線上參觀，含入口接待區、日式走廊、休憩區與城市窗景共八個站點。","url":"https://edgd2619.com/tour.html","primaryImageOfPage":"https://edgd2619.com/images/tour/tour-og.webp","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"about":{"@type":"LocalBusiness","name":"日日好日商務中心","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"}}}</script>
+<style>
+:root{--brand:#2D5016;--brand-deep:#1E3A0F;--off-white:#F7F3EE;--text:#5E5148;--border:#D8CFC5;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Heiti TC',Arial,sans-serif;background:#171410;color:#fff;-webkit-font-smoothing:antialiased;touch-action:none}
+a{text-decoration:none;color:inherit}
+.stage{position:fixed;inset:0;display:flex;flex-direction:column}
+/* 頂欄 */
+.tbar{flex:0 0 auto;display:flex;align-items:center;gap:10px;padding:calc(8px + env(safe-area-inset-top)) 14px 8px;background:rgba(23,20,16,.86);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid rgba(255,255,255,.08);z-index:30}
+.tbar img{width:34px;height:34px;border-radius:50%}
+.tbar-title{flex:1;min-width:0}
+.tbar-title h1{font-size:.92rem;font-weight:700;letter-spacing:.04em;color:#fff;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:inherit}
+.tbar-title span{display:block;font-size:.66rem;color:rgba(255,255,255,.55);letter-spacing:.08em}
+.tbar-back{flex:0 0 auto;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.85);padding:7px 13px;border:1px solid rgba(255,255,255,.25);border-radius:999px;white-space:nowrap}
+/* 環景視窗 */
+.pano{flex:1 1 auto;position:relative;overflow:hidden;background:#0d0b08;cursor:grab}
+.pano.dragging{cursor:grabbing}
+.pano img{position:absolute;top:0;left:0;height:100%;width:auto;max-width:none;user-select:none;-webkit-user-drag:none;will-change:transform;opacity:0;transition:opacity .45s ease}
+.pano img.ready{opacity:1}
+/* 場景資訊 */
+.scene-info{position:absolute;left:14px;bottom:88px;z-index:20;pointer-events:none}
+.scene-step{display:inline-block;font-size:.66rem;font-weight:700;letter-spacing:.14em;color:#D8E8C8;background:rgba(45,80,22,.82);padding:4px 12px;border-radius:999px;margin-bottom:7px}
+.scene-name{font-size:1.18rem;font-weight:700;letter-spacing:.05em;text-shadow:0 2px 12px rgba(0,0,0,.6)}
+.scene-desc{font-size:.78rem;color:rgba(255,255,255,.82);margin-top:3px;text-shadow:0 1px 8px rgba(0,0,0,.6);max-width:78vw}
+/* 拖曳提示 */
+.hint{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:20;display:flex;align-items:center;gap:10px;font-size:.82rem;letter-spacing:.1em;color:rgba(255,255,255,.9);background:rgba(0,0,0,.42);padding:11px 20px;border-radius:999px;pointer-events:none;transition:opacity .5s;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hint.gone{opacity:0}
+.hint .arr{animation:sway 1.6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:translateX(-5px)}50%{transform:translateX(5px)}}
+/* 前後站按鈕 */
+.step-btn{position:absolute;top:50%;transform:translateY(-50%);z-index:22;width:44px;height:44px;border-radius:50%;background:rgba(23,20,16,.55);border:1px solid rgba(255,255,255,.22);color:#fff;font-size:1.15rem;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);transition:background .2s}
+.step-btn:active{background:rgba(45,80,22,.85)}
+#prevBtn{left:10px}#nextBtn{right:10px}
+.step-btn[disabled]{opacity:.28;pointer-events:none}
+/* 站點列 */
+.stops{flex:0 0 auto;display:flex;gap:8px;overflow-x:auto;padding:10px 14px;background:rgba(23,20,16,.92);border-top:1px solid rgba(255,255,255,.08);scrollbar-width:none;z-index:30}
+.stops::-webkit-scrollbar{display:none}
+.stop{flex:0 0 auto;font-size:.72rem;font-weight:600;letter-spacing:.04em;color:rgba(255,255,255,.6);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:999px;padding:7px 13px;white-space:nowrap;cursor:pointer;transition:all .2s}
+.stop.active{color:#fff;background:var(--brand);border-color:var(--brand)}
+/* 底部行動列 */
+.cta{flex:0 0 auto;display:flex;gap:10px;padding:9px 14px calc(10px + env(safe-area-inset-bottom));background:rgba(255,252,248,.96);z-index:30}
+.cta a{display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:999px;font-weight:700;letter-spacing:.03em}
+.cta .cb-call{flex:1 1 auto;padding:13px 12px;font-size:.98rem;background:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(45,80,22,.32)}
+.cta .cb-call:active{transform:scale(.97)}
+.cta .cb-visit{flex:0 0 auto;padding:13px 16px;font-size:.85rem;background:#fff;color:var(--brand);border:1.5px solid rgba(45,80,22,.4)}
+/* 體感模式鈕 */
+.gyro-btn{position:absolute;right:12px;bottom:88px;z-index:22;font-size:.7rem;font-weight:700;letter-spacing:.06em;color:#fff;background:rgba(23,20,16,.55);border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:8px 14px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);cursor:pointer}
+.gyro-btn.on{background:var(--brand);border-color:var(--brand)}
+@media(min-width:769px){.scene-name{font-size:1.5rem}.scene-info{left:28px;bottom:96px}.gyro-btn{display:none}}
+</style>
+</head>
+<body>
+<div class="stage">
+  <header class="tbar">
+    <img src="images/logo.webp" alt="日日好日商務中心 Logo" width="34" height="34"/>
+    <div class="tbar-title">
+      <h1>中壢館 360° 線上參觀</h1>
+      <span>日日好日商務中心 EVERY DAY GOOD DAY</span>
+    </div>
+    <a class="tbar-back" href="index.html">返回官網</a>
+  </header>
+
+  <div class="pano" id="pano">
+    <div class="hint" id="hint"><span class="arr">⟵</span> 左右拖曳環顧四周 <span class="arr">⟶</span></div>
+    <div class="scene-info">
+      <span class="scene-step" id="sceneStep">第 1 站 / 共 8 站</span>
+      <div class="scene-name" id="sceneName">入口・接待區</div>
+      <div class="scene-desc" id="sceneDesc">推開大門的第一眼，溫暖木質接待空間</div>
+    </div>
+    <button class="step-btn" id="prevBtn" aria-label="上一站">‹</button>
+    <button class="step-btn" id="nextBtn" aria-label="下一站">›</button>
+    <button class="gyro-btn" id="gyroBtn">🧭 體感模式</button>
+  </div>
+
+  <nav class="stops" id="stops" aria-label="參觀站點"></nav>
+
+  <div class="cta">
+    <a class="cb-call" href="tel:032759489">📞 喜歡嗎？預約實地參觀</a>
+    <a class="cb-visit" href="contact.html">聯絡我們</a>
+  </div>
+</div>
+
+<script>
+(function(){
+var SCENES=[
+ {img:'images/tour/tour-1.webp',name:'入口・接待區',desc:'推開大門的第一眼，溫暖木質接待空間'},
+ {img:'images/tour/tour-2.webp',name:'館內主通道',desc:'沿著木地板往館內前進'},
+ {img:'images/tour/tour-3.webp',name:'日式走廊',desc:'暖簾與窗格，經過獨立辦公室與會議空間'},
+ {img:'images/tour/tour-4.webp',name:'走廊底端',desc:'安靜的辦公廊道，每一間都是獨立空間'},
+ {img:'images/tour/tour-5.webp',name:'休憩交流區',desc:'茶水、事務設備與交流空間'},
+ {img:'images/tour/tour-6.webp',name:'採光窗景',desc:'落地窗吧台座位，眺望中壢城市景觀'},
+ {img:'images/tour/tour-7.webp',name:'迴廊轉角',desc:'繞行全館，處處是採光與綠意'},
+ {img:'images/tour/tour-8.webp',name:'返回入口',desc:'一圈走完，歡迎親自來感受'}
+];
+var pano=document.getElementById('pano'),hint=document.getElementById('hint'),
+    stopsEl=document.getElementById('stops'),gyroBtn=document.getElementById('gyroBtn');
+var cur=0,x=0,minX=0,imgEl=null,interacted=false,gyroOn=false,lastAlpha=null;
+var cache={};
+
+function loadImg(i,cb){
+  if(cache[i]){cb&&cb(cache[i]);return;}
+  var im=new Image();
+  im.src=SCENES[i].img;im.alt='日日好日商務中心中壢館 '+SCENES[i].name+' 環景';
+  im.onload=function(){cache[i]=im;cb&&cb(im);};
+}
+function fit(){
+  if(!imgEl)return;
+  var vw=pano.clientWidth,vh=pano.clientHeight;
+  var iw=imgEl.naturalWidth*(vh/imgEl.naturalHeight);
+  imgEl.style.height=vh+'px';
+  minX=Math.min(0,vw-iw);
+  if(x<minX)x=minX;if(x>0)x=0;
+  imgEl.style.transform='translateX('+x+'px)';
+}
+function show(i){
+  cur=i;interacted=false;
+  document.getElementById('sceneStep').textContent='第 '+(i+1)+' 站 / 共 '+SCENES.length+' 站';
+  document.getElementById('sceneName').textContent=SCENES[i].name;
+  document.getElementById('sceneDesc').textContent=SCENES[i].desc;
+  document.getElementById('prevBtn').disabled=(i===0);
+  document.getElementById('nextBtn').disabled=(i===SCENES.length-1);
+  Array.prototype.forEach.call(stopsEl.children,function(c,j){c.classList.toggle('active',j===i);});
+  var act=stopsEl.children[i];if(act&&act.scrollIntoView)act.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'});
+  loadImg(i,function(im){
+    if(imgEl)imgEl.remove();
+    imgEl=im.cloneNode();imgEl.className='';
+    pano.insertBefore(imgEl,pano.firstChild);
+    var vw=pano.clientWidth,vh=pano.clientHeight;
+    var iw=im.naturalWidth*(vh/im.naturalHeight);
+    x=(vw-iw)/2; // 置中起始
+    fit();
+    requestAnimationFrame(function(){imgEl.classList.add('ready');});
+    if(i+1<SCENES.length)loadImg(i+1);
+    if(i-1>=0)loadImg(i-1);
+  });
+}
+// 建站點列
+SCENES.forEach(function(s,i){
+  var b=document.createElement('button');b.className='stop';b.textContent=(i+1)+'. '+s.name;
+  b.addEventListener('click',function(){show(i);});
+  stopsEl.appendChild(b);
+});
+// 拖曳
+var dragging=false,sx=0,ox=0,vx=0,lastT=0,lastX=0,raf=null;
+function onDown(e){
+  dragging=true;pano.classList.add('dragging');
+  sx=(e.touches?e.touches[0].clientX:e.clientX);ox=x;vx=0;lastT=Date.now();lastX=sx;
+  if(!interacted){interacted=true;hint.classList.add('gone');}
+  if(raf){cancelAnimationFrame(raf);raf=null;}
+}
+function onMove(e){
+  if(!dragging)return;
+  var cx=(e.touches?e.touches[0].clientX:e.clientX);
+  var now=Date.now();if(now-lastT>16){vx=(cx-lastX)/(now-lastT);lastT=now;lastX=cx;}
+  x=ox+(cx-sx);if(x>0)x=0;if(x<minX)x=minX;
+  if(imgEl)imgEl.style.transform='translateX('+x+'px)';
+}
+function onUp(){
+  if(!dragging)return;dragging=false;pano.classList.remove('dragging');
+  var v=vx*14;
+  (function glide(){
+    if(Math.abs(v)<.5)return;
+    x+=v;v*=.93;if(x>0){x=0;v=0;}if(x<minX){x=minX;v=0;}
+    if(imgEl)imgEl.style.transform='translateX('+x+'px)';
+    raf=requestAnimationFrame(glide);
+  })();
+}
+pano.addEventListener('mousedown',onDown);
+window.addEventListener('mousemove',onMove);
+window.addEventListener('mouseup',onUp);
+pano.addEventListener('touchstart',onDown,{passive:true});
+pano.addEventListener('touchmove',onMove,{passive:true});
+pano.addEventListener('touchend',onUp);
+// 前後站
+document.getElementById('prevBtn').addEventListener('click',function(){if(cur>0)show(cur-1);});
+document.getElementById('nextBtn').addEventListener('click',function(){if(cur<SCENES.length-1)show(cur+1);});
+// 體感模式（iOS 需授權）
+function onOrient(e){
+  if(!gyroOn||e.alpha==null)return;
+  if(lastAlpha==null){lastAlpha=e.alpha;return;}
+  var d=e.alpha-lastAlpha;
+  if(d>180)d-=360;if(d<-180)d+=360;
+  lastAlpha=e.alpha;
+  x+=d*7;if(x>0)x=0;if(x<minX)x=minX;
+  if(imgEl)imgEl.style.transform='translateX('+x+'px)';
+  if(!interacted&&Math.abs(d)>.5){interacted=true;hint.classList.add('gone');}
+}
+gyroBtn.addEventListener('click',function(){
+  if(gyroOn){gyroOn=false;lastAlpha=null;gyroBtn.classList.remove('on');gyroBtn.textContent='🧭 體感模式';return;}
+  function enable(){gyroOn=true;gyroBtn.classList.add('on');gyroBtn.textContent='🧭 體感中・點擊關閉';window.addEventListener('deviceorientation',onOrient);}
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){
+    DeviceOrientationEvent.requestPermission().then(function(r){if(r==='granted')enable();}).catch(function(){});
+  }else{enable();}
+});
+window.addEventListener('resize',fit);
+show(0);
+})();
+</script>
+</body>
+</html>
