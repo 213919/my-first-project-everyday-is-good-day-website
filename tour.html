@@ -325,7 +325,7 @@ document.getElementById('prevBtn').addEventListener('click',function(){tryMusic(
 document.getElementById('nextBtn').addEventListener('click',function(){tryMusic();if(cur<SCENES.length-1)show(cur+1,true);});
 // 自動環顧漂移
 (function drift(){
-  if(imgEl&&!dragging&&!busy&&!gyroOn&&Date.now()-lastInteract>2600&&minX<0){
+  if(imgEl&&!dragging&&!busy&&!gyroOn&&Date.now()-lastInteract>1000&&minX<0){
     x+=autoDir*.34;
     if(x<=minX){x=minX;autoDir=1;}
     if(x>=0){x=0;autoDir=-1;}
