@@ -97,7 +97,7 @@ img{display:block}
 .hud-title{display:flex;align-items:center;gap:10px;min-width:0;flex:1 1 auto}
 .hud-title>div{min-width:0}
 .hud-title img{width:30px;height:30px;border-radius:50%}
-.hud-title strong{display:block;font-size:.86rem;font-weight:600;letter-spacing:.12em;color:var(--charcoal);
+.hud-title strong{display:block;font-size:.7rem;font-weight:600;letter-spacing:.26em;color:var(--charcoal);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hud-title small{display:block;font-size:.58rem;font-weight:500;letter-spacing:.22em;color:var(--charcoal-faint);
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -134,20 +134,48 @@ img{display:block}
 .dk-call{background:rgba(126,148,113,.14);border-color:rgba(126,148,113,.4);color:var(--sage-deep)}
 .dk-call:hover{background:var(--sage);border-color:var(--sage);color:#fff}
 
-/* ===== 結尾 ===== */
-.outro{position:relative;z-index:5;background:var(--ivory);
-  padding:96px 24px calc(130px + env(safe-area-inset-bottom));
+/* ===== 結尾:日式余白 × 直書明朝 × 液態玻璃 ===== */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+.outro{position:relative;z-index:5;background:var(--ivory);overflow:hidden;
+  padding:110px 24px calc(140px + env(safe-area-inset-bottom));
   display:flex;flex-direction:column;align-items:center;text-align:center}
-.outro img{width:60px;height:60px;border-radius:50%;box-shadow:0 4px 16px rgba(88,76,58,.18);margin-bottom:26px}
-.outro h2{font-size:clamp(1.3rem,5.4vw,1.9rem);font-weight:600;letter-spacing:.14em;line-height:1.9;
-  color:var(--charcoal);margin-bottom:40px;font-family:inherit;text-wrap:balance;max-width:22em}
-.outro-btns{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
-.obtn{display:flex;align-items:center;justify-content:center;gap:9px;padding:15px 26px;border-radius:999px;
-  font-size:.93rem;font-weight:700;letter-spacing:.1em;transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+/* 柔霧色斑:給液態玻璃一點可折射的底色 */
+.outro::before{content:'';position:absolute;width:380px;height:380px;border-radius:50%;
+  left:50%;bottom:40px;transform:translateX(-60%);
+  background:radial-gradient(circle,rgba(126,148,113,.34),transparent 66%);pointer-events:none}
+.outro::after{content:'';position:absolute;width:320px;height:320px;border-radius:50%;
+  left:50%;bottom:120px;transform:translateX(20%);
+  background:radial-gradient(circle,rgba(196,180,152,.38),transparent 66%);pointer-events:none}
+.outro>*{position:relative;z-index:1}
+.outro-tline{width:1px;height:44px;margin-bottom:36px;
+  background:linear-gradient(180deg,transparent,rgba(155,147,127,.7))}
+.outro-seal{width:58px;height:58px;border-radius:50%;box-shadow:0 4px 16px rgba(88,76,58,.18);margin-bottom:40px}
+.outro-txt{font-family:'Hiragino Mincho ProN','YuMincho','Noto Serif TC','Noto Serif CJK TC','PingFang TC',serif;
+  font-size:clamp(1.12rem,4.5vw,1.4rem);font-weight:500;color:var(--charcoal);
+  letter-spacing:.26em;line-height:2.5;text-align:center;text-indent:.26em;
+  margin-bottom:40px;text-wrap:balance;max-width:20em}
+.outro-line{width:1px;height:52px;margin-bottom:48px;
+  background:linear-gradient(180deg,transparent,rgba(155,147,127,.75),transparent)}
+.outro-btns{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px}
+/* 液態玻璃按鈕 */
+.obtn{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:9px;
+  padding:16px 26px;border-radius:999px;font-size:.93rem;font-weight:700;letter-spacing:.1em;
+  backdrop-filter:blur(18px) saturate(1.7);-webkit-backdrop-filter:blur(18px) saturate(1.7);
+  border:1px solid rgba(255,255,255,.78);
+  transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+.obtn::before{content:'';position:absolute;inset:0;border-radius:999px;pointer-events:none;
+  background:linear-gradient(165deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 42%,transparent 60%,rgba(255,255,255,.22) 100%)}
+.obtn::after{content:'';position:absolute;top:-30%;left:-24%;width:44%;height:160%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.42),transparent);transform:skewX(-18deg)}
 .obtn:active{transform:scale(.97)}
-.obtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
-.obtn-solid{background:var(--sage);color:#fff;box-shadow:0 10px 26px rgba(126,148,113,.35)}
-.obtn-line{border:1.5px solid rgba(126,148,113,.55);color:var(--sage-deep);background:rgba(255,255,255,.6)}
+.obtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;position:relative;z-index:1}
+.obtn span{position:relative;z-index:1}
+.obtn-solid{background:rgba(106,128,96,.62);color:#fff;
+  box-shadow:0 14px 34px rgba(106,128,96,.32),inset 0 1px 0 rgba(255,255,255,.55),inset 0 -1px 0 rgba(255,255,255,.14)}
+.obtn-solid:hover{box-shadow:0 18px 40px rgba(106,128,96,.4),inset 0 1px 0 rgba(255,255,255,.6)}
+.obtn-line{background:rgba(255,253,247,.34);color:var(--sage-deep);
+  box-shadow:0 10px 26px rgba(88,76,58,.13),inset 0 1px 0 rgba(255,255,255,.85),inset 0 -1px 0 rgba(255,255,255,.3)}
+.obtn-line:hover{box-shadow:0 14px 32px rgba(88,76,58,.17),inset 0 1px 0 rgba(255,255,255,.9)}
 
 @media(min-width:769px){
   .hud{left:50%;right:auto;transform:translateX(-50%) translateY(-8px);min-width:520px;max-width:680px}
@@ -171,8 +199,7 @@ img{display:block}
   <div class="hud-title">
     <img src="images/logo.webp" alt="日日好日商務中心 Logo" width="30" height="30"/>
     <div>
-      <strong>中壢館 ON LINE 全景參觀</strong>
-      <small>EVERY DAY GOOD DAY</small>
+      <strong>EVERY DAY GOOD DAY</strong>
     </div>
   </div>
   <span class="hud-tag" id="hudTag">[ SCROLL TOUR ]</span>
@@ -185,9 +212,9 @@ img{display:block}
     <!-- 場景圖層與字幕由 JS 依 SCENES 生成 -->
     <div class="grade"></div>
     <div class="intro" id="intro">
+      <h1 class="sr-only">中壢館 ON LINE 全景參觀｜日日好日商務中心</h1>
       <img src="images/logo.webp" alt="" width="64" height="64"/>
       <span class="en">EVERY DAY GOOD DAY · CHUNGLI</span>
-      <h1>中壢館 ON LINE 全景參觀</h1>
       <p>一根手指往下滑<br/>鏡頭帶你環顧八個角落</p>
       <span class="swipe"><span class="wheel"></span>SWIPE UP ─ 往下滑開始</span>
     </div>
@@ -195,16 +222,18 @@ img{display:block}
 </div>
 
 <section class="outro">
-  <img src="images/logo.webp" alt="日日好日商務中心 Logo" width="60" height="60"/>
-  <h2>我們是日日好日，<br/>讓您的未來日日是好日。</h2>
+  <div class="outro-tline" aria-hidden="true"></div>
+  <img class="outro-seal" src="images/logo.webp" alt="日日好日商務中心 Logo" width="58" height="58"/>
+  <h2 class="outro-txt">我們是日日好日，<br/>讓您的未來日日是好日。</h2>
+  <div class="outro-line" aria-hidden="true"></div>
   <div class="outro-btns">
     <a class="obtn obtn-solid" href="tel:032759489">
       <svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.13.96.36 1.9.7 2.8a2 2 0 01-.45 2.1L8.1 9.9a16 16 0 006 6l1.3-1.3a2 2 0 012.1-.45c.9.34 1.84.57 2.8.7A2 2 0 0122 16.9z"/></svg>
-      立即來電 03-275-9489
+      <span>立即來電 03-275-9489</span>
     </a>
     <a class="obtn obtn-line" href="contact.html">
       <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
-      線上預約參觀
+      <span>線上預約參觀</span>
     </a>
   </div>
 </section>
@@ -234,7 +263,7 @@ img{display:block}
 var SCENES=[
  {img:'images/tour/tour-1.webp',name:'大門入口',code:'01 · ENTRANCE',desc:'推開門,日日好日的一天從這裡開始。'},
  {img:'images/tour/tour-2.webp',name:'接待 ‧ 展示區',code:'02 · RECEPTION',desc:'溫潤木質的接待區,給訪客的第一印象。'},
- {img:'images/tour/tour-3.webp',name:'會議長桌區',code:'03 · MEETING AREA',desc:'租客免費使用的會議長桌,臨時開會不用另外找場地。'},
+ {img:'images/tour/tour-3.webp',name:'會議長桌區',code:'03 · MEETING AREA',desc:'辦公室租客免費使用開會區域。'},
  {img:'images/tour/tour-4.webp',name:'日式走廊',code:'04 · CORRIDOR',desc:'安靜的日式廊道,串起每一間辦公室。'},
  {img:'images/tour/tour-5.webp',name:'休憩交流區',code:'05 · LOUNGE',desc:'工作之間,留一段喘息與交流的時光。'},
  {img:'images/tour/tour-6.webp',name:'採光窗景吧台',code:'06 · WINDOW VIEW',desc:'面窗吧台,把城市天際線借進辦公室。'},
