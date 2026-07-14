@@ -76,14 +76,17 @@ img{display:block}
   background:linear-gradient(180deg,rgba(40,34,26,.34),rgba(40,34,26,.18) 45%,rgba(40,34,26,.4))}
 .intro img{width:64px;height:64px;border-radius:50%;box-shadow:0 4px 18px rgba(40,32,20,.35);margin-bottom:22px}
 .intro .en{font-size:.62rem;font-weight:600;letter-spacing:.4em;color:rgba(255,255,255,.85);margin-bottom:14px}
-.intro .swipe{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:14px;
-  font-size:.62rem;font-weight:600;letter-spacing:.3em;color:rgba(255,255,255,.9)}
-.intro .swipe .start{font-size:.86rem;font-weight:600;letter-spacing:.58em;text-indent:.58em;
+.intro .swipe{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.9)}
+.intro .chev{display:flex;flex-direction:column;align-items:center;gap:2px}
+.intro .chev svg{width:24px;height:12px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;
+  filter:drop-shadow(0 1px 5px rgba(40,32,20,.45));opacity:0;animation:chevRise 1.9s var(--ease) infinite}
+.intro .chev svg:first-child{animation-delay:.22s}
+@keyframes chevRise{0%{transform:translateY(9px);opacity:0}30%{opacity:1}62%{transform:translateY(-7px);opacity:0}100%{transform:translateY(-7px);opacity:0}}
+.intro .swipe .start{font-size:.9rem;font-weight:600;letter-spacing:.58em;text-indent:.58em;
   color:#fff;text-shadow:0 1px 10px rgba(40,32,20,.5)}
-.intro .swipe .wheel{width:26px;height:42px;border:1.5px solid rgba(255,255,255,.75);border-radius:14px;position:relative}
-.intro .swipe .wheel::before{content:'';position:absolute;left:50%;top:8px;width:3px;height:8px;margin-left:-1.5px;
-  border-radius:2px;background:rgba(255,255,255,.9);animation:wheel 1.7s var(--ease) infinite}
-@keyframes wheel{0%{transform:translateY(0);opacity:1}70%{transform:translateY(14px);opacity:0}100%{transform:translateY(0);opacity:0}}
+.intro .swtxt{font-size:.6rem;font-weight:600;letter-spacing:.34em;text-indent:.34em;color:rgba(255,255,255,.88);
+  text-shadow:0 1px 8px rgba(40,32,20,.5);animation:swFloat 2.3s ease-in-out infinite}
+@keyframes swFloat{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(-7px);opacity:1}}
 
 /* ===== Top HUD ===== */
 .hud{position:fixed;top:calc(10px + env(safe-area-inset-top));left:12px;right:12px;z-index:60;
@@ -191,7 +194,7 @@ img{display:block}
   .obtn{flex:1}
 }
 @media(prefers-reduced-motion:reduce){
-  .intro .swipe .wheel::before{animation:none}
+  .intro .chev svg,.intro .swtxt{animation:none;opacity:1}
 }
 </style>
 </head>
@@ -219,7 +222,14 @@ img{display:block}
       <h1 class="sr-only">中壢館 ON LINE 全景參觀｜日日好日商務中心</h1>
       <img src="images/logo.webp" alt="" width="64" height="64"/>
       <span class="en">EVERY DAY GOOD DAY · CHUNGLI</span>
-      <span class="swipe"><span class="wheel"></span><span class="start">START</span></span>
+      <span class="swipe">
+        <span class="chev" aria-hidden="true">
+          <svg viewBox="0 0 24 12"><path d="M2 10l10-8 10 8"/></svg>
+          <svg viewBox="0 0 24 12"><path d="M2 10l10-8 10 8"/></svg>
+        </span>
+        <span class="start">START</span>
+        <span class="swtxt">SWIPE UP</span>
+      </span>
     </div>
   </div>
 </div>
@@ -423,62 +433,36 @@ window.addEventListener('resize',function(){measure();onScroll();});
 window.addEventListener('orientationchange',function(){setTimeout(function(){measure();onScroll();},250);});
 render();
 
-/* ===== 背景音樂:Web Audio 無縫循環,音量 31%,明確 ON/OFF ===== */
+/* ===== 背景音樂:<audio> 媒體播放 =====
+   改用媒體元素而非 Web Audio:iPhone 靜音鍵撥到靜音時 Web Audio 會被整個消音,
+   媒體播放則照常出聲。iOS 不允許 JS 調整音量,因此 31% 音量已烘焙進音檔。 */
 var soundBtn=document.getElementById('soundBtn'),soundLbl=document.getElementById('soundLbl');
-var actx=null,musicBuf=null,srcNode=null,musicOn=false,musicLoading=false,musicFailed=false,userMuted=false;
+var bgm=new Audio('music/tour-bgm-soft.mp3');
+bgm.loop=true;bgm.preload='auto';
+bgm.setAttribute('playsinline','');
+var userMuted=false;
 function updateSound(){
-  /* 顯示「意圖」狀態:預設為播放,行動裝置待首次觸碰即出聲 */
-  var wantOn=!userMuted&&!musicFailed;
+  var wantOn=!userMuted;
   soundLbl.textContent=wantOn?'音樂 ON':'音樂 OFF';
   soundBtn.classList.toggle('on',wantOn);
 }
-function startMusic(){
-  if(!actx||!musicBuf||musicOn)return;
-  srcNode=actx.createBufferSource();
-  srcNode.buffer=musicBuf;srcNode.loop=true;
-  var gainNode=actx.createGain();gainNode.gain.value=.31;
-  srcNode.connect(gainNode).connect(actx.destination);
-  srcNode.start(0);musicOn=true;updateSound();
-}
-function stopMusic(){
-  if(srcNode){try{srcNode.stop();}catch(e){}srcNode=null;}
-  musicOn=false;updateSound();
-}
 function tryMusic(){
-  if(musicOn||musicFailed||userMuted)return;
-  if(!actx){
-    var AC=window.AudioContext||window.webkitAudioContext;
-    if(!AC){musicFailed=true;return;}
-    actx=new AC();
-    actx.onstatechange=updateSound;
-  }
-  if(actx.state==='suspended')actx.resume();
-  if(musicBuf){startMusic();return;}
-  if(musicLoading)return;
-  musicLoading=true;
-  fetch('music/tour-bgm.mp3').then(function(r){
-    if(!r.ok)throw new Error('http '+r.status);
-    return r.arrayBuffer();
-  }).then(function(ab){
-    return actx.decodeAudioData(ab);
-  }).then(function(buf){
-    musicBuf=buf;startMusic();
-  }).catch(function(){musicFailed=true;updateSound();});
+  if(userMuted||!bgm.paused)return;
+  var p=bgm.play();
+  if(p&&p.catch)p.catch(function(){});   // 首次手勢前會被擋下,交由解鎖事件重試
 }
 soundBtn.addEventListener('click',function(e){
   e.stopPropagation();
-  if(musicOn){userMuted=true;stopMusic();}
-  else{userMuted=false;tryMusic();}
+  if(userMuted){userMuted=false;tryMusic();}
+  else{userMuted=true;bgm.pause();}
+  updateSound();
 });
-/* 自動播放:首圖先行,音樂延後 1.2 秒抓取避免搶頻寬 */
-setTimeout(tryMusic,1200);
-['pointerdown','touchstart','keydown','wheel','scroll'].forEach(function(ev){
-  document.addEventListener(ev,function(){
-    if(musicFailed||userMuted)return;
-    if(actx&&actx.state==='suspended')actx.resume();
-    if(!musicOn)tryMusic();
-  },{passive:true});
+/* 進頁先試播(桌機多半可直接播);手機於首次手勢(touchend/pointerup)解鎖 */
+setTimeout(tryMusic,900);
+['pointerup','touchend','click','keydown'].forEach(function(ev){
+  document.addEventListener(ev,tryMusic,{passive:true});
 });
+updateSound();
 })();
 </script>
 </body>
