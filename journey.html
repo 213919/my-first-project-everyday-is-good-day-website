@@ -47,9 +47,12 @@ img{display:block}
 .stage{position:sticky;top:0;height:var(--vh100);overflow:hidden;background:var(--sand)}
 
 /* 場景圖層（JS 控制 opacity / transform） */
-.layer{position:absolute;inset:0;will-change:transform,opacity,filter;opacity:0}
+.layer{position:absolute;inset:0;overflow:hidden;will-change:transform,opacity,filter;opacity:0}
 .layer img{width:100%;height:100%;object-fit:cover;user-select:none;-webkit-user-drag:none;
   filter:saturate(1.05) contrast(1.02) brightness(1.03)}
+/* JS 量好尺寸後改為置中絕對定位,靠 transform 做環景橫掃 */
+.layer img.fitted{position:absolute;left:50%;top:50%;width:auto;height:auto;max-width:none;
+  object-fit:fill;will-change:transform;transform:translate(-50%,-50%)}
 /* 柔和暖霧光影（固定疊在所有場景之上） */
 .grade{position:absolute;inset:0;z-index:40;pointer-events:none}
 .grade::before{content:'';position:absolute;inset:0;
@@ -220,12 +223,13 @@ var journey=document.getElementById('journey'),
     bar=document.getElementById('bar');
 
 /* --- 建立圖層與字幕(先進場景疊在上層,淡出後露出下一景) --- */
-var layers=[],caps=[],dots=[],loaded=[];
+var layers=[],caps=[],dots=[],loaded=[],dims=[];
 SCENES.forEach(function(s,i){
   var ly=document.createElement('div');ly.className='layer';ly.style.zIndex=String(N-i);
   var im=document.createElement('img');
   im.alt='日日好日商務中心中壢館 '+s.name;
   im.decoding='async';
+  im.addEventListener('load',function(){fitLayer(i);onScroll();});
   if(i<2){im.src=s.img;loaded[i]=true;}   // 其餘場景接近時才載入
   ly.appendChild(im);
   stage.insertBefore(ly,stage.firstChild);
@@ -253,13 +257,25 @@ function ensureLoaded(i){
 }
 
 /* --- 幾何量測 --- */
-var vh=window.innerHeight,journeyTop=0,journeyScroll=1;
+var vh=window.innerHeight,journeyTop=0,journeyScroll=1,stageW=0,stageH=0;
+function fitLayer(i){
+  /* 依舞台高度等比縮放,保留完整橫幅寬度供環景橫掃 */
+  var im=layers[i].firstChild;
+  if(!im.naturalWidth||reduceMotion)return;
+  var w=im.naturalWidth*(stageH/im.naturalHeight),h=stageH;
+  if(w<stageW){h=im.naturalHeight*(stageW/im.naturalWidth);w=stageW;}  // 窄圖改以寬度鋪滿
+  dims[i]={w:w,h:h};
+  im.classList.add('fitted');
+  im.style.width=w+'px';im.style.height=h+'px';
+}
 function measure(){
   vh=window.innerHeight;
+  stageW=stage.clientWidth;stageH=stage.clientHeight;
   journey.style.height=((N*TRAVEL*vh)+vh)+'px';
   var r=journey.getBoundingClientRect();
   journeyTop=r.top+(window.pageYOffset||document.documentElement.scrollTop);
   journeyScroll=N*TRAVEL*vh;   // sticky 可捲動的距離
+  for(var i=0;i<N;i++)fitLayer(i);
 }
 measure();
 
@@ -301,9 +317,22 @@ function render(){
     ly.style.opacity=String(o);
 
     if(!reduceMotion){
-      var push=1+0.26*clamp(d,-0.2,isLast?1:1.2);   // 鏡頭持續推進
-      if(d<0)push=1;
-      ly.style.transform='scale('+push+')';
+      /* 環景橫掃:整段時段內從照片一端掃到另一端,逐景交替方向;
+         同時輕微推進,像邊走邊環顧四周 */
+      var im=ly.firstChild,dm=dims[i];
+      var pp=clamp(d,0,1);
+      var push=1.04+0.10*pp;                        // 輕推進(橫掃是主角)
+      if(d<0)push=1.04;
+      if(dm){
+        var ease=pp*pp*(3-2*pp);                    // smoothstep,起訖平緩
+        var E=Math.max(0,(dm.w*push-stageW)/2);     // 中心可位移的最大距離
+        var dir=(i%2===0)?1:-1;
+        var tx=dir*E*(1-2*ease);                    // +E → -E(或反向)
+        var Ey=Math.max(0,(dm.h*push-stageH)/2);
+        im.style.transform='translate(-50%,-50%) translate('+tx+'px,'+(Ey*0.3*(1-2*ease))+'px) scale('+push+')';
+      }else{
+        im.style.transform='scale('+push+')';
+      }
       var glow=isLast?0:clamp((d-0.78)/0.22,0,1);
       ly.style.filter=glow>0
         ?'saturate(1.05) contrast(1.02) brightness('+(1.03+glow*0.55)+') blur('+(glow*5)+'px)'
