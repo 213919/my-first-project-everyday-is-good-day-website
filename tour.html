@@ -43,7 +43,7 @@ img{display:block}
 
 /* ===== 旅程容器：高度撐出捲動距離，舞台 sticky 釘住 ===== */
 .journey{position:relative}
-.stage{position:sticky;top:0;height:var(--vh100);overflow:hidden;background:var(--sand)}
+.stage{position:sticky;top:0;height:var(--vh100);overflow:hidden;background:var(--sand);cursor:pointer}
 
 /* 場景圖層（JS 控制 opacity / transform） */
 .layer{position:absolute;inset:0;overflow:hidden;will-change:transform,opacity,filter;opacity:0}
@@ -76,7 +76,8 @@ img{display:block}
   background:linear-gradient(180deg,rgba(40,34,26,.34),rgba(40,34,26,.18) 45%,rgba(40,34,26,.4))}
 .intro img{width:64px;height:64px;border-radius:50%;box-shadow:0 4px 18px rgba(40,32,20,.35);margin-bottom:22px}
 .intro .en{font-size:.62rem;font-weight:600;letter-spacing:.4em;color:rgba(255,255,255,.85);margin-bottom:14px}
-.intro .swipe{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.9)}
+.intro .swipe{margin-top:40px;display:flex;flex-direction:column;align-items:center;gap:12px;color:rgba(255,255,255,.9);
+  pointer-events:auto;cursor:pointer;padding:10px 26px}
 .intro .chev{display:flex;flex-direction:column;align-items:center;gap:2px}
 .intro .chev svg{width:24px;height:12px;stroke:#fff;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round;
   filter:drop-shadow(0 1px 5px rgba(40,32,20,.45));opacity:0;animation:chevRise 1.9s var(--ease) infinite}
@@ -222,14 +223,14 @@ img{display:block}
       <h1 class="sr-only">中壢館 ON LINE 全景參觀｜日日好日商務中心</h1>
       <img src="images/logo.webp" alt="" width="64" height="64"/>
       <span class="en">EVERY DAY GOOD DAY · CHUNGLI</span>
-      <span class="swipe">
+      <button class="swipe" aria-label="開始參觀">
         <span class="chev" aria-hidden="true">
           <svg viewBox="0 0 24 12"><path d="M2 10l10-8 10 8"/></svg>
           <svg viewBox="0 0 24 12"><path d="M2 10l10-8 10 8"/></svg>
         </span>
         <span class="start">START</span>
         <span class="swtxt">SWIPE UP</span>
-      </span>
+      </button>
     </div>
   </div>
 </div>
@@ -302,7 +303,7 @@ SCENES.forEach(function(s,i){
   im.alt='日日好日商務中心中壢館 '+s.name+' 環景';
   im.decoding='async';
   im.addEventListener('load',function(){fitLayer(i);onScroll();});
-  if(i<2){im.src=s.img;loaded[i]=true;}   // 其餘場景接近時才載入
+  if(i===0){im.fetchPriority='high';im.src=s.img;loaded[0]=true;}   // 首圖優先,其餘接近時才載入
   ly.appendChild(im);
   stage.insertBefore(ly,stage.firstChild);
   layers[i]=ly;
@@ -433,12 +434,31 @@ window.addEventListener('resize',function(){measure();onScroll();});
 window.addEventListener('orientationchange',function(){setTimeout(function(){measure();onScroll();},250);});
 render();
 
+/* ===== 滑鼠點擊推進:點畫面(或 START)前往下一站 ===== */
+function advance(){
+  tryMusic();
+  var y=(window.pageYOffset||document.documentElement.scrollTop)-journeyTop;
+  var f=clamp(y/journeyScroll,0,1)*N;
+  var next=(f<0.4)?0:Math.floor(f)+1;
+  if(next>=N){
+    document.querySelector('.outro').scrollIntoView({behavior:reduceMotion?'auto':'smooth'});
+    return;
+  }
+  window.scrollTo({top:journeyTop+((next*TRAVEL+0.45*TRAVEL)*vh),behavior:reduceMotion?'auto':'smooth'});
+}
+stage.addEventListener('click',advance);
+
+/* 首屏就緒後再補第二景,避免搶首圖頻寬 */
+window.addEventListener('load',function(){
+  setTimeout(function(){ensureLoaded(1);},1200);
+});
+
 /* ===== 背景音樂:<audio> 媒體播放 =====
    改用媒體元素而非 Web Audio:iPhone 靜音鍵撥到靜音時 Web Audio 會被整個消音,
    媒體播放則照常出聲。iOS 不允許 JS 調整音量,因此 31% 音量已烘焙進音檔。 */
 var soundBtn=document.getElementById('soundBtn'),soundLbl=document.getElementById('soundLbl');
 var bgm=new Audio('music/tour-bgm-soft.mp3');
-bgm.loop=true;bgm.preload='auto';
+bgm.loop=true;bgm.preload='none';   // 不搶首屏頻寬,首次手勢才載入
 bgm.setAttribute('playsinline','');
 var userMuted=false;
 function updateSound(){
@@ -453,12 +473,17 @@ function tryMusic(){
 }
 soundBtn.addEventListener('click',function(e){
   e.stopPropagation();
-  if(userMuted){userMuted=false;tryMusic();}
+  /* 依「實際是否出聲」切換:靜音狀態下點擊一律視為開啟 */
+  if(bgm.paused){userMuted=false;tryMusic();}
   else{userMuted=true;bgm.pause();}
   updateSound();
 });
 /* 進頁先試播(桌機多半可直接播);手機於首次手勢(touchend/pointerup)解鎖 */
 setTimeout(tryMusic,900);
+/* 首屏就緒後預熱音檔,讓首次手勢能立刻出聲 */
+window.addEventListener('load',function(){
+  setTimeout(function(){if(bgm.paused){bgm.preload='auto';try{bgm.load();}catch(e){}}},2600);
+});
 ['pointerup','touchend','click','keydown'].forEach(function(ev){
   document.addEventListener(ev,tryMusic,{passive:true});
 });
