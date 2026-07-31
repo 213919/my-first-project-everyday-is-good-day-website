@@ -1,0 +1,315 @@
+/*
+ * app.js — UI 層
+ * 職責：產生選單 → 讀表單 → 驗證 → 呼叫 PA.api.query() → 渲染結果。
+ * 不含任何行星/天使的知識或推算邏輯（那些在 data.js / api.js）。
+ */
+(function (global) {
+  'use strict';
+
+  var PA = global.PA;
+  var OPT = PA.data.FORM_OPTIONS;
+
+  var el = {};
+  var lastResponse = null;   // 方便在 console 用 PA.app.last() 檢視
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    cacheDom();
+    buildSelects();
+    bindEvents();
+    updateHour24Preview();
+  }
+
+  function cacheDom() {
+    ['birth-form', 'city', 'year', 'month', 'day', 'hour', 'minute', 'meridiem',
+     'form-error', 'submit-btn', 'hour24-preview', 'result', 'result-subject',
+     'day-symbol', 'day-planet', 'day-angel', 'day-angel-domain',
+     'hour-symbol', 'hour-planet', 'hour-angel', 'hour-range',
+     'detail-weekday', 'detail-keywords', 'detail-colors', 'detail-material',
+     'detail-advice', 'hour-table-body', 'json-output', 'result-note'
+    ].forEach(function (id) {
+      el[camel(id)] = document.getElementById(id);
+    });
+  }
+
+  /* ---------- 選單生成 ---------- */
+
+  function buildSelects() {
+    fillSelect(el.year, range(OPT.yearRange.max, OPT.yearRange.min, -1), function (v) {
+      return v + ' 年';
+    }, OPT.yearRange.defaultValue);
+
+    fillSelect(el.month, range(OPT.monthRange.min, OPT.monthRange.max), function (v) {
+      return v + '月';
+    }, OPT.monthRange.defaultValue);
+
+    rebuildDays(OPT.dayDefault);
+
+    fillSelect(el.hour, range(OPT.hourRange.min, OPT.hourRange.max), function (v) {
+      return String(v);
+    }, OPT.hourRange.defaultValue);
+
+    fillSelect(el.minute, range(OPT.minuteRange.min, OPT.minuteRange.max), function (v) {
+      return pad2(v);
+    }, OPT.minuteRange.defaultValue);
+
+    el.meridiem.innerHTML = '';
+    OPT.meridiems.forEach(function (m) {
+      el.meridiem.appendChild(new Option(m.label, m.value));
+    });
+    el.meridiem.value = 'AM';
+
+    el.city.value = OPT.defaultCity;
+  }
+
+  /** 依年月重建「日」選單，並盡量保留原本選到的日期 */
+  function rebuildDays(preferred) {
+    var year = parseInt(el.year.value, 10);
+    var month = parseInt(el.month.value, 10);
+    var max = daysInMonth(year, month);
+    var keep = preferred || parseInt(el.day.value, 10) || 1;
+
+    fillSelect(el.day, range(1, max), function (v) { return v + ' 日'; }, Math.min(keep, max));
+  }
+
+  function fillSelect(select, values, labelFn, selected) {
+    select.innerHTML = '';
+    values.forEach(function (v) {
+      select.appendChild(new Option(labelFn(v), String(v)));
+    });
+    select.value = String(selected);
+  }
+
+  /* ---------- 事件 ---------- */
+
+  function bindEvents() {
+    el.year.addEventListener('change', function () { rebuildDays(); });
+    el.month.addEventListener('change', function () { rebuildDays(); });
+
+    [el.hour, el.minute, el.meridiem].forEach(function (node) {
+      node.addEventListener('change', updateHour24Preview);
+    });
+
+    // 使用者一修改就清掉該欄位的錯誤提示
+    [el.city, el.year, el.month, el.day, el.hour, el.minute, el.meridiem].forEach(function (node) {
+      node.addEventListener('input', function () { clearFieldError(node.id); });
+      node.addEventListener('change', function () { clearFieldError(node.id); });
+    });
+
+    el.birthForm.addEventListener('submit', onSubmit);
+  }
+
+  function updateHour24Preview() {
+    var h = parseInt(el.hour.value, 10);
+    var m = parseInt(el.minute.value, 10);
+    if (isNaN(h) || isNaN(m)) { el.hour24Preview.textContent = '—'; return; }
+    el.hour24Preview.textContent = pad2(PA.api.toHour24(h, el.meridiem.value)) + ':' + pad2(m);
+  }
+
+  function onSubmit(e) {
+    e.preventDefault();
+
+    var raw = readForm();
+    var errors = validate(raw);
+
+    renderErrors(errors);
+    if (Object.keys(errors).length) {
+      focusFirstError(errors);
+      return;
+    }
+
+    var request = PA.api.buildRequest(raw);
+    setLoading(true);
+
+    PA.api.query(request)
+      .then(function (response) {
+        lastResponse = response;
+        renderResult(response);
+      })
+      .catch(function (err) {
+        el.formError.textContent = '查詢失敗：' + (err && err.message ? err.message : '未知錯誤');
+      })
+      .finally(function () {
+        setLoading(false);
+      });
+  }
+
+  /* ---------- 讀取與驗證 ---------- */
+
+  function readForm() {
+    return {
+      city: el.city.value.trim(),
+      year: toInt(el.year.value),
+      month: toInt(el.month.value),
+      day: toInt(el.day.value),
+      hour12: toInt(el.hour.value),
+      minute: toInt(el.minute.value),
+      meridiem: el.meridiem.value
+    };
+  }
+
+  /**
+   * 回傳 { 欄位id: 錯誤訊息 }；空物件代表通過。
+   * 即使下拉選單「理論上」不會產生非法值，仍完整驗證，
+   * 以防日後改成手動輸入或被外部程式竄改。
+   */
+  function validate(v) {
+    var errors = {};
+
+    if (!v.city) errors.city = '請填寫出生城市';
+
+    if (v.year === null) errors.year = '請選擇年份';
+    else if (v.year < OPT.yearRange.min || v.year > OPT.yearRange.max) {
+      errors.year = '年份需介於 ' + OPT.yearRange.min + '–' + OPT.yearRange.max;
+    }
+
+    if (v.month === null) errors.month = '請選擇月份';
+    else if (v.month < 1 || v.month > 12) errors.month = '月份需介於 1–12';
+
+    if (v.day === null) {
+      errors.day = '請選擇日期';
+    } else if (v.day < 1) {
+      errors.day = '日期需大於 0';
+    } else if (!errors.year && !errors.month) {
+      var max = daysInMonth(v.year, v.month);
+      if (v.day > max) errors.day = v.year + ' 年 ' + v.month + ' 月只有 ' + max + ' 天';
+    } else if (v.day > 31) {
+      errors.day = '日期需介於 1–31';
+    }
+
+    if (v.hour12 === null) errors.hour = '請選擇小時';
+    else if (v.hour12 < 1 || v.hour12 > 12) errors.hour = '小時需介於 1–12（12 小時制）';
+
+    if (v.minute === null) errors.minute = '請選擇分鐘';
+    else if (v.minute < 0 || v.minute > 59) errors.minute = '分鐘需介於 0–59';
+
+    if (v.meridiem !== 'AM' && v.meridiem !== 'PM') errors.meridiem = '請選擇上午或下午';
+
+    return errors;
+  }
+
+  function renderErrors(errors) {
+    ['city', 'year', 'month', 'day', 'hour', 'minute', 'meridiem'].forEach(function (id) {
+      var msg = errors[id] || '';
+      var slot = document.querySelector('[data-error-for="' + id + '"]');
+      if (slot) slot.textContent = msg;
+      var control = document.getElementById(id);
+      if (control) {
+        control.classList.toggle('is-invalid', Boolean(msg));
+        control.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      }
+    });
+
+    var count = Object.keys(errors).length;
+    el.formError.textContent = count ? '尚有 ' + count + ' 個欄位需要修正' : '';
+  }
+
+  function clearFieldError(id) {
+    var slot = document.querySelector('[data-error-for="' + id + '"]');
+    if (slot) slot.textContent = '';
+    var control = document.getElementById(id);
+    if (control) {
+      control.classList.remove('is-invalid');
+      control.setAttribute('aria-invalid', 'false');
+    }
+  }
+
+  function focusFirstError(errors) {
+    var first = ['city', 'year', 'month', 'day', 'hour', 'minute', 'meridiem']
+      .filter(function (id) { return errors[id]; })[0];
+    if (first) document.getElementById(first).focus();
+  }
+
+  function setLoading(on) {
+    el.submitBtn.disabled = on;
+    el.submitBtn.textContent = on ? '✦ 推算中… ✦' : '✦ 查詢行星日與天使 ✦';
+  }
+
+  /* ---------- 渲染結果 ---------- */
+
+  function renderResult(res) {
+    var r = res.result;
+    var b = res.request.birth;
+    var dayP = r.planetaryDay;
+    var hourP = r.planetaryHour.planet;
+
+    el.resultSubject.textContent = res.request.city + '｜' +
+      b.year + '/' + pad2(b.month) + '/' + pad2(b.day) + ' ' +
+      pad2(b.hour24) + ':' + pad2(b.minute);
+
+    el.daySymbol.textContent = dayP.symbol;
+    el.dayPlanet.textContent = dayP.name + '（' + dayP.latin + '）';
+    el.dayAngel.textContent = dayP.angel.name + ' · ' + dayP.angel.latin;
+    el.dayAngelDomain.textContent = dayP.angel.domain;
+
+    el.hourSymbol.textContent = hourP.symbol;
+    el.hourPlanet.textContent = hourP.name + '（' + hourP.latin + '）';
+    el.hourAngel.textContent = hourP.angel.name + ' · ' + hourP.angel.latin;
+    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時 · ' +
+      (r.planetaryHour.isNight ? '夜' : '日') + '間 · ' +
+      r.planetaryHour.startTime + '–' + r.planetaryHour.endTime;
+
+    el.detailWeekday.textContent = r.weekday.name + '（行星日主星：' + dayP.name + '）';
+    el.detailKeywords.textContent = hourP.keywords.join('、');
+    el.detailColors.textContent = hourP.colors.join('、');
+    el.detailMaterial.textContent = hourP.metal + '／' + hourP.incense;
+    el.detailAdvice.textContent = hourP.advice;
+
+    renderHourTable(r.hourTable, r.planetaryHour.index);
+
+    el.jsonOutput.textContent = JSON.stringify(res, null, 2);
+    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機示範資料（mock）' : 'API') +
+      (res.meta.approximate ? '　※ ' + res.meta.notes : '');
+
+    el.result.hidden = false;
+    el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderHourTable(rows, currentIndex) {
+    var frag = document.createDocumentFragment();
+    rows.forEach(function (row) {
+      var tr = document.createElement('tr');
+      if (row.index === currentIndex) tr.className = 'is-current';
+      [row.index, row.start + '–' + row.end, row.symbol + ' ' + row.planetName, row.angelName]
+        .forEach(function (text) {
+          var td = document.createElement('td');
+          td.textContent = text;
+          tr.appendChild(td);
+        });
+      frag.appendChild(tr);
+    });
+    el.hourTableBody.innerHTML = '';
+    el.hourTableBody.appendChild(frag);
+  }
+
+  /* ---------- 工具 ---------- */
+
+  function range(from, to, step) {
+    step = step || (to >= from ? 1 : -1);
+    var out = [];
+    for (var v = from; step > 0 ? v <= to : v >= to; v += step) out.push(v);
+    return out;
+  }
+
+  function daysInMonth(year, month) {
+    if (!year || !month || month < 1 || month > 12) return 31;
+    return new Date(year, month, 0).getDate();   // 自動處理閏年
+  }
+
+  function toInt(value) {
+    var n = parseInt(value, 10);
+    return isNaN(n) ? null : n;
+  }
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  function camel(id) {
+    return id.replace(/-([a-z0-9])/g, function (_, c) { return c.toUpperCase(); });
+  }
+
+  PA.app = {
+    validate: validate,
+    last: function () { return lastResponse; }
+  };
+})(window);

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>行星日 · 行星時 · 天使｜Planetary Day &amp; Hour Angel</title>
+  <meta name="description" content="輸入出生日期與時間，查詢對應的行星日、行星時與守護天使。">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"></div>
+
+  <main class="app">
+
+    <!-- 1. 標題區 -->
+    <header class="app__header">
+      <h1 class="app__title">行星日 · 行星時 · 天使</h1>
+      <p class="app__subtitle">Planetary Day &amp; Hour Angel — 依出生日期時間</p>
+    </header>
+
+    <!-- 2. 表單區 -->
+    <section class="panel" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="sr-only">出生資料輸入</h2>
+
+      <form id="birth-form" class="form" novalidate autocomplete="off">
+
+        <div class="field">
+          <label class="field__label" for="city">出生城市</label>
+          <input class="field__control" type="text" id="city" name="city" value="台北"
+                 maxlength="30" placeholder="例如：台北" aria-describedby="err-city">
+          <p class="field__error" id="err-city" data-error-for="city"></p>
+        </div>
+
+        <div class="field-row field-row--3">
+          <div class="field">
+            <label class="field__label" for="year">年份</label>
+            <select class="field__control" id="year" name="year" aria-describedby="err-year"></select>
+            <p class="field__error" id="err-year" data-error-for="year"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="month">月份</label>
+            <select class="field__control" id="month" name="month" aria-describedby="err-month"></select>
+            <p class="field__error" id="err-month" data-error-for="month"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="day">日</label>
+            <select class="field__control" id="day" name="day" aria-describedby="err-day"></select>
+            <p class="field__error" id="err-day" data-error-for="day"></p>
+          </div>
+        </div>
+
+        <div class="field-row field-row--3">
+          <div class="field">
+            <label class="field__label" for="hour">小時</label>
+            <select class="field__control" id="hour" name="hour" aria-describedby="err-hour"></select>
+            <p class="field__error" id="err-hour" data-error-for="hour"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="minute">分鐘</label>
+            <select class="field__control" id="minute" name="minute" aria-describedby="err-minute"></select>
+            <p class="field__error" id="err-minute" data-error-for="minute"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="meridiem">上／下午</label>
+            <select class="field__control" id="meridiem" name="meridiem" aria-describedby="err-meridiem"></select>
+            <p class="field__error" id="err-meridiem" data-error-for="meridiem"></p>
+          </div>
+        </div>
+
+        <!-- 24 小時制即時預覽，用來確認 AM/PM 換算是否正確 -->
+        <p class="form__preview">換算後（24 小時制）：<span id="hour24-preview">12:00</span></p>
+
+        <p class="form__error" id="form-error" role="alert"></p>
+
+        <button class="btn-submit" type="submit" id="submit-btn">✦ 查詢行星日與天使 ✦</button>
+      </form>
+    </section>
+
+    <!-- 3. 結果區（查詢後才顯示） -->
+    <section class="result" id="result" hidden aria-live="polite" aria-labelledby="result-heading">
+      <h2 id="result-heading" class="result__heading">
+        <span id="result-subject">—</span> 的行星時刻
+      </h2>
+
+      <div class="result__cards">
+        <article class="card card--day">
+          <p class="card__eyebrow">行星日 Planetary Day</p>
+          <p class="card__glyph" id="day-symbol">·</p>
+          <h3 class="card__title" id="day-planet">—</h3>
+          <p class="card__angel">守護天使：<strong id="day-angel">—</strong></p>
+          <p class="card__meta" id="day-angel-domain">—</p>
+        </article>
+
+        <article class="card card--hour">
+          <p class="card__eyebrow">行星時 Planetary Hour</p>
+          <p class="card__glyph" id="hour-symbol">·</p>
+          <h3 class="card__title" id="hour-planet">—</h3>
+          <p class="card__angel">守護天使：<strong id="hour-angel">—</strong></p>
+          <p class="card__meta" id="hour-range">—</p>
+        </article>
+      </div>
+
+      <dl class="detail">
+        <div class="detail__item"><dt>星期</dt><dd id="detail-weekday">—</dd></div>
+        <div class="detail__item"><dt>關鍵字</dt><dd id="detail-keywords">—</dd></div>
+        <div class="detail__item"><dt>幸運色</dt><dd id="detail-colors">—</dd></div>
+        <div class="detail__item"><dt>金屬／薰香</dt><dd id="detail-material">—</dd></div>
+      </dl>
+
+      <p class="result__advice" id="detail-advice">—</p>
+
+      <details class="hour-table">
+        <summary>當日 24 個行星時對照表</summary>
+        <div class="hour-table__scroll">
+          <table>
+            <thead>
+              <tr><th>#</th><th>時段</th><th>行星</th><th>天使</th></tr>
+            </thead>
+            <tbody id="hour-table-body"></tbody>
+          </table>
+        </div>
+      </details>
+
+      <details class="json-view">
+        <summary>檢視資料結構（JSON，供串接 API 參考）</summary>
+        <pre id="json-output"></pre>
+      </details>
+
+      <p class="result__note" id="result-note"></p>
+    </section>
+
+    <footer class="app__footer">
+      <p>結果為簡化推算之示範資料，僅供參考。</p>
+    </footer>
+  </main>
+
+  <script src="data.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
