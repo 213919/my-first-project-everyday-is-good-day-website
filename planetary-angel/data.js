@@ -38,7 +38,7 @@
       symbol: '♂',
       name: '火星',
       latin: 'Mars',
-      angel: { name: '薩邁爾', latin: 'Samael', domain: '勇氣、切割、防衛' },
+      angel: { name: '卡麥爾', latin: 'Camael', domain: '力量、勇氣、公正' },
       keywords: ['行動', '競爭', '斬斷', '護身'],
       colors: ['正紅', '鐵鏽色'],
       metal: '鐵',
@@ -62,7 +62,7 @@
       symbol: '♃',
       name: '木星',
       latin: 'Iuppiter',
-      angel: { name: '薩基爾', latin: 'Sachiel', domain: '恩慈、財富、擴張' },
+      angel: { name: '薩基爾', latin: 'Zadkiel', domain: '恩慈、寬恕、豐盛' },
       keywords: ['貴人', '財富', '法律', '信仰'],
       colors: ['royal blue', '紫'],
       metal: '錫',
@@ -74,7 +74,7 @@
       symbol: '♀',
       name: '金星',
       latin: 'Venus',
-      angel: { name: '安納爾', latin: 'Anael', domain: '愛、和諧、美感' },
+      angel: { name: '哈吉爾', latin: 'Hagiel', domain: '愛、美感、吸引' },
       keywords: ['戀愛', '藝術', '和解', '享樂'],
       colors: ['翡翠綠', '粉紅'],
       metal: '銅',
@@ -95,10 +95,45 @@
     }
   };
 
-  /* 迦勒底次序（Chaldean order）：行星時依此循環 */
-  var CHALDEAN_ORDER = ['saturn', 'jupiter', 'mars', 'sun', 'venus', 'mercury', 'moon'];
+  /*
+   * 行星時對照表（本專案的權威資料來源）
+   *
+   *   HOUR_RULERS[時][星期] = 行星 key
+   *   時   = 0–23，第 0 列代表 00:00–01:00，每時段 60 分鐘
+   *   星期 = 0–6，依序為 週日、週一、週二、週三、週四、週五、週六
+   *
+   * 內容依迦勒底次序（土、木、火、日、金、水、月）循環，06:00 那一列
+   * 正好是各星期的主星（日→太陽、一→月亮…六→土星）；06:00 之前的時段
+   * 延續前一天的順序，所以例如週日 00:00 是金星時（屬週六土星日的序列）。
+   */
+  var HOUR_RULERS = [
+    /* 00:00–01:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 01:00–02:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 02:00–03:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun'],
+    /* 03:00–04:00 */ ['saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus'],
+    /* 04:00–05:00 */ ['jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars', 'mercury'],
+    /* 05:00–06:00 */ ['mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon'],
+    /* 06:00–07:00 */ ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'],
+    /* 07:00–08:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 08:00–09:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 09:00–10:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun'],
+    /* 10:00–11:00 */ ['saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus'],
+    /* 11:00–12:00 */ ['jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars', 'mercury'],
+    /* 12:00–13:00 */ ['mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon'],
+    /* 13:00–14:00 */ ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'],
+    /* 14:00–15:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 15:00–16:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 16:00–17:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun'],
+    /* 17:00–18:00 */ ['saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus'],
+    /* 18:00–19:00 */ ['jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars', 'mercury'],
+    /* 19:00–20:00 */ ['mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon'],
+    /* 20:00–21:00 */ ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'],
+    /* 21:00–22:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 22:00–23:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 23:00–24:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun']
+  ];
 
-  /* 星期 0=週日 … 6=週六，對應的行星日主星 */
+  /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
   var WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -119,7 +154,7 @@
 
   PA.data = {
     PLANETS: PLANETS,
-    CHALDEAN_ORDER: CHALDEAN_ORDER,
+    HOUR_RULERS: HOUR_RULERS,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS

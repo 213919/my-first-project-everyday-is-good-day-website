@@ -19,11 +19,11 @@
     endpoint: '/api/planetary-angel',   // remote 模式使用
     timeoutMs: 8000,
     mockLatencyMs: 420,                 // 模擬網路延遲，讓 loading 狀態看得出來
-    schemaVersion: '1.0',
-    /* 簡化假設：日出固定 06:00、行星時等分為 60 分鐘。
-       真實計算需依城市經緯度求日出日落，屆時由後端負責。 */
-    sunriseMinutes: 6 * 60,
-    hourSystem: 'equal'
+    schemaVersion: '1.1',
+    /* 行星時的取法。'fixed-table' = 直接查 data.js 的 HOUR_RULERS 對照表
+       （00:00 起算、每時段 60 分鐘、以星期分欄）。
+       日後若後端改用日出日落分割不等長的行星時，這裡會換成別的值。 */
+    hourSystem: 'fixed-table'
   };
 
   /* ---------- request 建構 ---------- */
@@ -49,7 +49,6 @@
       localDateTime: pad(raw.year, 4) + '-' + pad(raw.month, 2) + '-' + pad(raw.day, 2) +
         'T' + pad(hour24, 2) + ':' + pad(raw.minute, 2) + ':00',
       options: {
-        sunriseMinutes: CONFIG.sunriseMinutes,
         hourSystem: CONFIG.hourSystem
       }
     };
@@ -100,39 +99,29 @@
 
   function compute(request) {
     var b = request.birth;
-    var minutesOfDay = b.hour24 * 60 + b.minute;
-    var sunrise = request.options.sunriseMinutes;
-
-    // 行星日以「日出」換日：日出前仍屬前一天的行星日
-    var beforeSunrise = minutesOfDay < sunrise;
-    var base = new Date(b.year, b.month - 1, b.day);
-    if (beforeSunrise) base.setDate(base.getDate() - 1);
-
-    var weekdayIndex = base.getDay();
+    var weekdayIndex = new Date(b.year, b.month - 1, b.day).getDay();
     var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
 
-    // 第幾個行星時（1–24），第 1 時由日出開始、主星即為當日主星
-    var elapsed = beforeSunrise ? minutesOfDay + 1440 - sunrise : minutesOfDay - sunrise;
-    var hourIndex = Math.floor(elapsed / 60) + 1;
-
-    var hours = buildHourTable(dayRulerKey, sunrise);
-    var current = hours[hourIndex - 1];
+    // 直接查對照表：列 = 出生時的整點，欄 = 出生日的星期
+    var hours = buildHourTable(weekdayIndex);
+    var current = hours[b.hour24];
 
     return {
       meta: {
         source: CONFIG.mode,           // 'mock' — 之後接 API 會變成 'remote'
         schemaVersion: CONFIG.schemaVersion,
         generatedAt: new Date().toISOString(),
-        approximate: true,             // 使用固定日出的簡化結果
-        notes: '日出固定以 06:00 估算，未依' + request.city + '實際經緯度計算。'
+        method: 'fixed-hour-table',
+        notes: '行星時依固定對照表：00:00 起算，每時段 60 分鐘，欄位為星期。' +
+          (b.hour24 < 6 ? '　06:00 前的時段延續前一日的行星時序，因此不會等於當日主星。' : '')
       },
       request: request,
       result: {
         weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
         planetaryDay: describe(dayRulerKey),
         planetaryHour: {
-          index: hourIndex,
-          isNight: hourIndex > 12,
+          index: current.index,        // 1–24，第 1 時段為 00:00–01:00
+          isNight: current.isNight,
           startTime: current.start,
           endTime: current.end,
           planet: describe(current.planetKey)
@@ -142,25 +131,21 @@
     };
   }
 
-  /** 產生當日 24 個行星時（迦勒底次序循環） */
-  function buildHourTable(dayRulerKey, sunrise) {
-    var startIdx = D.CHALDEAN_ORDER.indexOf(dayRulerKey);
-    var table = [];
-    for (var i = 0; i < 24; i++) {
-      var planetKey = D.CHALDEAN_ORDER[(startIdx + i) % 7];
-      var startMin = (sunrise + i * 60) % 1440;
-      table.push({
-        index: i + 1,
-        isNight: i >= 12,
+  /** 取出某個星期的 24 個時段（直接來自 D.HOUR_RULERS，不做推算） */
+  function buildHourTable(weekdayIndex) {
+    return D.HOUR_RULERS.map(function (row, hour) {
+      var planetKey = row[weekdayIndex];
+      return {
+        index: hour + 1,
+        isNight: hour < 6 || hour >= 18,
         planetKey: planetKey,
         planetName: D.PLANETS[planetKey].name,
         symbol: D.PLANETS[planetKey].symbol,
         angelName: D.PLANETS[planetKey].angel.name,
-        start: formatMinutes(startMin),
-        end: formatMinutes((startMin + 60) % 1440)
-      });
-    }
-    return table;
+        start: formatMinutes(hour * 60),
+        end: formatMinutes((hour + 1) * 60)
+      };
+    });
   }
 
   /** 由 planetKey 取出行星 + 天使的完整描述（複製一份，避免外部改到知識庫） */

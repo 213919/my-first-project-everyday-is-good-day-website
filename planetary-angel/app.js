@@ -257,8 +257,7 @@
     el.hourSymbol.textContent = hourP.symbol;
     el.hourPlanet.textContent = hourP.name + '（' + hourP.latin + '）';
     el.hourAngel.textContent = hourP.angel.name + ' · ' + hourP.angel.latin;
-    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時 · ' +
-      (r.planetaryHour.isNight ? '夜' : '日') + '間 · ' +
+    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時段 · ' +
       r.planetaryHour.startTime + '–' + r.planetaryHour.endTime;
 
     el.detailWeekday.textContent = r.weekday.name + '（行星日主星：' + dayP.name + '）';
@@ -270,8 +269,8 @@
     renderHourTable(r.hourTable, r.planetaryHour.index);
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
-    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機示範資料（mock）' : 'API') +
-      (res.meta.approximate ? '　※ ' + res.meta.notes : '');
+    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機對照表' : 'API') +
+      '　※ ' + res.meta.notes;
 
     el.result.hidden = false;
     el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });

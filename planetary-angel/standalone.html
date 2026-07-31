@@ -796,7 +796,7 @@ summary {
       <p class="result__advice" id="detail-advice">—</p>
 
       <details class="hour-table">
-        <summary>當日 24 個行星時對照表</summary>
+        <summary>當日 24 個時段對照表</summary>
         <div class="hour-table__scroll">
           <table>
             <thead>
@@ -816,7 +816,7 @@ summary {
     </section>
 
     <footer class="app__footer">
-      <p>結果為簡化推算之示範資料，僅供參考。</p>
+      <p>結果依固定行星時對照表產生，僅供參考。</p>
     </footer>
   </main>
 
@@ -861,7 +861,7 @@ summary {
       symbol: '♂',
       name: '火星',
       latin: 'Mars',
-      angel: { name: '薩邁爾', latin: 'Samael', domain: '勇氣、切割、防衛' },
+      angel: { name: '卡麥爾', latin: 'Camael', domain: '力量、勇氣、公正' },
       keywords: ['行動', '競爭', '斬斷', '護身'],
       colors: ['正紅', '鐵鏽色'],
       metal: '鐵',
@@ -885,7 +885,7 @@ summary {
       symbol: '♃',
       name: '木星',
       latin: 'Iuppiter',
-      angel: { name: '薩基爾', latin: 'Sachiel', domain: '恩慈、財富、擴張' },
+      angel: { name: '薩基爾', latin: 'Zadkiel', domain: '恩慈、寬恕、豐盛' },
       keywords: ['貴人', '財富', '法律', '信仰'],
       colors: ['royal blue', '紫'],
       metal: '錫',
@@ -897,7 +897,7 @@ summary {
       symbol: '♀',
       name: '金星',
       latin: 'Venus',
-      angel: { name: '安納爾', latin: 'Anael', domain: '愛、和諧、美感' },
+      angel: { name: '哈吉爾', latin: 'Hagiel', domain: '愛、美感、吸引' },
       keywords: ['戀愛', '藝術', '和解', '享樂'],
       colors: ['翡翠綠', '粉紅'],
       metal: '銅',
@@ -918,10 +918,45 @@ summary {
     }
   };
 
-  /* 迦勒底次序（Chaldean order）：行星時依此循環 */
-  var CHALDEAN_ORDER = ['saturn', 'jupiter', 'mars', 'sun', 'venus', 'mercury', 'moon'];
+  /*
+   * 行星時對照表（本專案的權威資料來源）
+   *
+   *   HOUR_RULERS[時][星期] = 行星 key
+   *   時   = 0–23，第 0 列代表 00:00–01:00，每時段 60 分鐘
+   *   星期 = 0–6，依序為 週日、週一、週二、週三、週四、週五、週六
+   *
+   * 內容依迦勒底次序（土、木、火、日、金、水、月）循環，06:00 那一列
+   * 正好是各星期的主星（日→太陽、一→月亮…六→土星）；06:00 之前的時段
+   * 延續前一天的順序，所以例如週日 00:00 是金星時（屬週六土星日的序列）。
+   */
+  var HOUR_RULERS = [
+    /* 00:00–01:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 01:00–02:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 02:00–03:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun'],
+    /* 03:00–04:00 */ ['saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus'],
+    /* 04:00–05:00 */ ['jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars', 'mercury'],
+    /* 05:00–06:00 */ ['mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon'],
+    /* 06:00–07:00 */ ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'],
+    /* 07:00–08:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 08:00–09:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 09:00–10:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun'],
+    /* 10:00–11:00 */ ['saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus'],
+    /* 11:00–12:00 */ ['jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars', 'mercury'],
+    /* 12:00–13:00 */ ['mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon'],
+    /* 13:00–14:00 */ ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'],
+    /* 14:00–15:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 15:00–16:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 16:00–17:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun'],
+    /* 17:00–18:00 */ ['saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus'],
+    /* 18:00–19:00 */ ['jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars', 'mercury'],
+    /* 19:00–20:00 */ ['mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon'],
+    /* 20:00–21:00 */ ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'],
+    /* 21:00–22:00 */ ['venus', 'saturn', 'sun', 'moon', 'mars', 'mercury', 'jupiter'],
+    /* 22:00–23:00 */ ['mercury', 'jupiter', 'venus', 'saturn', 'sun', 'moon', 'mars'],
+    /* 23:00–24:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun']
+  ];
 
-  /* 星期 0=週日 … 6=週六，對應的行星日主星 */
+  /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
   var WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
@@ -942,7 +977,7 @@ summary {
 
   PA.data = {
     PLANETS: PLANETS,
-    CHALDEAN_ORDER: CHALDEAN_ORDER,
+    HOUR_RULERS: HOUR_RULERS,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS
@@ -971,11 +1006,11 @@ summary {
     endpoint: '/api/planetary-angel',   // remote 模式使用
     timeoutMs: 8000,
     mockLatencyMs: 420,                 // 模擬網路延遲，讓 loading 狀態看得出來
-    schemaVersion: '1.0',
-    /* 簡化假設：日出固定 06:00、行星時等分為 60 分鐘。
-       真實計算需依城市經緯度求日出日落，屆時由後端負責。 */
-    sunriseMinutes: 6 * 60,
-    hourSystem: 'equal'
+    schemaVersion: '1.1',
+    /* 行星時的取法。'fixed-table' = 直接查 data.js 的 HOUR_RULERS 對照表
+       （00:00 起算、每時段 60 分鐘、以星期分欄）。
+       日後若後端改用日出日落分割不等長的行星時，這裡會換成別的值。 */
+    hourSystem: 'fixed-table'
   };
 
   /* ---------- request 建構 ---------- */
@@ -1001,7 +1036,6 @@ summary {
       localDateTime: pad(raw.year, 4) + '-' + pad(raw.month, 2) + '-' + pad(raw.day, 2) +
         'T' + pad(hour24, 2) + ':' + pad(raw.minute, 2) + ':00',
       options: {
-        sunriseMinutes: CONFIG.sunriseMinutes,
         hourSystem: CONFIG.hourSystem
       }
     };
@@ -1052,39 +1086,29 @@ summary {
 
   function compute(request) {
     var b = request.birth;
-    var minutesOfDay = b.hour24 * 60 + b.minute;
-    var sunrise = request.options.sunriseMinutes;
-
-    // 行星日以「日出」換日：日出前仍屬前一天的行星日
-    var beforeSunrise = minutesOfDay < sunrise;
-    var base = new Date(b.year, b.month - 1, b.day);
-    if (beforeSunrise) base.setDate(base.getDate() - 1);
-
-    var weekdayIndex = base.getDay();
+    var weekdayIndex = new Date(b.year, b.month - 1, b.day).getDay();
     var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
 
-    // 第幾個行星時（1–24），第 1 時由日出開始、主星即為當日主星
-    var elapsed = beforeSunrise ? minutesOfDay + 1440 - sunrise : minutesOfDay - sunrise;
-    var hourIndex = Math.floor(elapsed / 60) + 1;
-
-    var hours = buildHourTable(dayRulerKey, sunrise);
-    var current = hours[hourIndex - 1];
+    // 直接查對照表：列 = 出生時的整點，欄 = 出生日的星期
+    var hours = buildHourTable(weekdayIndex);
+    var current = hours[b.hour24];
 
     return {
       meta: {
         source: CONFIG.mode,           // 'mock' — 之後接 API 會變成 'remote'
         schemaVersion: CONFIG.schemaVersion,
         generatedAt: new Date().toISOString(),
-        approximate: true,             // 使用固定日出的簡化結果
-        notes: '日出固定以 06:00 估算，未依' + request.city + '實際經緯度計算。'
+        method: 'fixed-hour-table',
+        notes: '行星時依固定對照表：00:00 起算，每時段 60 分鐘，欄位為星期。' +
+          (b.hour24 < 6 ? '　06:00 前的時段延續前一日的行星時序，因此不會等於當日主星。' : '')
       },
       request: request,
       result: {
         weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
         planetaryDay: describe(dayRulerKey),
         planetaryHour: {
-          index: hourIndex,
-          isNight: hourIndex > 12,
+          index: current.index,        // 1–24，第 1 時段為 00:00–01:00
+          isNight: current.isNight,
           startTime: current.start,
           endTime: current.end,
           planet: describe(current.planetKey)
@@ -1094,25 +1118,21 @@ summary {
     };
   }
 
-  /** 產生當日 24 個行星時（迦勒底次序循環） */
-  function buildHourTable(dayRulerKey, sunrise) {
-    var startIdx = D.CHALDEAN_ORDER.indexOf(dayRulerKey);
-    var table = [];
-    for (var i = 0; i < 24; i++) {
-      var planetKey = D.CHALDEAN_ORDER[(startIdx + i) % 7];
-      var startMin = (sunrise + i * 60) % 1440;
-      table.push({
-        index: i + 1,
-        isNight: i >= 12,
+  /** 取出某個星期的 24 個時段（直接來自 D.HOUR_RULERS，不做推算） */
+  function buildHourTable(weekdayIndex) {
+    return D.HOUR_RULERS.map(function (row, hour) {
+      var planetKey = row[weekdayIndex];
+      return {
+        index: hour + 1,
+        isNight: hour < 6 || hour >= 18,
         planetKey: planetKey,
         planetName: D.PLANETS[planetKey].name,
         symbol: D.PLANETS[planetKey].symbol,
         angelName: D.PLANETS[planetKey].angel.name,
-        start: formatMinutes(startMin),
-        end: formatMinutes((startMin + 60) % 1440)
-      });
-    }
-    return table;
+        start: formatMinutes(hour * 60),
+        end: formatMinutes((hour + 1) * 60)
+      };
+    });
   }
 
   /** 由 planetKey 取出行星 + 天使的完整描述（複製一份，避免外部改到知識庫） */
@@ -1412,8 +1432,7 @@ summary {
     el.hourSymbol.textContent = hourP.symbol;
     el.hourPlanet.textContent = hourP.name + '（' + hourP.latin + '）';
     el.hourAngel.textContent = hourP.angel.name + ' · ' + hourP.angel.latin;
-    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時 · ' +
-      (r.planetaryHour.isNight ? '夜' : '日') + '間 · ' +
+    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時段 · ' +
       r.planetaryHour.startTime + '–' + r.planetaryHour.endTime;
 
     el.detailWeekday.textContent = r.weekday.name + '（行星日主星：' + dayP.name + '）';
@@ -1425,8 +1444,8 @@ summary {
     renderHourTable(r.hourTable, r.planetaryHour.index);
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
-    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機示範資料（mock）' : 'API') +
-      (res.meta.approximate ? '　※ ' + res.meta.notes : '');
+    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機對照表' : 'API') +
+      '　※ ' + res.meta.notes;
 
     el.result.hidden = false;
     el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
