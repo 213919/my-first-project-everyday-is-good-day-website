@@ -21,14 +21,29 @@ python3 -m http.server 8000
 `standalone.html` 是產生物，不要直接編輯。改完多檔版後重新打包：
 
 ```bash
+node planetary-angel/generate-options.js   # 只有改過 data.js 的 FORM_OPTIONS 才需要
 node planetary-angel/build-standalone.js
 ```
+
+### 不執行 JavaScript 的環境
+
+iOS 檔案 App 的 Quick Look、各種 App 的內建檔案預覽器、郵件附件預覽等，
+**不會執行 JavaScript**。若下拉選單的選項是用 JS 產生的，在這些地方會全部變成空的
+（點下去顯示「沒有選項」）。
+
+因此：
+
+- 所有 `<option>` 都寫死在 `index.html`（由 `generate-options.js` 產生），
+  不執行 JS 也看得到完整選單與預設值。
+- `app.js` 的 `ensureOptions()` 只在選單為空時才補上，兩邊不會互相覆蓋。
+- 查詢結果仍然需要 JavaScript，所以放了 `<noscript>` 提示，告訴使用者改用瀏覽器開啟。
 
 ## 檔案說明
 
 | 檔案 | 用途 |
 | --- | --- |
-| `index.html` | 頁面骨架：標題區、表單區（城市／年／月／日／時／分／上下午）、結果區（行星日卡、行星時卡、細節列表、24 行星時對照表、JSON 檢視）。只有結構，沒有邏輯。 |
+| `index.html` | 頁面骨架：標題區、表單區（城市／年／月／日／時／分／上下午）、結果區（行星日卡、行星時卡、細節列表、24 行星時對照表、JSON 檢視）。只有結構，沒有邏輯。所有 `<option>` 都寫死在這裡（見下方「不執行 JavaScript 的環境」）。 |
+| `generate-options.js` | 依 `data.js` 的範圍重新產生 `index.html` 裡的 `<option>` 清單，避免手動維護 318 個選項。改了 `FORM_OPTIONS` 才需要跑。 |
 | `styles.css` | 全部外觀：深夜藍紫底 + 金色點綴的神秘學風格、CSS 星塵背景、表單與結果卡片樣式、錯誤狀態樣式、RWD（≤420px 改單欄）。 |
 | `data.js` | 靜態知識庫：七行星資料（符號、中英文名、守護天使、關鍵字、幸運色、金屬、薰香、建議）、迦勒底次序、星期主星對照、表單選單的預設值與範圍。純資料，不含邏輯。 |
 | `api.js` | 資料層／服務層，**唯一要改的接 API 位置**。負責組 request、呼叫 provider、回傳統一格式的 response。內含 `mockProvider`（本機推算 + 模擬延遲）與 `remoteProvider`（`fetch` + timeout，已寫好但未啟用）。 |

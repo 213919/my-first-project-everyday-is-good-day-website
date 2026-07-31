@@ -154,6 +154,17 @@ select.field__control {
   text-align: right;
 }
 
+.noscript-note {
+  margin: 10px 0 0;
+  padding: 10px 12px;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--gold-soft);
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 8px;
+}
+
 .btn-submit {
   width: 100%;
   margin-top: 14px;

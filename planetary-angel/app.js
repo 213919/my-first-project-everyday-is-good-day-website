@@ -35,32 +35,43 @@
 
   /* ---------- 選單生成 ---------- */
 
+  /*
+   * 選項本身是寫在 index.html 裡的（由 generate-options.js 產生），
+   * 這樣在不執行 JavaScript 的預覽器裡也看得到完整選單。
+   * 這裡只在選單是空的時候才補上，避免兩邊互相覆蓋。
+   */
   function buildSelects() {
-    fillSelect(el.year, range(OPT.yearRange.max, OPT.yearRange.min, -1), function (v) {
+    ensureOptions(el.year, range(OPT.yearRange.max, OPT.yearRange.min, -1), function (v) {
       return v + ' 年';
     }, OPT.yearRange.defaultValue);
 
-    fillSelect(el.month, range(OPT.monthRange.min, OPT.monthRange.max), function (v) {
+    ensureOptions(el.month, range(OPT.monthRange.min, OPT.monthRange.max), function (v) {
       return v + '月';
     }, OPT.monthRange.defaultValue);
 
-    rebuildDays(OPT.dayDefault);
+    ensureOptions(el.day, range(1, 31), function (v) {
+      return v + ' 日';
+    }, OPT.dayDefault);
 
-    fillSelect(el.hour, range(OPT.hourRange.min, OPT.hourRange.max), function (v) {
+    ensureOptions(el.hour, range(OPT.hourRange.min, OPT.hourRange.max), function (v) {
       return String(v);
     }, OPT.hourRange.defaultValue);
 
-    fillSelect(el.minute, range(OPT.minuteRange.min, OPT.minuteRange.max), function (v) {
+    ensureOptions(el.minute, range(OPT.minuteRange.min, OPT.minuteRange.max), function (v) {
       return pad2(v);
     }, OPT.minuteRange.defaultValue);
 
-    el.meridiem.innerHTML = '';
-    OPT.meridiems.forEach(function (m) {
-      el.meridiem.appendChild(new Option(m.label, m.value));
-    });
-    el.meridiem.value = 'AM';
+    ensureOptions(el.meridiem, OPT.meridiems.map(function (m) { return m.value; }), function (v) {
+      return OPT.meridiems.filter(function (m) { return m.value === v; })[0].label;
+    }, OPT.meridiems[0].value);
 
-    el.city.value = OPT.defaultCity;
+    // 依實際年月修正「日」的天數（例如 2 月），保留目前選到的值
+    rebuildDays();
+  }
+
+  function ensureOptions(select, values, labelFn, fallbackValue) {
+    if (select.options.length) return;      // HTML 已經有選項，交給 HTML
+    fillSelect(select, values, labelFn, fallbackValue);
   }
 
   /** 依年月重建「日」選單，並盡量保留原本選到的日期 */
