@@ -315,6 +315,16 @@ summary {
 .hour-table th { color: var(--text-dim); font-weight: 400; }
 .hour-table tr.is-current { background: rgba(212, 175, 55, 0.14); color: var(--gold-soft); }
 
+/* 整週輪值表：整欄淡淡標出當天，該時段那一格再加強 */
+.week-table th[scope="row"] { color: var(--text-dim); text-align: left; }
+.week-table .is-current-col { background: rgba(150, 140, 220, 0.1); }
+
+.week-table td.is-current {
+  background: rgba(212, 175, 55, 0.22);
+  color: var(--gold-soft);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+
 .json-view pre {
   margin: 10px 0 0;
   padding: 12px;

@@ -48,7 +48,7 @@ iOS 檔案 App 的 Quick Look、各種 App 的內建檔案預覽器、郵件附�
 
 | 檔案 | 用途 |
 | --- | --- |
-| `index.html` | 頁面骨架：標題區、表單區（城市／年／月／日／時／分／上下午）、結果區（行星日卡、行星時卡、細節列表、24 行星時對照表、JSON 檢視）。只有結構，沒有邏輯。所有 `<option>` 都寫死在這裡（見下方「不執行 JavaScript 的環境」）。 |
+| `index.html` | 頁面骨架：標題區、表單區（城市／年／月／日／時／分／上下午）、結果區（行星日卡、行星時卡、細節列表、當日 24 時段對照表、一週行星時輪值表、JSON 檢視）。只有結構，沒有邏輯。所有 `<option>` 都寫死在這裡（見下方「不執行 JavaScript 的環境」）。 |
 | `generate-options.js` | 依 `data.js` 的範圍重新產生 `index.html` 裡的 `<option>` 清單，避免手動維護 318 個選項。改了 `FORM_OPTIONS` 才需要跑。 |
 | `styles.css` | 全部外觀：深夜藍紫底 + 金色點綴的神秘學風格、CSS 星塵背景、表單與結果卡片樣式、錯誤狀態樣式、RWD（≤420px 改單欄）。 |
 | `angels.tsv` | **行星與守護天使的對應**（土星 Cassiel、木星 Zadkiel、火星 Camael、太陽 Michael、金星 Hagiel、水星 Raphael、月亮 Gabriel）。`data.js` 依此填寫，`verify-hour-table.js` 會比對。 |
@@ -76,7 +76,7 @@ PA.api.buildRequest()  → request（= 未來的 API body）
 PA.api.query(request)   ← 這裡切換 mock / remote
       │ Promise<response>
       ▼
-renderResult(response) → [行星日卡][行星時卡][細節列表][24 時對照表][JSON]
+renderResult(response) → [行星日卡][行星時卡][細節列表][當日 24 時段][一週輪值表][JSON]
 ```
 
 分層原則：`data.js`（對照表與知識）→ `api.js`（查表／取數）→ `app.js`（畫面）。
@@ -168,6 +168,10 @@ var CONFIG = {
 - 列：`0`–`23`，第 0 列代表 `00:00–01:00`，每時段固定 60 分鐘
 - 欄：`0`–`6`，依序為 週日、週一、週二、週三、週四、週五、週六
 - 值：行星 key（`sun` / `moon` / `mars` / `mercury` / `jupiter` / `venus` / `saturn`）
+
+結果區的「一週行星時輪值表」就是這張表的完整呈現（列依時間 00:00→24:00 排序、
+欄為星期日→星期六），並會標出查詢到的那一格；資料由 `PA.api.getWeekTable()` 提供，
+不塞進每次查詢的 response，以免 168 格灌爆 payload。
 
 `api.js` 的 `compute()` 只做兩件事：用出生日期取得星期（欄），用 24 小時制的整點取得時段（列），
 然後查表。不做任何日出、時區或迦勒底次序的計算。

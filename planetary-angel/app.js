@@ -27,7 +27,8 @@
      'day-symbol', 'day-planet', 'day-angel', 'day-angel-domain',
      'hour-symbol', 'hour-planet', 'hour-angel', 'hour-range',
      'detail-weekday', 'detail-keywords', 'detail-colors', 'detail-material',
-     'detail-advice', 'hour-table-body', 'json-output', 'result-note'
+     'detail-advice', 'hour-table-body', 'week-table', 'week-table-head', 'week-table-body',
+     'json-output', 'result-note'
     ].forEach(function (id) {
       el[camel(id)] = document.getElementById(id);
     });
@@ -108,6 +109,7 @@
       node.addEventListener('change', function () { clearFieldError(node.id); });
     });
 
+    el.weekTable.addEventListener('toggle', revealCurrentCell);
     el.birthForm.addEventListener('submit', onSubmit);
   }
 
@@ -267,6 +269,7 @@
     el.detailAdvice.textContent = hourP.advice;
 
     renderHourTable(r.hourTable, r.planetaryHour.index);
+    renderWeekTable(b.hour24, r.weekday.index);
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
     el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機對照表' : 'API') +
@@ -291,6 +294,54 @@
     });
     el.hourTableBody.innerHTML = '';
     el.hourTableBody.appendChild(frag);
+  }
+
+  /** 整週輪值表：列＝時段（00:00 起依序），欄＝星期日～星期六，標出查到的那一格 */
+  function renderWeekTable(hour24, weekdayIndex) {
+    var table = PA.api.getWeekTable();
+
+    el.weekTableHead.innerHTML = '<th>時間</th>';
+    table.weekdays.forEach(function (name, i) {
+      var th = document.createElement('th');
+      th.textContent = name;
+      if (i === weekdayIndex) th.className = 'is-current-col';
+      el.weekTableHead.appendChild(th);
+    });
+
+    var frag = document.createDocumentFragment();
+    table.rows.forEach(function (row) {
+      var tr = document.createElement('tr');
+
+      var slot = document.createElement('th');
+      slot.scope = 'row';
+      slot.textContent = row.slot;
+      tr.appendChild(slot);
+
+      row.cells.forEach(function (cell, i) {
+        var td = document.createElement('td');
+        td.textContent = cell.symbol + ' ' + cell.planetName;
+        if (i === weekdayIndex) td.className = 'is-current-col';
+        if (i === weekdayIndex && row.hour === hour24) {
+          td.className = 'is-current';
+          td.title = cell.planetName + '時 · 天使 ' + cell.angelName;
+        }
+        tr.appendChild(td);
+      });
+
+      frag.appendChild(tr);
+    });
+
+    el.weekTableBody.innerHTML = '';
+    el.weekTableBody.appendChild(frag);
+  }
+
+  /* 表格有 8 欄，窄螢幕要水平捲動；展開時把標出的那一格捲進畫面 */
+  function revealCurrentCell() {
+    if (!el.weekTable.open) return;
+    var cell = el.weekTableBody.querySelector('td.is-current');
+    if (cell && cell.scrollIntoView) {
+      cell.scrollIntoView({ block: 'nearest', inline: 'center' });
+    }
   }
 
   /* ---------- 工具 ---------- */

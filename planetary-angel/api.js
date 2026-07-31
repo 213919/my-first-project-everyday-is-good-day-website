@@ -131,6 +131,30 @@
     };
   }
 
+  /**
+   * 整週輪值表（24 列時段 × 7 欄星期），供畫面顯示用。
+   * 與單次查詢無關，所以不放進 response，避免每次都回傳 168 格。
+   */
+  function getWeekTable() {
+    return {
+      weekdays: D.WEEKDAY_NAMES.slice(),
+      rows: D.HOUR_RULERS.map(function (row, hour) {
+        return {
+          hour: hour,
+          slot: formatMinutes(hour * 60) + '–' + formatMinutes((hour + 1) * 60),
+          cells: row.map(function (planetKey) {
+            return {
+              planetKey: planetKey,
+              planetName: D.PLANETS[planetKey].name,
+              symbol: D.PLANETS[planetKey].symbol,
+              angelName: D.PLANETS[planetKey].angel.name
+            };
+          })
+        };
+      })
+    };
+  }
+
   /** 取出某個星期的 24 個時段（直接來自 D.HOUR_RULERS，不做推算） */
   function buildHourTable(weekdayIndex) {
     return D.HOUR_RULERS.map(function (row, hour) {
@@ -181,6 +205,7 @@
     CONFIG: CONFIG,
     buildRequest: buildRequest,
     toHour24: toHour24,
-    query: query
+    query: query,
+    getWeekTable: getWeekTable
   };
 })(window);
