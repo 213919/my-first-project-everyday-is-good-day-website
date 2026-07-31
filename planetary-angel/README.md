@@ -7,12 +7,21 @@
 
 ## 執行方式
 
-直接用瀏覽器開啟 `index.html` 即可（`file://` 可正常運作）。
+**單一檔案版（最簡單）**：直接雙擊 `standalone.html`，一個檔案內含全部 CSS/JS，
+不需伺服器、不需網路，也方便單獨傳給別人。
+
+**多檔版（開發用）**：直接用瀏覽器開啟 `index.html` 即可（`file://` 可正常運作）。
 若要用本機伺服器：
 
 ```bash
 python3 -m http.server 8000
 # 開啟 http://localhost:8000/planetary-angel/
+```
+
+`standalone.html` 是產生物，不要直接編輯。改完多檔版後重新打包：
+
+```bash
+node planetary-angel/build-standalone.js
 ```
 
 ## 檔案說明

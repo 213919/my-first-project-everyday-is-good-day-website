@@ -171,6 +171,13 @@ select.field__control {
 }
 
 .btn-submit:hover { box-shadow: 0 12px 32px rgba(212, 175, 55, 0.36); }
+
+.btn-submit:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 3px;
+}
+
 .btn-submit:active { transform: translateY(1px); }
 .btn-submit[disabled] { opacity: 0.6; cursor: progress; }
 
@@ -285,6 +292,7 @@ summary {
   border-collapse: collapse;
   font-size: 0.78rem;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;   /* 時段數字對齊 */
 }
 
 .hour-table th, .hour-table td {

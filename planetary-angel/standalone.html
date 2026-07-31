@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<!-- 由 build-standalone.js 自動產生，請勿直接編輯；請改 index.html / styles.css / data.js / api.js / app.js 後重新執行。 -->
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>行星日 · 行星時 · 天使｜Planetary Day &amp; Hour Angel</title>
+  <meta name="description" content="輸入出生日期與時間，查詢對應的行星日、行星時與守護天使。">
+  <style>
+/*
+ * styles.css — 版面與神秘學風格外觀
+ * 深夜藍紫底 + 金色點綴，單欄置中，手機優先。
+ */
+
+:root {
+  --bg-deep: #0b0a1a;
+  --bg-mid: #151233;
+  --panel: rgba(21, 18, 48, 0.88);
+  --panel-border: rgba(212, 175, 55, 0.28);
+  --gold: #d4af37;
+  --gold-soft: #e8cf86;
+  --text: #ece9ff;
+  --text-dim: #a7a2cc;
+  --danger: #ff8095;
+  --radius: 14px;
+  --font-serif: "Noto Serif TC", "Songti TC", "Georgia", serif;
+  --font-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body { min-height: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--text);
+  background:
+    radial-gradient(1100px 620px at 50% -10%, #2b2160 0%, transparent 62%),
+    linear-gradient(180deg, var(--bg-mid) 0%, var(--bg-deep) 60%, #05040e 100%);
+  background-attachment: fixed;
+  line-height: 1.7;
+}
+
+/* 星塵背景：純 CSS，不用圖片 */
+.starfield {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(1.4px 1.4px at 12% 18%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 78% 12%, #ffe9b0, transparent),
+    radial-gradient(1px 1px at 32% 62%, #fff, transparent),
+    radial-gradient(1.6px 1.6px at 88% 74%, #cfd6ff, transparent),
+    radial-gradient(1px 1px at 58% 34%, #fff, transparent),
+    radial-gradient(1.2px 1.2px at 22% 88%, #ffe9b0, transparent);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- 版面 ---------- */
+
+.app {
+  position: relative;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 20px 64px;
+}
+
+.app__header { text-align: center; margin-bottom: 28px; }
+
+.app__title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.6rem, 6vw, 2.2rem);
+  letter-spacing: 0.12em;
+  margin: 0 0 10px;
+  color: var(--gold-soft);
+  text-shadow: 0 0 22px rgba(212, 175, 55, 0.35);
+}
+
+.app__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+/* ---------- 表單 ---------- */
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 26px 22px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.45);
+}
+
+.field { margin-bottom: 16px; }
+
+.field__label {
+  display: block;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  color: var(--gold-soft);
+  margin-bottom: 6px;
+}
+
+.field__control {
+  width: 100%;
+  padding: 11px 12px;
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--text);
+  background: rgba(10, 8, 30, 0.85);
+  border: 1px solid rgba(150, 140, 220, 0.32);
+  border-radius: 10px;
+  appearance: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+
+select.field__control {
+  /* 自訂下拉箭頭 */
+  background-image: linear-gradient(45deg, transparent 50%, var(--gold-soft) 50%),
+                    linear-gradient(135deg, var(--gold-soft) 50%, transparent 50%);
+  background-position: right 16px center, right 11px center;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 30px;
+}
+
+.field__control:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.18);
+}
+
+.field__control.is-invalid { border-color: var(--danger); }
+
+.field-row { display: grid; gap: 12px; }
+.field-row--3 { grid-template-columns: repeat(3, 1fr); }
+
+.field__error,
+.form__error {
+  min-height: 1.1em;
+  margin: 5px 0 0;
+  font-size: 0.75rem;
+  color: var(--danger);
+}
+
+.form__error { text-align: center; margin: 4px 0 0; }
+
+.form__preview {
+  margin: 4px 0 0;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+  text-align: right;
+}
+
+.btn-submit {
+  width: 100%;
+  margin-top: 14px;
+  padding: 14px 16px;
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  color: #1a1405;
+  background: linear-gradient(180deg, var(--gold-soft), var(--gold));
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.12s, box-shadow 0.18s, opacity 0.18s;
+  box-shadow: 0 10px 26px rgba(212, 175, 55, 0.22);
+}
+
+.btn-submit:hover { box-shadow: 0 12px 32px rgba(212, 175, 55, 0.36); }
+
+.btn-submit:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--gold-soft);
+  outline-offset: 3px;
+}
+
+.btn-submit:active { transform: translateY(1px); }
+.btn-submit[disabled] { opacity: 0.6; cursor: progress; }
+
+/* ---------- 結果區 ---------- */
+
+.result {
+  margin-top: 26px;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius);
+  padding: 24px 22px;
+  animation: rise 0.42s ease both;
+}
+
+@keyframes rise {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .result { animation: none; }
+}
+
+.result__heading {
+  margin: 0 0 18px;
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  text-align: center;
+  color: var(--gold-soft);
+  letter-spacing: 0.06em;
+}
+
+.result__cards { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+
+.card {
+  padding: 18px 14px;
+  text-align: center;
+  background: rgba(10, 8, 30, 0.6);
+  border: 1px solid rgba(150, 140, 220, 0.22);
+  border-radius: 12px;
+}
+
+.card--hour { border-color: rgba(212, 175, 55, 0.3); }
+
+.card__eyebrow {
+  margin: 0 0 8px;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  color: var(--text-dim);
+}
+
+.card__glyph {
+  margin: 0;
+  font-size: 2.4rem;
+  line-height: 1;
+  color: var(--gold);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.45);
+}
+
+.card__title {
+  margin: 8px 0 6px;
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  letter-spacing: 0.08em;
+}
+
+.card__angel { margin: 0; font-size: 0.86rem; }
+.card__angel strong { color: var(--gold-soft); }
+.card__meta { margin: 4px 0 0; font-size: 0.75rem; color: var(--text-dim); }
+
+.detail {
+  margin: 20px 0 0;
+  display: grid;
+  gap: 8px;
+}
+
+.detail__item {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed rgba(150, 140, 220, 0.18);
+  font-size: 0.85rem;
+}
+
+.detail dt { color: var(--text-dim); letter-spacing: 0.06em; }
+.detail dd { margin: 0; }
+
+.result__advice {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  font-size: 0.88rem;
+  background: rgba(212, 175, 55, 0.08);
+  border-left: 3px solid var(--gold);
+  border-radius: 0 8px 8px 0;
+}
+
+/* 摺疊區塊 */
+.hour-table, .json-view { margin-top: 16px; }
+
+summary {
+  cursor: pointer;
+  font-size: 0.82rem;
+  color: var(--gold-soft);
+  letter-spacing: 0.06em;
+}
+
+.hour-table__scroll { overflow-x: auto; margin-top: 10px; }
+
+.hour-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;   /* 時段數字對齊 */
+}
+
+.hour-table th, .hour-table td {
+  padding: 6px 8px;
+  text-align: left;
+  border-bottom: 1px solid rgba(150, 140, 220, 0.16);
+}
+
+.hour-table th { color: var(--text-dim); font-weight: 400; }
+.hour-table tr.is-current { background: rgba(212, 175, 55, 0.14); color: var(--gold-soft); }
+
+.json-view pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  max-height: 260px;
+  overflow: auto;
+  font-size: 0.72rem;
+  line-height: 1.5;
+  background: rgba(5, 4, 16, 0.85);
+  border: 1px solid rgba(150, 140, 220, 0.2);
+  border-radius: 8px;
+  color: var(--text-dim);
+}
+
+.result__note {
+  margin: 14px 0 0;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.app__footer {
+  margin-top: 26px;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.app__footer p { margin: 0; }
+
+/* ---------- 小螢幕 ---------- */
+
+@media (max-width: 420px) {
+  .app { padding: 32px 14px 48px; }
+  .field-row--3 { grid-template-columns: 1fr; }
+  .result__cards { grid-template-columns: 1fr; }
+}
+  </style>
+</head>
+<body>
+  <div class="starfield" aria-hidden="true"></div>
+
+  <main class="app">
+
+    <!-- 1. 標題區 -->
+    <header class="app__header">
+      <h1 class="app__title">行星日 · 行星時 · 天使</h1>
+      <p class="app__subtitle">Planetary Day &amp; Hour Angel — 依出生日期時間</p>
+    </header>
+
+    <!-- 2. 表單區 -->
+    <section class="panel" aria-labelledby="form-heading">
+      <h2 id="form-heading" class="sr-only">出生資料輸入</h2>
+
+      <form id="birth-form" class="form" novalidate autocomplete="off">
+
+        <div class="field">
+          <label class="field__label" for="city">出生城市</label>
+          <input class="field__control" type="text" id="city" name="city" value="台北"
+                 maxlength="30" placeholder="例如：台北" aria-describedby="err-city">
+          <p class="field__error" id="err-city" data-error-for="city"></p>
+        </div>
+
+        <div class="field-row field-row--3">
+          <div class="field">
+            <label class="field__label" for="year">年份</label>
+            <select class="field__control" id="year" name="year" aria-describedby="err-year"></select>
+            <p class="field__error" id="err-year" data-error-for="year"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="month">月份</label>
+            <select class="field__control" id="month" name="month" aria-describedby="err-month"></select>
+            <p class="field__error" id="err-month" data-error-for="month"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="day">日</label>
+            <select class="field__control" id="day" name="day" aria-describedby="err-day"></select>
+            <p class="field__error" id="err-day" data-error-for="day"></p>
+          </div>
+        </div>
+
+        <div class="field-row field-row--3">
+          <div class="field">
+            <label class="field__label" for="hour">小時</label>
+            <select class="field__control" id="hour" name="hour" aria-describedby="err-hour"></select>
+            <p class="field__error" id="err-hour" data-error-for="hour"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="minute">分鐘</label>
+            <select class="field__control" id="minute" name="minute" aria-describedby="err-minute"></select>
+            <p class="field__error" id="err-minute" data-error-for="minute"></p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="meridiem">上／下午</label>
+            <select class="field__control" id="meridiem" name="meridiem" aria-describedby="err-meridiem"></select>
+            <p class="field__error" id="err-meridiem" data-error-for="meridiem"></p>
+          </div>
+        </div>
+
+        <!-- 24 小時制即時預覽，用來確認 AM/PM 換算是否正確 -->
+        <p class="form__preview">換算後（24 小時制）：<span id="hour24-preview">12:00</span></p>
+
+        <p class="form__error" id="form-error" role="alert"></p>
+
+        <button class="btn-submit" type="submit" id="submit-btn">✦ 查詢行星日與天使 ✦</button>
+      </form>
+    </section>
+
+    <!-- 3. 結果區（查詢後才顯示） -->
+    <section class="result" id="result" hidden aria-live="polite" aria-labelledby="result-heading">
+      <h2 id="result-heading" class="result__heading">
+        <span id="result-subject">—</span> 的行星時刻
+      </h2>
+
+      <div class="result__cards">
+        <article class="card card--day">
+          <p class="card__eyebrow">行星日 Planetary Day</p>
+          <p class="card__glyph" id="day-symbol">·</p>
+          <h3 class="card__title" id="day-planet">—</h3>
+          <p class="card__angel">守護天使：<strong id="day-angel">—</strong></p>
+          <p class="card__meta" id="day-angel-domain">—</p>
+        </article>
+
+        <article class="card card--hour">
+          <p class="card__eyebrow">行星時 Planetary Hour</p>
+          <p class="card__glyph" id="hour-symbol">·</p>
+          <h3 class="card__title" id="hour-planet">—</h3>
+          <p class="card__angel">守護天使：<strong id="hour-angel">—</strong></p>
+          <p class="card__meta" id="hour-range">—</p>
+        </article>
+      </div>
+
+      <dl class="detail">
+        <div class="detail__item"><dt>星期</dt><dd id="detail-weekday">—</dd></div>
+        <div class="detail__item"><dt>關鍵字</dt><dd id="detail-keywords">—</dd></div>
+        <div class="detail__item"><dt>幸運色</dt><dd id="detail-colors">—</dd></div>
+        <div class="detail__item"><dt>金屬／薰香</dt><dd id="detail-material">—</dd></div>
+      </dl>
+
+      <p class="result__advice" id="detail-advice">—</p>
+
+      <details class="hour-table">
+        <summary>當日 24 個行星時對照表</summary>
+        <div class="hour-table__scroll">
+          <table>
+            <thead>
+              <tr><th>#</th><th>時段</th><th>行星</th><th>天使</th></tr>
+            </thead>
+            <tbody id="hour-table-body"></tbody>
+          </table>
+        </div>
+      </details>
+
+      <details class="json-view">
+        <summary>檢視資料結構（JSON，供串接 API 參考）</summary>
+        <pre id="json-output"></pre>
+      </details>
+
+      <p class="result__note" id="result-note"></p>
+    </section>
+
+    <footer class="app__footer">
+      <p>結果為簡化推算之示範資料，僅供參考。</p>
+    </footer>
+  </main>
+
+  <script>
+/*
+ * data.js — 靜態知識庫（行星 / 天使 / 迦勒底次序）
+ * 只放資料，不做任何 DOM 或計算，方便日後整包改成後端回傳。
+ */
+(function (global) {
+  'use strict';
+
+  var PA = (global.PA = global.PA || {});
+
+  /* 七行星基本資料：符號、中英文名、守護天使與象徵物 */
+  var PLANETS = {
+    sun: {
+      key: 'sun',
+      symbol: '☉',
+      name: '太陽',
+      latin: 'Sol',
+      angel: { name: '米迦勒', latin: 'Michael', domain: '守護、勝利、光明' },
+      keywords: ['生命力', '權威', '名聲', '療癒'],
+      colors: ['金色', '橙黃'],
+      metal: '金',
+      incense: '乳香',
+      advice: '適合展現自我、面見上位者、處理與名譽相關之事。'
+    },
+    moon: {
+      key: 'moon',
+      symbol: '☽',
+      name: '月亮',
+      latin: 'Luna',
+      angel: { name: '加百列', latin: 'Gabriel', domain: '傳訊、夢境、情感' },
+      keywords: ['直覺', '夢境', '家宅', '孕育'],
+      colors: ['銀白', '珍珠色'],
+      metal: '銀',
+      incense: '茉莉',
+      advice: '適合占卜、靜心、處理家務與情感、與母性相關之事。'
+    },
+    mars: {
+      key: 'mars',
+      symbol: '♂',
+      name: '火星',
+      latin: 'Mars',
+      angel: { name: '薩邁爾', latin: 'Samael', domain: '勇氣、切割、防衛' },
+      keywords: ['行動', '競爭', '斬斷', '護身'],
+      colors: ['正紅', '鐵鏽色'],
+      metal: '鐵',
+      incense: '龍血',
+      advice: '適合訓練、談判施壓、切斷孽緣；不宜衝動爭執。'
+    },
+    mercury: {
+      key: 'mercury',
+      symbol: '☿',
+      name: '水星',
+      latin: 'Mercurius',
+      angel: { name: '拉斐爾', latin: 'Raphael', domain: '智慧、言語、療癒' },
+      keywords: ['溝通', '學習', '契約', '商貿'],
+      colors: ['淺藍', '雜色'],
+      metal: '水銀',
+      incense: '薰衣草',
+      advice: '適合考試、寫作、簽約、談生意與短程移動。'
+    },
+    jupiter: {
+      key: 'jupiter',
+      symbol: '♃',
+      name: '木星',
+      latin: 'Iuppiter',
+      angel: { name: '薩基爾', latin: 'Sachiel', domain: '恩慈、財富、擴張' },
+      keywords: ['貴人', '財富', '法律', '信仰'],
+      colors: ['royal blue', '紫'],
+      metal: '錫',
+      incense: '雪松',
+      advice: '適合求財、求貴人、開展計畫、與師長或法律事務往來。'
+    },
+    venus: {
+      key: 'venus',
+      symbol: '♀',
+      name: '金星',
+      latin: 'Venus',
+      angel: { name: '安納爾', latin: 'Anael', domain: '愛、和諧、美感' },
+      keywords: ['戀愛', '藝術', '和解', '享樂'],
+      colors: ['翡翠綠', '粉紅'],
+      metal: '銅',
+      incense: '玫瑰',
+      advice: '適合告白、和解、社交、美容與一切美的創作。'
+    },
+    saturn: {
+      key: 'saturn',
+      symbol: '♄',
+      name: '土星',
+      latin: 'Saturnus',
+      angel: { name: '卡西爾', latin: 'Cassiel', domain: '界限、時間、秩序' },
+      keywords: ['紀律', '結界', '斷捨離', '長期'],
+      colors: ['深黑', '暗褐'],
+      metal: '鉛',
+      incense: '沒藥',
+      advice: '適合立規矩、清理、閉關、處理長期與土地相關之事；不宜開張。'
+    }
+  };
+
+  /* 迦勒底次序（Chaldean order）：行星時依此循環 */
+  var CHALDEAN_ORDER = ['saturn', 'jupiter', 'mars', 'sun', 'venus', 'mercury', 'moon'];
+
+  /* 星期 0=週日 … 6=週六，對應的行星日主星 */
+  var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
+
+  var WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+
+  /* 表單下拉選單用的靜態選項來源 */
+  var FORM_OPTIONS = {
+    yearRange: { min: 1900, max: 2100, defaultValue: 2000 },
+    monthRange: { min: 1, max: 12, defaultValue: 1 },
+    dayDefault: 1,
+    hourRange: { min: 1, max: 12, defaultValue: 12 },   // 12 小時制
+    minuteRange: { min: 0, max: 59, defaultValue: 0 },
+    meridiems: [
+      { value: 'AM', label: 'AM 上午' },
+      { value: 'PM', label: 'PM 下午' }
+    ],
+    defaultCity: '台北'
+  };
+
+  PA.data = {
+    PLANETS: PLANETS,
+    CHALDEAN_ORDER: CHALDEAN_ORDER,
+    WEEKDAY_RULERS: WEEKDAY_RULERS,
+    WEEKDAY_NAMES: WEEKDAY_NAMES,
+    FORM_OPTIONS: FORM_OPTIONS
+  };
+})(window);
+  </script>
+  <script>
+/*
+ * api.js — 資料層 / 服務層
+ *
+ * 這一層是「之後要接真 API」的唯一接點：
+ *   PA.api.query(request) -> Promise<response>
+ *
+ * 目前 PA.api.CONFIG.mode = 'mock'，由本機的簡化推算產生假資料；
+ * 要改接後端時，只要把 mode 換成 'remote' 並填 endpoint，
+ * UI 層（app.js）完全不需要改動，因為 request / response 結構固定。
+ */
+(function (global) {
+  'use strict';
+
+  var PA = (global.PA = global.PA || {});
+  var D = PA.data;
+
+  var CONFIG = {
+    mode: 'mock',                       // 'mock' | 'remote'
+    endpoint: '/api/planetary-angel',   // remote 模式使用
+    timeoutMs: 8000,
+    mockLatencyMs: 420,                 // 模擬網路延遲，讓 loading 狀態看得出來
+    schemaVersion: '1.0',
+    /* 簡化假設：日出固定 06:00、行星時等分為 60 分鐘。
+       真實計算需依城市經緯度求日出日落，屆時由後端負責。 */
+    sunriseMinutes: 6 * 60,
+    hourSystem: 'equal'
+  };
+
+  /* ---------- request 建構 ---------- */
+
+  /**
+   * 把表單的原始值整理成標準 request（同時也是未來送給 API 的 body）。
+   * @param {{city:string,year:number,month:number,day:number,hour12:number,minute:number,meridiem:'AM'|'PM'}} raw
+   */
+  function buildRequest(raw) {
+    var hour24 = toHour24(raw.hour12, raw.meridiem);
+    return {
+      city: raw.city,
+      birth: {
+        year: raw.year,
+        month: raw.month,
+        day: raw.day,
+        hour12: raw.hour12,
+        minute: raw.minute,
+        meridiem: raw.meridiem,
+        hour24: hour24
+      },
+      // 不帶時區的本地時間字串，後端可搭配 city 自行決定時區
+      localDateTime: pad(raw.year, 4) + '-' + pad(raw.month, 2) + '-' + pad(raw.day, 2) +
+        'T' + pad(hour24, 2) + ':' + pad(raw.minute, 2) + ':00',
+      options: {
+        sunriseMinutes: CONFIG.sunriseMinutes,
+        hourSystem: CONFIG.hourSystem
+      }
+    };
+  }
+
+  /** 12 小時制 + 上下午 → 24 小時制（12AM=0、12PM=12） */
+  function toHour24(hour12, meridiem) {
+    var h = hour12 % 12;              // 12 → 0
+    return meridiem === 'PM' ? h + 12 : h;
+  }
+
+  /* ---------- 對外入口 ---------- */
+
+  function query(request) {
+    return CONFIG.mode === 'remote' ? remoteProvider(request) : mockProvider(request);
+  }
+
+  /* ---------- provider：假資料（本機簡化推算） ---------- */
+
+  function mockProvider(request) {
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        resolve(compute(request));
+      }, CONFIG.mockLatencyMs);
+    });
+  }
+
+  /* ---------- provider：真 API（預留，尚未啟用） ---------- */
+
+  function remoteProvider(request) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, CONFIG.timeoutMs);
+
+    return fetch(CONFIG.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(request),
+      signal: controller.signal
+    }).then(function (res) {
+      if (!res.ok) throw new Error('API 回應狀態 ' + res.status);
+      return res.json();
+    }).finally(function () {
+      clearTimeout(timer);
+    });
+  }
+
+  /* ---------- 推算核心 ---------- */
+
+  function compute(request) {
+    var b = request.birth;
+    var minutesOfDay = b.hour24 * 60 + b.minute;
+    var sunrise = request.options.sunriseMinutes;
+
+    // 行星日以「日出」換日：日出前仍屬前一天的行星日
+    var beforeSunrise = minutesOfDay < sunrise;
+    var base = new Date(b.year, b.month - 1, b.day);
+    if (beforeSunrise) base.setDate(base.getDate() - 1);
+
+    var weekdayIndex = base.getDay();
+    var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
+
+    // 第幾個行星時（1–24），第 1 時由日出開始、主星即為當日主星
+    var elapsed = beforeSunrise ? minutesOfDay + 1440 - sunrise : minutesOfDay - sunrise;
+    var hourIndex = Math.floor(elapsed / 60) + 1;
+
+    var hours = buildHourTable(dayRulerKey, sunrise);
+    var current = hours[hourIndex - 1];
+
+    return {
+      meta: {
+        source: CONFIG.mode,           // 'mock' — 之後接 API 會變成 'remote'
+        schemaVersion: CONFIG.schemaVersion,
+        generatedAt: new Date().toISOString(),
+        approximate: true,             // 使用固定日出的簡化結果
+        notes: '日出固定以 06:00 估算，未依' + request.city + '實際經緯度計算。'
+      },
+      request: request,
+      result: {
+        weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
+        planetaryDay: describe(dayRulerKey),
+        planetaryHour: {
+          index: hourIndex,
+          isNight: hourIndex > 12,
+          startTime: current.start,
+          endTime: current.end,
+          planet: describe(current.planetKey)
+        },
+        hourTable: hours
+      }
+    };
+  }
+
+  /** 產生當日 24 個行星時（迦勒底次序循環） */
+  function buildHourTable(dayRulerKey, sunrise) {
+    var startIdx = D.CHALDEAN_ORDER.indexOf(dayRulerKey);
+    var table = [];
+    for (var i = 0; i < 24; i++) {
+      var planetKey = D.CHALDEAN_ORDER[(startIdx + i) % 7];
+      var startMin = (sunrise + i * 60) % 1440;
+      table.push({
+        index: i + 1,
+        isNight: i >= 12,
+        planetKey: planetKey,
+        planetName: D.PLANETS[planetKey].name,
+        symbol: D.PLANETS[planetKey].symbol,
+        angelName: D.PLANETS[planetKey].angel.name,
+        start: formatMinutes(startMin),
+        end: formatMinutes((startMin + 60) % 1440)
+      });
+    }
+    return table;
+  }
+
+  /** 由 planetKey 取出行星 + 天使的完整描述（複製一份，避免外部改到知識庫） */
+  function describe(planetKey) {
+    var p = D.PLANETS[planetKey];
+    return {
+      key: p.key,
+      symbol: p.symbol,
+      name: p.name,
+      latin: p.latin,
+      angel: { name: p.angel.name, latin: p.angel.latin, domain: p.angel.domain },
+      keywords: p.keywords.slice(),
+      colors: p.colors.slice(),
+      metal: p.metal,
+      incense: p.incense,
+      advice: p.advice
+    };
+  }
+
+  /* ---------- 小工具 ---------- */
+
+  function pad(n, len) {
+    var s = String(Math.abs(n));
+    while (s.length < len) s = '0' + s;
+    return (n < 0 ? '-' : '') + s;
+  }
+
+  function formatMinutes(total) {
+    return pad(Math.floor(total / 60), 2) + ':' + pad(total % 60, 2);
+  }
+
+  PA.api = {
+    CONFIG: CONFIG,
+    buildRequest: buildRequest,
+    toHour24: toHour24,
+    query: query
+  };
+})(window);
+  </script>
+  <script>
+/*
+ * app.js — UI 層
+ * 職責：產生選單 → 讀表單 → 驗證 → 呼叫 PA.api.query() → 渲染結果。
+ * 不含任何行星/天使的知識或推算邏輯（那些在 data.js / api.js）。
+ */
+(function (global) {
+  'use strict';
+
+  var PA = global.PA;
+  var OPT = PA.data.FORM_OPTIONS;
+
+  var el = {};
+  var lastResponse = null;   // 方便在 console 用 PA.app.last() 檢視
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    cacheDom();
+    buildSelects();
+    bindEvents();
+    updateHour24Preview();
+  }
+
+  function cacheDom() {
+    ['birth-form', 'city', 'year', 'month', 'day', 'hour', 'minute', 'meridiem',
+     'form-error', 'submit-btn', 'hour24-preview', 'result', 'result-subject',
+     'day-symbol', 'day-planet', 'day-angel', 'day-angel-domain',
+     'hour-symbol', 'hour-planet', 'hour-angel', 'hour-range',
+     'detail-weekday', 'detail-keywords', 'detail-colors', 'detail-material',
+     'detail-advice', 'hour-table-body', 'json-output', 'result-note'
+    ].forEach(function (id) {
+      el[camel(id)] = document.getElementById(id);
+    });
+  }
+
+  /* ---------- 選單生成 ---------- */
+
+  function buildSelects() {
+    fillSelect(el.year, range(OPT.yearRange.max, OPT.yearRange.min, -1), function (v) {
+      return v + ' 年';
+    }, OPT.yearRange.defaultValue);
+
+    fillSelect(el.month, range(OPT.monthRange.min, OPT.monthRange.max), function (v) {
+      return v + '月';
+    }, OPT.monthRange.defaultValue);
+
+    rebuildDays(OPT.dayDefault);
+
+    fillSelect(el.hour, range(OPT.hourRange.min, OPT.hourRange.max), function (v) {
+      return String(v);
+    }, OPT.hourRange.defaultValue);
+
+    fillSelect(el.minute, range(OPT.minuteRange.min, OPT.minuteRange.max), function (v) {
+      return pad2(v);
+    }, OPT.minuteRange.defaultValue);
+
+    el.meridiem.innerHTML = '';
+    OPT.meridiems.forEach(function (m) {
+      el.meridiem.appendChild(new Option(m.label, m.value));
+    });
+    el.meridiem.value = 'AM';
+
+    el.city.value = OPT.defaultCity;
+  }
+
+  /** 依年月重建「日」選單，並盡量保留原本選到的日期 */
+  function rebuildDays(preferred) {
+    var year = parseInt(el.year.value, 10);
+    var month = parseInt(el.month.value, 10);
+    var max = daysInMonth(year, month);
+    var keep = preferred || parseInt(el.day.value, 10) || 1;
+
+    fillSelect(el.day, range(1, max), function (v) { return v + ' 日'; }, Math.min(keep, max));
+  }
+
+  function fillSelect(select, values, labelFn, selected) {
+    select.innerHTML = '';
+    values.forEach(function (v) {
+      select.appendChild(new Option(labelFn(v), String(v)));
+    });
+    select.value = String(selected);
+  }
+
+  /* ---------- 事件 ---------- */
+
+  function bindEvents() {
+    el.year.addEventListener('change', function () { rebuildDays(); });
+    el.month.addEventListener('change', function () { rebuildDays(); });
+
+    [el.hour, el.minute, el.meridiem].forEach(function (node) {
+      node.addEventListener('change', updateHour24Preview);
+    });
+
+    // 使用者一修改就清掉該欄位的錯誤提示
+    [el.city, el.year, el.month, el.day, el.hour, el.minute, el.meridiem].forEach(function (node) {
+      node.addEventListener('input', function () { clearFieldError(node.id); });
+      node.addEventListener('change', function () { clearFieldError(node.id); });
+    });
+
+    el.birthForm.addEventListener('submit', onSubmit);
+  }
+
+  function updateHour24Preview() {
+    var h = parseInt(el.hour.value, 10);
+    var m = parseInt(el.minute.value, 10);
+    if (isNaN(h) || isNaN(m)) { el.hour24Preview.textContent = '—'; return; }
+    el.hour24Preview.textContent = pad2(PA.api.toHour24(h, el.meridiem.value)) + ':' + pad2(m);
+  }
+
+  function onSubmit(e) {
+    e.preventDefault();
+
+    var raw = readForm();
+    var errors = validate(raw);
+
+    renderErrors(errors);
+    if (Object.keys(errors).length) {
+      focusFirstError(errors);
+      return;
+    }
+
+    var request = PA.api.buildRequest(raw);
+    setLoading(true);
+
+    PA.api.query(request)
+      .then(function (response) {
+        lastResponse = response;
+        renderResult(response);
+      })
+      .catch(function (err) {
+        el.formError.textContent = '查詢失敗：' + (err && err.message ? err.message : '未知錯誤');
+      })
+      .finally(function () {
+        setLoading(false);
+      });
+  }
+
+  /* ---------- 讀取與驗證 ---------- */
+
+  function readForm() {
+    return {
+      city: el.city.value.trim(),
+      year: toInt(el.year.value),
+      month: toInt(el.month.value),
+      day: toInt(el.day.value),
+      hour12: toInt(el.hour.value),
+      minute: toInt(el.minute.value),
+      meridiem: el.meridiem.value
+    };
+  }
+
+  /**
+   * 回傳 { 欄位id: 錯誤訊息 }；空物件代表通過。
+   * 即使下拉選單「理論上」不會產生非法值，仍完整驗證，
+   * 以防日後改成手動輸入或被外部程式竄改。
+   */
+  function validate(v) {
+    var errors = {};
+
+    if (!v.city) errors.city = '請填寫出生城市';
+
+    if (v.year === null) errors.year = '請選擇年份';
+    else if (v.year < OPT.yearRange.min || v.year > OPT.yearRange.max) {
+      errors.year = '年份需介於 ' + OPT.yearRange.min + '–' + OPT.yearRange.max;
+    }
+
+    if (v.month === null) errors.month = '請選擇月份';
+    else if (v.month < 1 || v.month > 12) errors.month = '月份需介於 1–12';
+
+    if (v.day === null) {
+      errors.day = '請選擇日期';
+    } else if (v.day < 1) {
+      errors.day = '日期需大於 0';
+    } else if (!errors.year && !errors.month) {
+      var max = daysInMonth(v.year, v.month);
+      if (v.day > max) errors.day = v.year + ' 年 ' + v.month + ' 月只有 ' + max + ' 天';
+    } else if (v.day > 31) {
+      errors.day = '日期需介於 1–31';
+    }
+
+    if (v.hour12 === null) errors.hour = '請選擇小時';
+    else if (v.hour12 < 1 || v.hour12 > 12) errors.hour = '小時需介於 1–12（12 小時制）';
+
+    if (v.minute === null) errors.minute = '請選擇分鐘';
+    else if (v.minute < 0 || v.minute > 59) errors.minute = '分鐘需介於 0–59';
+
+    if (v.meridiem !== 'AM' && v.meridiem !== 'PM') errors.meridiem = '請選擇上午或下午';
+
+    return errors;
+  }
+
+  function renderErrors(errors) {
+    ['city', 'year', 'month', 'day', 'hour', 'minute', 'meridiem'].forEach(function (id) {
+      var msg = errors[id] || '';
+      var slot = document.querySelector('[data-error-for="' + id + '"]');
+      if (slot) slot.textContent = msg;
+      var control = document.getElementById(id);
+      if (control) {
+        control.classList.toggle('is-invalid', Boolean(msg));
+        control.setAttribute('aria-invalid', msg ? 'true' : 'false');
+      }
+    });
+
+    var count = Object.keys(errors).length;
+    el.formError.textContent = count ? '尚有 ' + count + ' 個欄位需要修正' : '';
+  }
+
+  function clearFieldError(id) {
+    var slot = document.querySelector('[data-error-for="' + id + '"]');
+    if (slot) slot.textContent = '';
+    var control = document.getElementById(id);
+    if (control) {
+      control.classList.remove('is-invalid');
+      control.setAttribute('aria-invalid', 'false');
+    }
+  }
+
+  function focusFirstError(errors) {
+    var first = ['city', 'year', 'month', 'day', 'hour', 'minute', 'meridiem']
+      .filter(function (id) { return errors[id]; })[0];
+    if (first) document.getElementById(first).focus();
+  }
+
+  function setLoading(on) {
+    el.submitBtn.disabled = on;
+    el.submitBtn.textContent = on ? '✦ 推算中… ✦' : '✦ 查詢行星日與天使 ✦';
+  }
+
+  /* ---------- 渲染結果 ---------- */
+
+  function renderResult(res) {
+    var r = res.result;
+    var b = res.request.birth;
+    var dayP = r.planetaryDay;
+    var hourP = r.planetaryHour.planet;
+
+    el.resultSubject.textContent = res.request.city + '｜' +
+      b.year + '/' + pad2(b.month) + '/' + pad2(b.day) + ' ' +
+      pad2(b.hour24) + ':' + pad2(b.minute);
+
+    el.daySymbol.textContent = dayP.symbol;
+    el.dayPlanet.textContent = dayP.name + '（' + dayP.latin + '）';
+    el.dayAngel.textContent = dayP.angel.name + ' · ' + dayP.angel.latin;
+    el.dayAngelDomain.textContent = dayP.angel.domain;
+
+    el.hourSymbol.textContent = hourP.symbol;
+    el.hourPlanet.textContent = hourP.name + '（' + hourP.latin + '）';
+    el.hourAngel.textContent = hourP.angel.name + ' · ' + hourP.angel.latin;
+    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時 · ' +
+      (r.planetaryHour.isNight ? '夜' : '日') + '間 · ' +
+      r.planetaryHour.startTime + '–' + r.planetaryHour.endTime;
+
+    el.detailWeekday.textContent = r.weekday.name + '（行星日主星：' + dayP.name + '）';
+    el.detailKeywords.textContent = hourP.keywords.join('、');
+    el.detailColors.textContent = hourP.colors.join('、');
+    el.detailMaterial.textContent = hourP.metal + '／' + hourP.incense;
+    el.detailAdvice.textContent = hourP.advice;
+
+    renderHourTable(r.hourTable, r.planetaryHour.index);
+
+    el.jsonOutput.textContent = JSON.stringify(res, null, 2);
+    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機示範資料（mock）' : 'API') +
+      (res.meta.approximate ? '　※ ' + res.meta.notes : '');
+
+    el.result.hidden = false;
+    el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function renderHourTable(rows, currentIndex) {
+    var frag = document.createDocumentFragment();
+    rows.forEach(function (row) {
+      var tr = document.createElement('tr');
+      if (row.index === currentIndex) tr.className = 'is-current';
+      [row.index, row.start + '–' + row.end, row.symbol + ' ' + row.planetName, row.angelName]
+        .forEach(function (text) {
+          var td = document.createElement('td');
+          td.textContent = text;
+          tr.appendChild(td);
+        });
+      frag.appendChild(tr);
+    });
+    el.hourTableBody.innerHTML = '';
+    el.hourTableBody.appendChild(frag);
+  }
+
+  /* ---------- 工具 ---------- */
+
+  function range(from, to, step) {
+    step = step || (to >= from ? 1 : -1);
+    var out = [];
+    for (var v = from; step > 0 ? v <= to : v >= to; v += step) out.push(v);
+    return out;
+  }
+
+  function daysInMonth(year, month) {
+    if (!year || !month || month < 1 || month > 12) return 31;
+    return new Date(year, month, 0).getDate();   // 自動處理閏年
+  }
+
+  function toInt(value) {
+    var n = parseInt(value, 10);
+    return isNaN(n) ? null : n;
+  }
+
+  function pad2(n) { return (n < 10 ? '0' : '') + n; }
+
+  function camel(id) {
+    return id.replace(/-([a-z0-9])/g, function (_, c) { return c.toUpperCase(); });
+  }
+
+  PA.app = {
+    validate: validate,
+    last: function () { return lastResponse; }
+  };
+})(window);
+  </script>
+</body>
+</html>
