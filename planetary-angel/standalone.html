@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<!-- 由 build-standalone.js 自動產生，請勿直接編輯；請改 index.html / styles.css / data.js / api.js / app.js 後重新執行。 -->
+<!-- 由 build-standalone.js 自動產生，請勿直接編輯；請改 index.html / styles.css / data.js / astro.js / api.js / app.js 後重新執行。 -->
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
@@ -392,8 +392,30 @@ summary {
 
         <div class="field">
           <label class="field__label" for="city">出生城市</label>
-          <input class="field__control" type="text" id="city" name="city" value="台北"
-                 maxlength="30" placeholder="例如：台北" aria-describedby="err-city">
+          <select class="field__control" id="city" name="city" aria-describedby="err-city">
+              <option value="台北市" selected>台北市</option>
+              <option value="新北市">新北市</option>
+              <option value="基隆市">基隆市</option>
+              <option value="桃園市">桃園市</option>
+              <option value="新竹市">新竹市</option>
+              <option value="新竹縣">新竹縣</option>
+              <option value="苗栗縣">苗栗縣</option>
+              <option value="台中市">台中市</option>
+              <option value="彰化縣">彰化縣</option>
+              <option value="南投縣">南投縣</option>
+              <option value="雲林縣">雲林縣</option>
+              <option value="嘉義市">嘉義市</option>
+              <option value="嘉義縣">嘉義縣</option>
+              <option value="台南市">台南市</option>
+              <option value="高雄市">高雄市</option>
+              <option value="屏東縣">屏東縣</option>
+              <option value="宜蘭縣">宜蘭縣</option>
+              <option value="花蓮縣">花蓮縣</option>
+              <option value="台東縣">台東縣</option>
+              <option value="澎湖縣">澎湖縣</option>
+              <option value="金門縣">金門縣</option>
+              <option value="連江縣">連江縣</option>
+            </select>
           <p class="field__error" id="err-city" data-error-for="city"></p>
         </div>
 
@@ -800,6 +822,8 @@ summary {
 
       <dl class="detail">
         <div class="detail__item"><dt>星期</dt><dd id="detail-weekday">—</dd></div>
+        <div class="detail__item"><dt>日出／日落</dt><dd id="detail-sun">—</dd></div>
+        <div class="detail__item"><dt>時段長度</dt><dd id="detail-hourlen">—</dd></div>
         <div class="detail__item"><dt>關鍵字</dt><dd id="detail-keywords">—</dd></div>
         <div class="detail__item"><dt>幸運色</dt><dd id="detail-colors">—</dd></div>
         <div class="detail__item"><dt>金屬／薰香</dt><dd id="detail-material">—</dd></div>
@@ -808,11 +832,11 @@ summary {
       <p class="result__advice" id="detail-advice">—</p>
 
       <details class="hour-table">
-        <summary>當日 24 個時段對照表</summary>
+        <summary>當日 24 個行星時（依日出日落分割）</summary>
         <div class="hour-table__scroll">
           <table>
             <thead>
-              <tr><th>#</th><th>時段</th><th>行星</th><th>天使</th></tr>
+              <tr><th>時序</th><th>時間</th><th>行星</th><th>天使</th></tr>
             </thead>
             <tbody id="hour-table-body"></tbody>
           </table>
@@ -820,7 +844,7 @@ summary {
       </details>
 
       <details class="hour-table week-table" id="week-table">
-        <summary>一週行星時輪值表</summary>
+        <summary>一週行星時輪值表（固定時鐘版・參考）</summary>
         <div class="hour-table__scroll">
           <table>
             <thead>
@@ -840,7 +864,7 @@ summary {
     </section>
 
     <footer class="app__footer">
-      <p>結果依固定行星時對照表產生，僅供參考。</p>
+      <p>行星時依出生地當日的日出日落計算，僅供參考。</p>
     </footer>
   </main>
 
@@ -1014,6 +1038,56 @@ summary {
   /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
+  /* 迦勒底次序：行星時依此循環，日出後第 1 時即當日主星 */
+  var CHALDEAN_ORDER = ['saturn', 'jupiter', 'mars', 'sun', 'venus', 'mercury', 'moon'];
+
+  /*
+   * 台灣各縣市座標（縣治所在地），時區固定 UTC+8。
+   * 用於計算日出日落 —— 真實行星時的長度取決於地點與日期。
+   */
+  var CITIES = [
+    { name: '台北市', lat: 25.0330, lon: 121.5654, tz: 8 },
+    { name: '新北市', lat: 25.0169, lon: 121.4628, tz: 8 },
+    { name: '基隆市', lat: 25.1276, lon: 121.7392, tz: 8 },
+    { name: '桃園市', lat: 24.9937, lon: 121.3009, tz: 8 },
+    { name: '新竹市', lat: 24.8138, lon: 120.9675, tz: 8 },
+    { name: '新竹縣', lat: 24.8387, lon: 121.0177, tz: 8 },
+    { name: '苗栗縣', lat: 24.5602, lon: 120.8214, tz: 8 },
+    { name: '台中市', lat: 24.1477, lon: 120.6736, tz: 8 },
+    { name: '彰化縣', lat: 24.0518, lon: 120.5161, tz: 8 },
+    { name: '南投縣', lat: 23.9609, lon: 120.9719, tz: 8 },
+    { name: '雲林縣', lat: 23.7092, lon: 120.4313, tz: 8 },
+    { name: '嘉義市', lat: 23.4801, lon: 120.4491, tz: 8 },
+    { name: '嘉義縣', lat: 23.4518, lon: 120.2555, tz: 8 },
+    { name: '台南市', lat: 22.9999, lon: 120.2269, tz: 8 },
+    { name: '高雄市', lat: 22.6273, lon: 120.3014, tz: 8 },
+    { name: '屏東縣', lat: 22.6813, lon: 120.4879, tz: 8 },
+    { name: '宜蘭縣', lat: 24.7021, lon: 121.7378, tz: 8 },
+    { name: '花蓮縣', lat: 23.9871, lon: 121.6015, tz: 8 },
+    { name: '台東縣', lat: 22.7583, lon: 121.1444, tz: 8 },
+    { name: '澎湖縣', lat: 23.5711, lon: 119.5793, tz: 8 },
+    { name: '金門縣', lat: 24.4321, lon: 118.3171, tz: 8 },
+    { name: '連江縣', lat: 26.1608, lon: 119.9494, tz: 8 }
+  ];
+
+  /*
+   * 台灣歷年夏令時間（日光節約時間）。
+   * 出生時間若落在這些區間，鐘面時間比標準時快 1 小時，換算日出日落前要先扣掉，
+   * 否則行星時會整整差一格。使用者可在表單關閉此換算。
+   *
+   * ⚠ 這份區間依交通部歷年公告整理，年代久遠且各方轉錄略有出入；
+   *   若你手上有更權威的版本，改這裡即可，其餘程式不受影響。
+   */
+  var TW_DST = [
+    { fromYear: 1945, toYear: 1951, start: [5, 1], end: [9, 30] },
+    { fromYear: 1952, toYear: 1952, start: [3, 1], end: [10, 31] },
+    { fromYear: 1953, toYear: 1954, start: [4, 1], end: [10, 31] },
+    { fromYear: 1955, toYear: 1959, start: [4, 1], end: [9, 30] },
+    { fromYear: 1960, toYear: 1961, start: [6, 1], end: [9, 30] },
+    { fromYear: 1974, toYear: 1975, start: [4, 1], end: [9, 30] },
+    { fromYear: 1979, toYear: 1979, start: [7, 1], end: [9, 30] }
+  ];
+
   var WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 
   /* 表單下拉選單用的靜態選項來源 */
@@ -1027,17 +1101,216 @@ summary {
       { value: 'AM', label: 'AM 上午' },
       { value: 'PM', label: 'PM 下午' }
     ],
-    defaultCity: '台北'
+    defaultCity: '台北市'
   };
 
   PA.data = {
     PLANETS: PLANETS,
     HOUR_RULERS: HOUR_RULERS,
+    CHALDEAN_ORDER: CHALDEAN_ORDER,
+    CITIES: CITIES,
+    TW_DST: TW_DST,
     PLANET_ALIASES: PLANET_ALIASES,
     ANGEL_NAMES_ZH: ANGEL_NAMES_ZH,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS
+  };
+})(window);
+  </script>
+  <script>
+/*
+ * astro.js — 日出日落與「真實行星時」計算
+ *
+ * 傳統行星時的定義：
+ *   日出到日落等分為 12 個「日間時」，日落到隔日日出等分為 12 個「夜間時」。
+ *   因此每個行星時的長度隨季節與緯度變動，冬天的日間時可能只有 45 分鐘。
+ *   一天從「日出」開始，所以日出前的時間仍屬前一天的行星日。
+ *
+ * 日出日落採 NOAA 的太陽位置公式（sunrise equation），只用經緯度與日期，
+ * 不需要連網。太陽高度取 -0.833°（含大氣折射與日輪半徑），與一般日出時刻定義相同。
+ */
+(function (global) {
+  'use strict';
+
+  var PA = (global.PA = global.PA || {});
+  var RAD = Math.PI / 180;
+  var J2000 = 2451545.0;
+
+  /** 公曆日期 → 儒略日（該日 00:00 UT） */
+  function julianDay(year, month, day) {
+    var y = year, m = month;
+    if (m <= 2) { y -= 1; m += 12; }
+    var a = Math.floor(y / 100);
+    var b = 2 - a + Math.floor(a / 4);
+    return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + day + b - 1524.5;
+  }
+
+  /**
+   * 某日的日出、日落、正午（回傳儒略日）。
+   * @param {number} lon 東經為正
+   * @returns {{rise:number,set:number,transit:number}|null} 極晝／極夜時回傳 null
+   */
+  function solarEvents(year, month, day, lat, lon) {
+    var n = Math.round(julianDay(year, month, day) - J2000 + 0.0008);
+    var jStar = n - lon / 360;                       // 平太陽時（公式以西經為正，東經要取負）
+
+    var M = mod360(357.5291 + 0.98560028 * jStar);   // 太陽平近點角
+    var C = 1.9148 * Math.sin(M * RAD) +             // 中心差
+            0.0200 * Math.sin(2 * M * RAD) +
+            0.0003 * Math.sin(3 * M * RAD);
+    var lambda = mod360(M + C + 282.9372);           // 黃經（180 + 102.9372）
+
+    var transit = J2000 + jStar + 0.0053 * Math.sin(M * RAD) - 0.0069 * Math.sin(2 * lambda * RAD);
+
+    var sinDec = Math.sin(lambda * RAD) * Math.sin(23.4397 * RAD);
+    var cosDec = Math.cos(Math.asin(sinDec));
+    var cosOmega = (Math.sin(-0.833 * RAD) - Math.sin(lat * RAD) * sinDec) /
+                   (Math.cos(lat * RAD) * cosDec);
+
+    if (cosOmega > 1 || cosOmega < -1) return null;  // 太陽整日不升或不落
+
+    var omega = Math.acos(cosOmega) / RAD;           // 時角（度）
+    return {
+      rise: transit - omega / 360,
+      set: transit + omega / 360,
+      transit: transit
+    };
+  }
+
+  /** 儒略日 → 指定日期當地午夜起算的分鐘數（可為負數或超過 1440） */
+  function toLocalMinutes(jd, year, month, day, tzHours) {
+    var localMidnight = julianDay(year, month, day) - tzHours / 24;
+    return (jd - localMidnight) * 1440;
+  }
+
+  /** 日期加減天數，回傳 {year, month, day} */
+  function shiftDate(year, month, day, delta) {
+    var d = new Date(Date.UTC(year, month - 1, day));
+    d.setUTCDate(d.getUTCDate() + delta);
+    return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
+  }
+
+  /**
+   * 出生時刻落在第幾個行星時。
+   *
+   * @param {{year,month,day,minutes}} at 當地時間（minutes = 當日 00:00 起算的分鐘）
+   * @param {{lat,lon,tz}} place
+   * @returns {{
+   *   index:number,          // 1–24，1–12 為日間時、13–24 為夜間時
+   *   isNight:boolean,
+   *   ordinal:number,        // 日間或夜間中的第幾時（1–12）
+   *   startMinutes:number,   // 相對於「出生當日 00:00」的分鐘，可能為負或 >1440
+   *   endMinutes:number,
+   *   lengthMinutes:number,  // 這個行星時有多長
+   *   dayDate:{year,month,day},   // 這個行星日對應的日期（日出前算前一天）
+   *   sunrise:number, sunset:number  // 出生當日的日出日落（分鐘，同上基準）
+   * }|null}
+   */
+  function planetaryHourAt(at, place) {
+    var today = solarEvents(at.year, at.month, at.day, place.lat, place.lon);
+    if (!today) return null;
+
+    var base = { year: at.year, month: at.month, day: at.day };
+    var sunrise = toLocalMinutes(today.rise, base.year, base.month, base.day, place.tz);
+    var sunset = toLocalMinutes(today.set, base.year, base.month, base.day, place.tz);
+    var t = at.minutes;
+
+    var segStart, segEnd, isNight, dayDate;
+
+    if (t >= sunrise && t < sunset) {
+      // 日間：日出 → 日落
+      segStart = sunrise;
+      segEnd = sunset;
+      isNight = false;
+      dayDate = base;
+
+    } else if (t >= sunset) {
+      // 夜間（前半夜）：今日日落 → 明日日出
+      var next = shiftDate(base.year, base.month, base.day, 1);
+      var tomorrow = solarEvents(next.year, next.month, next.day, place.lat, place.lon);
+      if (!tomorrow) return null;
+      segStart = sunset;
+      segEnd = toLocalMinutes(tomorrow.rise, base.year, base.month, base.day, place.tz);
+      isNight = true;
+      dayDate = base;
+
+    } else {
+      // 夜間（後半夜）：昨日日落 → 今日日出，行星日仍算前一天
+      var prev = shiftDate(base.year, base.month, base.day, -1);
+      var yesterday = solarEvents(prev.year, prev.month, prev.day, place.lat, place.lon);
+      if (!yesterday) return null;
+      segStart = toLocalMinutes(yesterday.set, base.year, base.month, base.day, place.tz);
+      segEnd = sunrise;
+      isNight = true;
+      dayDate = prev;
+    }
+
+    var length = (segEnd - segStart) / 12;
+    var ordinal = Math.min(12, Math.floor((t - segStart) / length) + 1);
+
+    return {
+      index: isNight ? ordinal + 12 : ordinal,
+      isNight: isNight,
+      ordinal: ordinal,
+      startMinutes: segStart + (ordinal - 1) * length,
+      endMinutes: segStart + ordinal * length,
+      lengthMinutes: length,
+      dayDate: dayDate,
+      sunrise: sunrise,
+      sunset: sunset
+    };
+  }
+
+  /**
+   * 某一天完整的 24 個行星時（日間 12 + 夜間 12），時間基準為該日 00:00。
+   */
+  function dayHours(year, month, day, place) {
+    var today = solarEvents(year, month, day, place.lat, place.lon);
+    var next = shiftDate(year, month, day, 1);
+    var tomorrow = solarEvents(next.year, next.month, next.day, place.lat, place.lon);
+    if (!today || !tomorrow) return null;
+
+    var sunrise = toLocalMinutes(today.rise, year, month, day, place.tz);
+    var sunset = toLocalMinutes(today.set, year, month, day, place.tz);
+    var nextRise = toLocalMinutes(tomorrow.rise, year, month, day, place.tz);
+
+    var dayLen = (sunset - sunrise) / 12;
+    var nightLen = (nextRise - sunset) / 12;
+    var hours = [];
+    var i;
+
+    for (i = 0; i < 12; i++) {
+      hours.push({
+        index: i + 1, ordinal: i + 1, isNight: false,
+        startMinutes: sunrise + i * dayLen,
+        endMinutes: sunrise + (i + 1) * dayLen,
+        lengthMinutes: dayLen
+      });
+    }
+    for (i = 0; i < 12; i++) {
+      hours.push({
+        index: i + 13, ordinal: i + 1, isNight: true,
+        startMinutes: sunset + i * nightLen,
+        endMinutes: sunset + (i + 1) * nightLen,
+        lengthMinutes: nightLen
+      });
+    }
+
+    return { sunrise: sunrise, sunset: sunset, nextSunrise: nextRise, hours: hours };
+  }
+
+  function mod360(v) {
+    return ((v % 360) + 360) % 360;
+  }
+
+  PA.astro = {
+    julianDay: julianDay,
+    solarEvents: solarEvents,
+    toLocalMinutes: toLocalMinutes,
+    shiftDate: shiftDate,
+    planetaryHourAt: planetaryHourAt,
+    dayHours: dayHours
   };
 })(window);
   </script>
@@ -1077,9 +1350,18 @@ summary {
     },
 
     mockLatencyMs: 420,                 // 模擬網路延遲，讓 loading 狀態看得出來
-    schemaVersion: '1.2',
-    /* 行星時的取法。'fixed-table' = 00:00 起算、每時段 60 分鐘、以星期分欄。 */
-    hourSystem: 'fixed-table'
+    schemaVersion: '2.0',
+
+    /*
+     * 行星時的取法：
+     *   'sunrise'     = 依出生地經緯度計算日出日落，日間／夜間各分 12 段（傳統定義，預設）
+     *   'fixed-table' = data.js 的 HOUR_RULERS 固定時鐘對照表（00:00 起算、每段 60 分鐘）
+     * 兩者結果會不同：固定表全年每段都是 60 分鐘，日出日落版則隨季節與緯度變動。
+     */
+    hourSystem: 'sunrise',
+
+    /* 出生時間若落在台灣歷年夏令時間，自動 −1 小時換算為標準時 */
+    applyDst: true
   };
 
   /* ---------- request 建構 ---------- */
@@ -1092,6 +1374,7 @@ summary {
     var hour24 = toHour24(raw.hour12, raw.meridiem);
     return {
       city: raw.city,
+      place: findCity(raw.city),        // 經緯度與時區，日出日落計算用
       birth: {
         year: raw.year,
         month: raw.month,
@@ -1105,9 +1388,16 @@ summary {
       localDateTime: pad(raw.year, 4) + '-' + pad(raw.month, 2) + '-' + pad(raw.day, 2) +
         'T' + pad(hour24, 2) + ':' + pad(raw.minute, 2) + ':00',
       options: {
-        hourSystem: CONFIG.hourSystem
+        hourSystem: CONFIG.hourSystem,
+        applyDst: CONFIG.applyDst
       }
     };
+  }
+
+  /** 由縣市名稱取得座標；找不到回 null（validate() 會先擋下） */
+  function findCity(name) {
+    var found = D.CITIES.filter(function (c) { return c.name === name; })[0];
+    return found ? { name: found.name, lat: found.lat, lon: found.lon, tz: found.tz } : null;
   }
 
   /** 12 小時制 + 上下午 → 24 小時制（12AM=0、12PM=12） */
@@ -1137,9 +1427,15 @@ summary {
   /* ---------- provider：本機對照表 ---------- */
 
   function tableProvider(request) {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        resolve(compute(request));
+        // compute() 會丟錯（缺座標、極區無日出…），要轉成 reject，
+        // 否則錯誤會逸出 Promise 變成未捕捉例外
+        try {
+          resolve(compute(request));
+        } catch (err) {
+          reject(err);
+        }
       }, CONFIG.mockLatencyMs);
     });
   }
@@ -1259,6 +1555,104 @@ summary {
   /* ---------- 推算核心 ---------- */
 
   function compute(request) {
+    return CONFIG.hourSystem === 'fixed-table' ? computeFromTable(request) : computeFromSun(request);
+  }
+
+  /* ---------- 演算法 A：依日出日落的真實行星時（預設） ---------- */
+
+  function computeFromSun(request) {
+    var b = request.birth;
+    var place = request.place;
+    if (!place) throw new Error('缺少出生地座標，無法計算日出日落');
+
+    // 夏令時間的鐘面時間比標準時快 1 小時，先還原
+    var dst = CONFIG.applyDst && request.options.applyDst !== false && isTaiwanDst(b.year, b.month, b.day);
+    var minutes = b.hour24 * 60 + b.minute - (dst ? 60 : 0);
+
+    var at = { year: b.year, month: b.month, day: b.day, minutes: minutes };
+    var hit = PA.astro.planetaryHourAt(at, place);
+    if (!hit) throw new Error('該地點該日無日出或日落（極區），無法計算行星時');
+
+    // 行星日以日出換日：日出前仍屬前一天
+    var dayDate = hit.dayDate;
+    var weekdayIndex = new Date(dayDate.year, dayDate.month - 1, dayDate.day).getDay();
+    var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
+    var hourKey = rulerOfHour(dayRulerKey, hit.index);
+
+    var table = PA.astro.dayHours(dayDate.year, dayDate.month, dayDate.day, place);
+
+    return {
+      meta: {
+        source: 'table',
+        schemaVersion: CONFIG.schemaVersion,
+        generatedAt: new Date().toISOString(),
+        method: 'sunrise-sunset',
+        dstApplied: Boolean(dst),
+        notes: '行星時依' + request.city + '（' + place.lat.toFixed(2) + '°N, ' +
+          place.lon.toFixed(2) + '°E）當日的日出日落計算，日間與夜間各分 12 段。' +
+          (dst ? '　出生時間落在該年夏令時間，已自動 −1 小時換算為標準時。' : '') +
+          (hit.isNight && minutes < hit.sunrise ? '　日出前仍屬前一日的行星日。' : '')
+      },
+      request: request,
+      result: {
+        weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
+        planetaryDay: describe(dayRulerKey),
+        planetaryHour: {
+          index: hit.index,
+          ordinal: hit.ordinal,
+          isNight: hit.isNight,
+          startTime: formatClock(hit.startMinutes),
+          endTime: formatClock(hit.endMinutes),
+          lengthMinutes: Math.round(hit.lengthMinutes),
+          planet: describe(hourKey)
+        },
+        sun: {
+          date: pad(dayDate.year, 4) + '-' + pad(dayDate.month, 2) + '-' + pad(dayDate.day, 2),
+          sunrise: formatClock(table.sunrise),
+          sunset: formatClock(table.sunset),
+          nextSunrise: formatClock(table.nextSunrise),
+          dayHourMinutes: Math.round((table.sunset - table.sunrise) / 12),
+          nightHourMinutes: Math.round((table.nextSunrise - table.sunset) / 12)
+        },
+        hourTable: table.hours.map(function (h) {
+          var key = rulerOfHour(dayRulerKey, h.index);
+          return {
+            index: h.index,
+            ordinal: h.ordinal,
+            isNight: h.isNight,
+            planetKey: key,
+            planetName: D.PLANETS[key].name,
+            symbol: D.PLANETS[key].symbol,
+            angelName: D.PLANETS[key].angel.name,
+            start: formatClock(h.startMinutes),
+            end: formatClock(h.endMinutes),
+            nextDay: h.startMinutes >= 1440          // 已跨過午夜，屬隔日的鐘面時間
+          };
+        })
+      }
+    };
+  }
+
+  /** 第 n 個行星時（1–24）的主星：自當日主星起，依迦勒底次序循環 */
+  function rulerOfHour(dayRulerKey, index) {
+    var start = D.CHALDEAN_ORDER.indexOf(dayRulerKey);
+    return D.CHALDEAN_ORDER[(start + index - 1) % 7];
+  }
+
+  /** 該日期是否落在台灣歷年夏令時間 */
+  function isTaiwanDst(year, month, day) {
+    var value = month * 100 + day;
+    for (var i = 0; i < D.TW_DST.length; i++) {
+      var r = D.TW_DST[i];
+      if (year < r.fromYear || year > r.toYear) continue;
+      if (value >= r.start[0] * 100 + r.start[1] && value <= r.end[0] * 100 + r.end[1]) return true;
+    }
+    return false;
+  }
+
+  /* ---------- 演算法 B：固定時鐘對照表 ---------- */
+
+  function computeFromTable(request) {
     var b = request.birth;
     var weekdayIndex = new Date(b.year, b.month - 1, b.day).getDay();
     var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
@@ -1362,11 +1756,20 @@ summary {
     return pad(Math.floor(total / 60), 2) + ':' + pad(total % 60, 2);
   }
 
+  /** 分鐘 → HH:MM，會繞回 24 小時內（夜間時段常跨過午夜，四捨五入到分鐘） */
+  function formatClock(total) {
+    var m = Math.round(total) % 1440;
+    if (m < 0) m += 1440;
+    return pad(Math.floor(m / 60), 2) + ':' + pad(m % 60, 2);
+  }
+
   PA.api = {
     CONFIG: CONFIG,
     buildRequest: buildRequest,
     toHour24: toHour24,
     query: query,
+    findCity: findCity,
+    isTaiwanDst: isTaiwanDst,
     getWeekTable: getWeekTable,
     resolvePlanetKey: resolvePlanetKey,
     adaptRemoteResponse: adaptRemoteResponse
@@ -1403,7 +1806,7 @@ summary {
      'day-symbol', 'day-planet', 'day-angel', 'day-angel-domain',
      'hour-symbol', 'hour-planet', 'hour-angel', 'hour-range',
      'detail-weekday', 'detail-keywords', 'detail-colors', 'detail-material',
-     'detail-advice', 'hour-table-body', 'week-table', 'week-table-head', 'week-table-body',
+     'detail-sun', 'detail-hourlen', 'detail-advice', 'hour-table-body', 'week-table', 'week-table-head', 'week-table-body',
      'json-output', 'result-note'
     ].forEach(function (id) {
       el[camel(id)] = document.getElementById(id);
@@ -1418,6 +1821,10 @@ summary {
    * 這裡只在選單是空的時候才補上，避免兩邊互相覆蓋。
    */
   function buildSelects() {
+    ensureOptions(el.city, PA.data.CITIES.map(function (c) { return c.name; }), function (v) {
+      return v;
+    }, OPT.defaultCity);
+
     ensureOptions(el.year, range(OPT.yearRange.max, OPT.yearRange.min, -1), function (v) {
       return v + ' 年';
     }, OPT.yearRange.defaultValue);
@@ -1528,7 +1935,7 @@ summary {
 
   function readForm() {
     return {
-      city: el.city.value.trim(),
+      city: el.city.value,
       year: toInt(el.year.value),
       month: toInt(el.month.value),
       day: toInt(el.day.value),
@@ -1546,7 +1953,8 @@ summary {
   function validate(v) {
     var errors = {};
 
-    if (!v.city) errors.city = '請填寫出生城市';
+    if (!v.city) errors.city = '請選擇出生城市';
+    else if (!PA.api.findCity(v.city)) errors.city = '沒有「' + v.city + '」的座標資料，請從清單選擇';
 
     if (v.year === null) errors.year = '請選擇年份';
     else if (v.year < OPT.yearRange.min || v.year > OPT.yearRange.max) {
@@ -1635,10 +2043,22 @@ summary {
     el.hourSymbol.textContent = hourP.symbol;
     el.hourPlanet.textContent = hourP.name + '（' + hourP.latin + '）';
     el.hourAngel.textContent = hourP.angel.name + ' · ' + hourP.angel.latin;
-    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時段 · ' +
+    el.hourRange.textContent = hourLabel(r.planetaryHour) + ' · ' +
       r.planetaryHour.startTime + '–' + r.planetaryHour.endTime;
 
     el.detailWeekday.textContent = r.weekday.name + '（行星日主星：' + dayP.name + '）';
+
+    if (r.sun) {
+      el.detailSun.textContent = '日出 ' + r.sun.sunrise + '　日落 ' + r.sun.sunset;
+      el.detailHourlen.textContent = '日間每時 ' + r.sun.dayHourMinutes + ' 分　' +
+        '夜間每時 ' + r.sun.nightHourMinutes + ' 分';
+      el.detailSun.parentNode.hidden = false;
+      el.detailHourlen.parentNode.hidden = false;
+    } else {
+      // 固定時鐘模式沒有日出日落可言，整列收起來
+      el.detailSun.parentNode.hidden = true;
+      el.detailHourlen.parentNode.hidden = true;
+    }
     el.detailKeywords.textContent = hourP.keywords.join('、');
     el.detailColors.textContent = hourP.colors.join('、');
     el.detailMaterial.textContent = hourP.metal + '／' + hourP.incense;
@@ -1649,12 +2069,22 @@ summary {
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
     el.resultNote.textContent = (res.meta.fallback ? '⚠ ' : '') +
-      '資料來源：' + (res.meta.source === 'remote' ? '外部來源' : '本機對照表') +
-      '　※ ' + res.meta.notes;
+      '資料來源：' + sourceLabel(res.meta) + '　※ ' + res.meta.notes;
     el.resultNote.classList.toggle('is-warning', Boolean(res.meta.fallback));
 
     el.result.hidden = false;
     el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function sourceLabel(meta) {
+    if (meta.source === 'remote') return '外部來源';
+    return meta.method === 'sunrise-sunset' ? '本機日出日落計算' : '本機固定對照表';
+  }
+
+  /** 「日間第 3 時」／「夜間第 8 時」；固定時鐘模式則只有序號 */
+  function hourLabel(hour) {
+    if (typeof hour.ordinal !== 'number') return '第 ' + hour.index + ' 時段';
+    return (hour.isNight ? '夜間' : '日間') + '第 ' + hour.ordinal + ' 時';
   }
 
   function renderHourTable(rows, currentIndex) {
@@ -1662,7 +2092,8 @@ summary {
     rows.forEach(function (row) {
       var tr = document.createElement('tr');
       if (row.index === currentIndex) tr.className = 'is-current';
-      [row.index, row.start + '–' + row.end, row.symbol + ' ' + row.planetName, row.angelName]
+      [hourLabel(row), row.start + '–' + row.end + (row.nextDay ? '⁺' : ''),
+       row.symbol + ' ' + row.planetName, row.angelName]
         .forEach(function (text) {
           var td = document.createElement('td');
           td.textContent = text;

@@ -25,7 +25,7 @@ html = html.replace(/[ \t]*<script src="([^"]+)"><\/script>\n?/g, (_, src) =>
 );
 
 const banner = '<!-- 由 build-standalone.js 自動產生，請勿直接編輯；' +
-  '請改 index.html / styles.css / data.js / api.js / app.js 後重新執行。 -->\n';
+  '請改 index.html / styles.css / data.js / astro.js / api.js / app.js 後重新執行。 -->\n';
 html = html.replace('<!DOCTYPE html>\n', '<!DOCTYPE html>\n' + banner);
 
 const out = path.join(dir, 'standalone.html');

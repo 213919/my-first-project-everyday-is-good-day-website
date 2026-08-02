@@ -11,11 +11,13 @@ const fs = require('fs');
 const path = require('path');
 
 const dir = __dirname;
-const win = { setTimeout, Promise, Date, AbortController, fetch: function () {}, JSON: JSON };
-new Function('window', fs.readFileSync(path.join(dir, 'data.js'), 'utf8'))(win);
-new Function('window', fs.readFileSync(path.join(dir, 'api.js'), 'utf8'))(win);
+const win = { setTimeout, clearTimeout, Promise, Date, Math, AbortController, fetch: function () {}, JSON: JSON };
+['data.js', 'astro.js', 'api.js'].forEach(function (f) {
+  new Function('window', fs.readFileSync(path.join(dir, f), 'utf8'))(win);
+});
 const PA = win.PA;
 PA.api.CONFIG.mockLatencyMs = 0;
+PA.api.CONFIG.hourSystem = 'fixed-table';   // 這支驗的是固定時鐘對照表，不是日出日落版
 
 const LABEL_TO_NAME = {
   '太陽時': '太陽', '月亮時': '月亮', '火星時': '火星', '水星時': '水星',
@@ -43,7 +45,7 @@ for (let d = 1; d <= 7; d++) {
       const date = datesByWeekday[weekday];
 
       const request = PA.api.buildRequest({
-        city: '台北',
+        city: '台北市',
         year: date.year, month: date.month, day: date.day,
         hour12: hour % 12 === 0 ? 12 : hour % 12,
         minute: 30,
@@ -68,7 +70,7 @@ for (let d = 1; d <= 7; d++) {
   for (let weekday = 0; weekday < 7; weekday++) {
     const date = datesByWeekday[weekday];
     const res = await PA.api.query(PA.api.buildRequest({
-      city: '台北', year: date.year, month: date.month, day: date.day,
+      city: '台北市', year: date.year, month: date.month, day: date.day,
       hour12: 12, minute: 0, meridiem: 'PM'
     }));
     res.result.hourTable.forEach((row, hour) => {

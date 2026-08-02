@@ -26,8 +26,30 @@
 
         <div class="field">
           <label class="field__label" for="city">出生城市</label>
-          <input class="field__control" type="text" id="city" name="city" value="台北"
-                 maxlength="30" placeholder="例如：台北" aria-describedby="err-city">
+          <select class="field__control" id="city" name="city" aria-describedby="err-city">
+              <option value="台北市" selected>台北市</option>
+              <option value="新北市">新北市</option>
+              <option value="基隆市">基隆市</option>
+              <option value="桃園市">桃園市</option>
+              <option value="新竹市">新竹市</option>
+              <option value="新竹縣">新竹縣</option>
+              <option value="苗栗縣">苗栗縣</option>
+              <option value="台中市">台中市</option>
+              <option value="彰化縣">彰化縣</option>
+              <option value="南投縣">南投縣</option>
+              <option value="雲林縣">雲林縣</option>
+              <option value="嘉義市">嘉義市</option>
+              <option value="嘉義縣">嘉義縣</option>
+              <option value="台南市">台南市</option>
+              <option value="高雄市">高雄市</option>
+              <option value="屏東縣">屏東縣</option>
+              <option value="宜蘭縣">宜蘭縣</option>
+              <option value="花蓮縣">花蓮縣</option>
+              <option value="台東縣">台東縣</option>
+              <option value="澎湖縣">澎湖縣</option>
+              <option value="金門縣">金門縣</option>
+              <option value="連江縣">連江縣</option>
+            </select>
           <p class="field__error" id="err-city" data-error-for="city"></p>
         </div>
 
@@ -434,6 +456,8 @@
 
       <dl class="detail">
         <div class="detail__item"><dt>星期</dt><dd id="detail-weekday">—</dd></div>
+        <div class="detail__item"><dt>日出／日落</dt><dd id="detail-sun">—</dd></div>
+        <div class="detail__item"><dt>時段長度</dt><dd id="detail-hourlen">—</dd></div>
         <div class="detail__item"><dt>關鍵字</dt><dd id="detail-keywords">—</dd></div>
         <div class="detail__item"><dt>幸運色</dt><dd id="detail-colors">—</dd></div>
         <div class="detail__item"><dt>金屬／薰香</dt><dd id="detail-material">—</dd></div>
@@ -442,11 +466,11 @@
       <p class="result__advice" id="detail-advice">—</p>
 
       <details class="hour-table">
-        <summary>當日 24 個時段對照表</summary>
+        <summary>當日 24 個行星時（依日出日落分割）</summary>
         <div class="hour-table__scroll">
           <table>
             <thead>
-              <tr><th>#</th><th>時段</th><th>行星</th><th>天使</th></tr>
+              <tr><th>時序</th><th>時間</th><th>行星</th><th>天使</th></tr>
             </thead>
             <tbody id="hour-table-body"></tbody>
           </table>
@@ -454,7 +478,7 @@
       </details>
 
       <details class="hour-table week-table" id="week-table">
-        <summary>一週行星時輪值表</summary>
+        <summary>一週行星時輪值表（固定時鐘版・參考）</summary>
         <div class="hour-table__scroll">
           <table>
             <thead>
@@ -474,11 +498,12 @@
     </section>
 
     <footer class="app__footer">
-      <p>結果依固定行星時對照表產生，僅供參考。</p>
+      <p>行星時依出生地當日的日出日落計算，僅供參考。</p>
     </footer>
   </main>
 
   <script src="data.js"></script>
+  <script src="astro.js"></script>
   <script src="api.js"></script>
   <script src="app.js"></script>
 </body>

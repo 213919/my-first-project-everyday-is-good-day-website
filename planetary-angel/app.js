@@ -27,7 +27,7 @@
      'day-symbol', 'day-planet', 'day-angel', 'day-angel-domain',
      'hour-symbol', 'hour-planet', 'hour-angel', 'hour-range',
      'detail-weekday', 'detail-keywords', 'detail-colors', 'detail-material',
-     'detail-advice', 'hour-table-body', 'week-table', 'week-table-head', 'week-table-body',
+     'detail-sun', 'detail-hourlen', 'detail-advice', 'hour-table-body', 'week-table', 'week-table-head', 'week-table-body',
      'json-output', 'result-note'
     ].forEach(function (id) {
       el[camel(id)] = document.getElementById(id);
@@ -42,6 +42,10 @@
    * 這裡只在選單是空的時候才補上，避免兩邊互相覆蓋。
    */
   function buildSelects() {
+    ensureOptions(el.city, PA.data.CITIES.map(function (c) { return c.name; }), function (v) {
+      return v;
+    }, OPT.defaultCity);
+
     ensureOptions(el.year, range(OPT.yearRange.max, OPT.yearRange.min, -1), function (v) {
       return v + ' 年';
     }, OPT.yearRange.defaultValue);
@@ -152,7 +156,7 @@
 
   function readForm() {
     return {
-      city: el.city.value.trim(),
+      city: el.city.value,
       year: toInt(el.year.value),
       month: toInt(el.month.value),
       day: toInt(el.day.value),
@@ -170,7 +174,8 @@
   function validate(v) {
     var errors = {};
 
-    if (!v.city) errors.city = '請填寫出生城市';
+    if (!v.city) errors.city = '請選擇出生城市';
+    else if (!PA.api.findCity(v.city)) errors.city = '沒有「' + v.city + '」的座標資料，請從清單選擇';
 
     if (v.year === null) errors.year = '請選擇年份';
     else if (v.year < OPT.yearRange.min || v.year > OPT.yearRange.max) {
@@ -259,10 +264,22 @@
     el.hourSymbol.textContent = hourP.symbol;
     el.hourPlanet.textContent = hourP.name + '（' + hourP.latin + '）';
     el.hourAngel.textContent = hourP.angel.name + ' · ' + hourP.angel.latin;
-    el.hourRange.textContent = '第 ' + r.planetaryHour.index + ' 時段 · ' +
+    el.hourRange.textContent = hourLabel(r.planetaryHour) + ' · ' +
       r.planetaryHour.startTime + '–' + r.planetaryHour.endTime;
 
     el.detailWeekday.textContent = r.weekday.name + '（行星日主星：' + dayP.name + '）';
+
+    if (r.sun) {
+      el.detailSun.textContent = '日出 ' + r.sun.sunrise + '　日落 ' + r.sun.sunset;
+      el.detailHourlen.textContent = '日間每時 ' + r.sun.dayHourMinutes + ' 分　' +
+        '夜間每時 ' + r.sun.nightHourMinutes + ' 分';
+      el.detailSun.parentNode.hidden = false;
+      el.detailHourlen.parentNode.hidden = false;
+    } else {
+      // 固定時鐘模式沒有日出日落可言，整列收起來
+      el.detailSun.parentNode.hidden = true;
+      el.detailHourlen.parentNode.hidden = true;
+    }
     el.detailKeywords.textContent = hourP.keywords.join('、');
     el.detailColors.textContent = hourP.colors.join('、');
     el.detailMaterial.textContent = hourP.metal + '／' + hourP.incense;
@@ -273,12 +290,22 @@
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
     el.resultNote.textContent = (res.meta.fallback ? '⚠ ' : '') +
-      '資料來源：' + (res.meta.source === 'remote' ? '外部來源' : '本機對照表') +
-      '　※ ' + res.meta.notes;
+      '資料來源：' + sourceLabel(res.meta) + '　※ ' + res.meta.notes;
     el.resultNote.classList.toggle('is-warning', Boolean(res.meta.fallback));
 
     el.result.hidden = false;
     el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function sourceLabel(meta) {
+    if (meta.source === 'remote') return '外部來源';
+    return meta.method === 'sunrise-sunset' ? '本機日出日落計算' : '本機固定對照表';
+  }
+
+  /** 「日間第 3 時」／「夜間第 8 時」；固定時鐘模式則只有序號 */
+  function hourLabel(hour) {
+    if (typeof hour.ordinal !== 'number') return '第 ' + hour.index + ' 時段';
+    return (hour.isNight ? '夜間' : '日間') + '第 ' + hour.ordinal + ' 時';
   }
 
   function renderHourTable(rows, currentIndex) {
@@ -286,7 +313,8 @@
     rows.forEach(function (row) {
       var tr = document.createElement('tr');
       if (row.index === currentIndex) tr.className = 'is-current';
-      [row.index, row.start + '–' + row.end, row.symbol + ' ' + row.planetName, row.angelName]
+      [hourLabel(row), row.start + '–' + row.end + (row.nextDay ? '⁺' : ''),
+       row.symbol + ' ' + row.planetName, row.angelName]
         .forEach(function (text) {
           var td = document.createElement('td');
           td.textContent = text;

@@ -167,6 +167,56 @@
   /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
+  /* 迦勒底次序：行星時依此循環，日出後第 1 時即當日主星 */
+  var CHALDEAN_ORDER = ['saturn', 'jupiter', 'mars', 'sun', 'venus', 'mercury', 'moon'];
+
+  /*
+   * 台灣各縣市座標（縣治所在地），時區固定 UTC+8。
+   * 用於計算日出日落 —— 真實行星時的長度取決於地點與日期。
+   */
+  var CITIES = [
+    { name: '台北市', lat: 25.0330, lon: 121.5654, tz: 8 },
+    { name: '新北市', lat: 25.0169, lon: 121.4628, tz: 8 },
+    { name: '基隆市', lat: 25.1276, lon: 121.7392, tz: 8 },
+    { name: '桃園市', lat: 24.9937, lon: 121.3009, tz: 8 },
+    { name: '新竹市', lat: 24.8138, lon: 120.9675, tz: 8 },
+    { name: '新竹縣', lat: 24.8387, lon: 121.0177, tz: 8 },
+    { name: '苗栗縣', lat: 24.5602, lon: 120.8214, tz: 8 },
+    { name: '台中市', lat: 24.1477, lon: 120.6736, tz: 8 },
+    { name: '彰化縣', lat: 24.0518, lon: 120.5161, tz: 8 },
+    { name: '南投縣', lat: 23.9609, lon: 120.9719, tz: 8 },
+    { name: '雲林縣', lat: 23.7092, lon: 120.4313, tz: 8 },
+    { name: '嘉義市', lat: 23.4801, lon: 120.4491, tz: 8 },
+    { name: '嘉義縣', lat: 23.4518, lon: 120.2555, tz: 8 },
+    { name: '台南市', lat: 22.9999, lon: 120.2269, tz: 8 },
+    { name: '高雄市', lat: 22.6273, lon: 120.3014, tz: 8 },
+    { name: '屏東縣', lat: 22.6813, lon: 120.4879, tz: 8 },
+    { name: '宜蘭縣', lat: 24.7021, lon: 121.7378, tz: 8 },
+    { name: '花蓮縣', lat: 23.9871, lon: 121.6015, tz: 8 },
+    { name: '台東縣', lat: 22.7583, lon: 121.1444, tz: 8 },
+    { name: '澎湖縣', lat: 23.5711, lon: 119.5793, tz: 8 },
+    { name: '金門縣', lat: 24.4321, lon: 118.3171, tz: 8 },
+    { name: '連江縣', lat: 26.1608, lon: 119.9494, tz: 8 }
+  ];
+
+  /*
+   * 台灣歷年夏令時間（日光節約時間）。
+   * 出生時間若落在這些區間，鐘面時間比標準時快 1 小時，換算日出日落前要先扣掉，
+   * 否則行星時會整整差一格。使用者可在表單關閉此換算。
+   *
+   * ⚠ 這份區間依交通部歷年公告整理，年代久遠且各方轉錄略有出入；
+   *   若你手上有更權威的版本，改這裡即可，其餘程式不受影響。
+   */
+  var TW_DST = [
+    { fromYear: 1945, toYear: 1951, start: [5, 1], end: [9, 30] },
+    { fromYear: 1952, toYear: 1952, start: [3, 1], end: [10, 31] },
+    { fromYear: 1953, toYear: 1954, start: [4, 1], end: [10, 31] },
+    { fromYear: 1955, toYear: 1959, start: [4, 1], end: [9, 30] },
+    { fromYear: 1960, toYear: 1961, start: [6, 1], end: [9, 30] },
+    { fromYear: 1974, toYear: 1975, start: [4, 1], end: [9, 30] },
+    { fromYear: 1979, toYear: 1979, start: [7, 1], end: [9, 30] }
+  ];
+
   var WEEKDAY_NAMES = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
 
   /* 表單下拉選單用的靜態選項來源 */
@@ -180,12 +230,15 @@
       { value: 'AM', label: 'AM 上午' },
       { value: 'PM', label: 'PM 下午' }
     ],
-    defaultCity: '台北'
+    defaultCity: '台北市'
   };
 
   PA.data = {
     PLANETS: PLANETS,
     HOUR_RULERS: HOUR_RULERS,
+    CHALDEAN_ORDER: CHALDEAN_ORDER,
+    CITIES: CITIES,
+    TW_DST: TW_DST,
     PLANET_ALIASES: PLANET_ALIASES,
     ANGEL_NAMES_ZH: ANGEL_NAMES_ZH,
     WEEKDAY_RULERS: WEEKDAY_RULERS,

@@ -33,9 +33,18 @@
     },
 
     mockLatencyMs: 420,                 // 模擬網路延遲，讓 loading 狀態看得出來
-    schemaVersion: '1.2',
-    /* 行星時的取法。'fixed-table' = 00:00 起算、每時段 60 分鐘、以星期分欄。 */
-    hourSystem: 'fixed-table'
+    schemaVersion: '2.0',
+
+    /*
+     * 行星時的取法：
+     *   'sunrise'     = 依出生地經緯度計算日出日落，日間／夜間各分 12 段（傳統定義，預設）
+     *   'fixed-table' = data.js 的 HOUR_RULERS 固定時鐘對照表（00:00 起算、每段 60 分鐘）
+     * 兩者結果會不同：固定表全年每段都是 60 分鐘，日出日落版則隨季節與緯度變動。
+     */
+    hourSystem: 'sunrise',
+
+    /* 出生時間若落在台灣歷年夏令時間，自動 −1 小時換算為標準時 */
+    applyDst: true
   };
 
   /* ---------- request 建構 ---------- */
@@ -48,6 +57,7 @@
     var hour24 = toHour24(raw.hour12, raw.meridiem);
     return {
       city: raw.city,
+      place: findCity(raw.city),        // 經緯度與時區，日出日落計算用
       birth: {
         year: raw.year,
         month: raw.month,
@@ -61,9 +71,16 @@
       localDateTime: pad(raw.year, 4) + '-' + pad(raw.month, 2) + '-' + pad(raw.day, 2) +
         'T' + pad(hour24, 2) + ':' + pad(raw.minute, 2) + ':00',
       options: {
-        hourSystem: CONFIG.hourSystem
+        hourSystem: CONFIG.hourSystem,
+        applyDst: CONFIG.applyDst
       }
     };
+  }
+
+  /** 由縣市名稱取得座標；找不到回 null（validate() 會先擋下） */
+  function findCity(name) {
+    var found = D.CITIES.filter(function (c) { return c.name === name; })[0];
+    return found ? { name: found.name, lat: found.lat, lon: found.lon, tz: found.tz } : null;
   }
 
   /** 12 小時制 + 上下午 → 24 小時制（12AM=0、12PM=12） */
@@ -93,9 +110,15 @@
   /* ---------- provider：本機對照表 ---------- */
 
   function tableProvider(request) {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        resolve(compute(request));
+        // compute() 會丟錯（缺座標、極區無日出…），要轉成 reject，
+        // 否則錯誤會逸出 Promise 變成未捕捉例外
+        try {
+          resolve(compute(request));
+        } catch (err) {
+          reject(err);
+        }
       }, CONFIG.mockLatencyMs);
     });
   }
@@ -215,6 +238,104 @@
   /* ---------- 推算核心 ---------- */
 
   function compute(request) {
+    return CONFIG.hourSystem === 'fixed-table' ? computeFromTable(request) : computeFromSun(request);
+  }
+
+  /* ---------- 演算法 A：依日出日落的真實行星時（預設） ---------- */
+
+  function computeFromSun(request) {
+    var b = request.birth;
+    var place = request.place;
+    if (!place) throw new Error('缺少出生地座標，無法計算日出日落');
+
+    // 夏令時間的鐘面時間比標準時快 1 小時，先還原
+    var dst = CONFIG.applyDst && request.options.applyDst !== false && isTaiwanDst(b.year, b.month, b.day);
+    var minutes = b.hour24 * 60 + b.minute - (dst ? 60 : 0);
+
+    var at = { year: b.year, month: b.month, day: b.day, minutes: minutes };
+    var hit = PA.astro.planetaryHourAt(at, place);
+    if (!hit) throw new Error('該地點該日無日出或日落（極區），無法計算行星時');
+
+    // 行星日以日出換日：日出前仍屬前一天
+    var dayDate = hit.dayDate;
+    var weekdayIndex = new Date(dayDate.year, dayDate.month - 1, dayDate.day).getDay();
+    var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
+    var hourKey = rulerOfHour(dayRulerKey, hit.index);
+
+    var table = PA.astro.dayHours(dayDate.year, dayDate.month, dayDate.day, place);
+
+    return {
+      meta: {
+        source: 'table',
+        schemaVersion: CONFIG.schemaVersion,
+        generatedAt: new Date().toISOString(),
+        method: 'sunrise-sunset',
+        dstApplied: Boolean(dst),
+        notes: '行星時依' + request.city + '（' + place.lat.toFixed(2) + '°N, ' +
+          place.lon.toFixed(2) + '°E）當日的日出日落計算，日間與夜間各分 12 段。' +
+          (dst ? '　出生時間落在該年夏令時間，已自動 −1 小時換算為標準時。' : '') +
+          (hit.isNight && minutes < hit.sunrise ? '　日出前仍屬前一日的行星日。' : '')
+      },
+      request: request,
+      result: {
+        weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
+        planetaryDay: describe(dayRulerKey),
+        planetaryHour: {
+          index: hit.index,
+          ordinal: hit.ordinal,
+          isNight: hit.isNight,
+          startTime: formatClock(hit.startMinutes),
+          endTime: formatClock(hit.endMinutes),
+          lengthMinutes: Math.round(hit.lengthMinutes),
+          planet: describe(hourKey)
+        },
+        sun: {
+          date: pad(dayDate.year, 4) + '-' + pad(dayDate.month, 2) + '-' + pad(dayDate.day, 2),
+          sunrise: formatClock(table.sunrise),
+          sunset: formatClock(table.sunset),
+          nextSunrise: formatClock(table.nextSunrise),
+          dayHourMinutes: Math.round((table.sunset - table.sunrise) / 12),
+          nightHourMinutes: Math.round((table.nextSunrise - table.sunset) / 12)
+        },
+        hourTable: table.hours.map(function (h) {
+          var key = rulerOfHour(dayRulerKey, h.index);
+          return {
+            index: h.index,
+            ordinal: h.ordinal,
+            isNight: h.isNight,
+            planetKey: key,
+            planetName: D.PLANETS[key].name,
+            symbol: D.PLANETS[key].symbol,
+            angelName: D.PLANETS[key].angel.name,
+            start: formatClock(h.startMinutes),
+            end: formatClock(h.endMinutes),
+            nextDay: h.startMinutes >= 1440          // 已跨過午夜，屬隔日的鐘面時間
+          };
+        })
+      }
+    };
+  }
+
+  /** 第 n 個行星時（1–24）的主星：自當日主星起，依迦勒底次序循環 */
+  function rulerOfHour(dayRulerKey, index) {
+    var start = D.CHALDEAN_ORDER.indexOf(dayRulerKey);
+    return D.CHALDEAN_ORDER[(start + index - 1) % 7];
+  }
+
+  /** 該日期是否落在台灣歷年夏令時間 */
+  function isTaiwanDst(year, month, day) {
+    var value = month * 100 + day;
+    for (var i = 0; i < D.TW_DST.length; i++) {
+      var r = D.TW_DST[i];
+      if (year < r.fromYear || year > r.toYear) continue;
+      if (value >= r.start[0] * 100 + r.start[1] && value <= r.end[0] * 100 + r.end[1]) return true;
+    }
+    return false;
+  }
+
+  /* ---------- 演算法 B：固定時鐘對照表 ---------- */
+
+  function computeFromTable(request) {
     var b = request.birth;
     var weekdayIndex = new Date(b.year, b.month - 1, b.day).getDay();
     var dayRulerKey = D.WEEKDAY_RULERS[weekdayIndex];
@@ -318,11 +439,20 @@
     return pad(Math.floor(total / 60), 2) + ':' + pad(total % 60, 2);
   }
 
+  /** 分鐘 → HH:MM，會繞回 24 小時內（夜間時段常跨過午夜，四捨五入到分鐘） */
+  function formatClock(total) {
+    var m = Math.round(total) % 1440;
+    if (m < 0) m += 1440;
+    return pad(Math.floor(m / 60), 2) + ':' + pad(m % 60, 2);
+  }
+
   PA.api = {
     CONFIG: CONFIG,
     buildRequest: buildRequest,
     toHour24: toHour24,
     query: query,
+    findCity: findCity,
+    isTaiwanDst: isTaiwanDst,
     getWeekTable: getWeekTable,
     resolvePlanetKey: resolvePlanetKey,
     adaptRemoteResponse: adaptRemoteResponse

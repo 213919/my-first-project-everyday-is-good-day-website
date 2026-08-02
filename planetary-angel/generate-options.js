@@ -19,6 +19,7 @@ const dir = __dirname;
 const fakeWindow = {};
 new Function('window', fs.readFileSync(path.join(dir, 'data.js'), 'utf8'))(fakeWindow);
 const OPT = fakeWindow.PA.data.FORM_OPTIONS;
+OPT.cities = fakeWindow.PA.data.CITIES.map((c) => c.name);
 
 const pad2 = (n) => (n < 10 ? '0' : '') + n;
 
@@ -39,6 +40,9 @@ function range(from, to, step) {
 const IND = '              ';
 
 const lists = {
+  city: OPT.cities.map((c, i) =>
+    IND + '<option value="' + c + '"' + (c === OPT.defaultCity ? ' selected' : '') + '>' + c + '</option>'
+  ).join('\n'),
   year: options(range(OPT.yearRange.max, OPT.yearRange.min, -1), (v) => v + ' 年', OPT.yearRange.defaultValue, IND),
   month: options(range(1, 12), (v) => v + '月', OPT.monthRange.defaultValue, IND),
   day: options(range(1, 31), (v) => v + ' 日', OPT.dayDefault, IND),
