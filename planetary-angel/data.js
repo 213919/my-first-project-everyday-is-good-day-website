@@ -148,6 +148,22 @@
     saturn: 'saturn', saturnus: 'saturn', 土星: 'saturn', 土: 'saturn'
   };
 
+  /*
+   * 天使英文名 → 中文譯名。
+   * 外部來源若自己有列天使名，會以它為準；這裡只負責補上中文顯示，
+   * 查不到的名字就直接顯示原文（涵蓋各家常見的異名寫法）。
+   */
+  var ANGEL_NAMES_ZH = {
+    michael: '米迦勒',
+    gabriel: '加百列',
+    raphael: '拉斐爾',
+    cassiel: '卡西爾', castiel: '卡西爾', kafziel: '卡西爾',
+    zadkiel: '薩基爾', tzadkiel: '薩基爾', sachiel: '薩基爾',
+    camael: '卡麥爾', kamael: '卡麥爾', chamuel: '卡麥爾', samael: '薩邁爾',
+    hagiel: '哈吉爾', haniel: '哈尼爾', anael: '安納爾',
+    uriel: '烏列爾'
+  };
+
   /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
@@ -171,6 +187,7 @@
     PLANETS: PLANETS,
     HOUR_RULERS: HOUR_RULERS,
     PLANET_ALIASES: PLANET_ALIASES,
+    ANGEL_NAMES_ZH: ANGEL_NAMES_ZH,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS

@@ -995,6 +995,22 @@ summary {
     saturn: 'saturn', saturnus: 'saturn', 土星: 'saturn', 土: 'saturn'
   };
 
+  /*
+   * 天使英文名 → 中文譯名。
+   * 外部來源若自己有列天使名，會以它為準；這裡只負責補上中文顯示，
+   * 查不到的名字就直接顯示原文（涵蓋各家常見的異名寫法）。
+   */
+  var ANGEL_NAMES_ZH = {
+    michael: '米迦勒',
+    gabriel: '加百列',
+    raphael: '拉斐爾',
+    cassiel: '卡西爾', castiel: '卡西爾', kafziel: '卡西爾',
+    zadkiel: '薩基爾', tzadkiel: '薩基爾', sachiel: '薩基爾',
+    camael: '卡麥爾', kamael: '卡麥爾', chamuel: '卡麥爾', samael: '薩邁爾',
+    hagiel: '哈吉爾', haniel: '哈尼爾', anael: '安納爾',
+    uriel: '烏列爾'
+  };
+
   /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
@@ -1018,6 +1034,7 @@ summary {
     PLANETS: PLANETS,
     HOUR_RULERS: HOUR_RULERS,
     PLANET_ALIASES: PLANET_ALIASES,
+    ANGEL_NAMES_ZH: ANGEL_NAMES_ZH,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS
@@ -1166,8 +1183,8 @@ summary {
    * 預期的最小內容（欄位名稱可在此調整，其餘程式不受影響）：
    *   { hourPlanet: 'Venus', dayPlanet: 'Saturn', start: '00:00', end: '01:00' }
    *
-   * 行星名稱經 PLANET_ALIASES 正規化，**天使一律由本專案的 angels.tsv 對應**，
-   * 因為外部來源通常只給行星，不給天使名。
+   * 行星名稱經 PLANET_ALIASES 正規化。
+   * **天使以外部來源為準**（`hourAngel` / `dayAngel`）；沒給時才用本專案的 angels.tsv。
    */
   function adaptRemoteResponse(raw, request) {
     var hourKey = resolvePlanetKey(raw.hourPlanet || raw.planet || raw.hour);
@@ -1179,6 +1196,8 @@ summary {
     if (!dayKey) dayKey = D.WEEKDAY_RULERS[weekdayIndex];
 
     var hour = request.birth.hour24;
+    var hourPlanet = applyRemoteAngel(describe(hourKey), raw.hourAngel || raw.angel);
+    var dayPlanet = applyRemoteAngel(describe(dayKey), raw.dayAngel);
 
     return {
       meta: {
@@ -1187,23 +1206,47 @@ summary {
         generatedAt: new Date().toISOString(),
         method: 'remote-lookup',
         endpoint: CONFIG.remote.endpoint,
-        notes: '行星時由外部來源提供，守護天使仍依本專案的行星→天使對應表。',
+        angelSource: hourPlanet.angel.source || 'local',
+        notes: '行星時由外部來源提供，天使' +
+          (hourPlanet.angel.source === 'remote' ? '同樣採用該來源的名稱。' : '沿用本專案的行星→天使對應表。'),
         raw: raw                       // 保留原始回應，方便比對與除錯
       },
       request: request,
       result: {
         weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
-        planetaryDay: describe(dayKey),
+        planetaryDay: dayPlanet,
         planetaryHour: {
           index: hour + 1,
           isNight: hour < 6 || hour >= 18,
           startTime: raw.start || formatMinutes(hour * 60),
           endTime: raw.end || formatMinutes((hour + 1) * 60),
-          planet: describe(hourKey)
+          planet: hourPlanet
         },
         hourTable: buildHourTable(weekdayIndex)
       }
     };
+  }
+
+  /**
+   * 外部來源若有給天使名，就以它為準（本專案的對應只當備援）。
+   * 中文譯名查 ANGEL_NAMES_ZH；查不到就直接顯示原文，不自行編譯名。
+   */
+  function applyRemoteAngel(planet, angelName) {
+    if (!angelName) return planet;
+
+    var given = String(angelName).trim();
+    if (!given) return planet;
+    if (given.toLowerCase() === planet.angel.latin.toLowerCase()) return planet;  // 與本地相同就不動
+
+    var zh = D.ANGEL_NAMES_ZH[given.toLowerCase()];
+    planet.angel = {
+      name: zh || given,
+      latin: given,
+      domain: planet.angel.domain,
+      source: 'remote',
+      localName: planet.angel.latin        // 保留本地版本，方便比對差異
+    };
+    return planet;
   }
 
   /** 'Venus' / 'venus' / '金星' / 'Sol' … → 內部 key，無法辨識則回 null */

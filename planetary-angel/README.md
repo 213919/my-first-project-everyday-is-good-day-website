@@ -157,13 +157,19 @@ var CONFIG = {
 `adaptRemoteResponse()` 只認以下最小內容，其餘欄位一律忽略：
 
 ```json
-{ "hourPlanet": "Venus", "dayPlanet": "Saturn", "start": "00:00", "end": "01:00" }
+{
+  "hourPlanet": "Venus", "dayPlanet": "Saturn",
+  "hourAngel": "Anael", "dayAngel": "Cassiel",
+  "start": "00:00", "end": "01:00"
+}
 ```
 
 - `hourPlanet` 必填，其餘可省略：沒給 `dayPlanet` 就用星期主星，沒給 `start`/`end` 就用整點時段。
 - 行星名稱走 `data.js` 的 `PLANET_ALIASES` 正規化，英文（`Venus`）、拉丁文（`Iuppiter`、`Sol`）、
   中文（`金星`、`金星時`）都認得；認不出來會當作查詢失敗。
-- **天使一律由本專案的 `angels.tsv` 對應**，不吃外部來源的天使名 —— 多數行星時網站只給行星。
+- **天使以外部來源為準**：有給 `hourAngel` / `dayAngel` 就用它的名字，中文譯名查 `ANGEL_NAMES_ZH`，
+  查不到就直接顯示原文（不自行編譯名）。外部沒給時才退回 `angels.tsv`。
+  `meta.angelSource` 會標明這次是 `remote` 還是 `local`，`angel.localName` 保留本地版本方便比對。
 - 欄位名稱要換，只改 `adaptRemoteResponse()` 一個函式，其他檔案不受影響。
 
 ### 為什麼要自己的端點
