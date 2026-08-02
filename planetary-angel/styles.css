@@ -344,6 +344,8 @@ summary {
   color: var(--text-dim);
 }
 
+.result__note.is-warning { color: var(--danger); }
+
 .app__footer {
   margin-top: 26px;
   text-align: center;

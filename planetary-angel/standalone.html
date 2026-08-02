@@ -353,6 +353,8 @@ summary {
   color: var(--text-dim);
 }
 
+.result__note.is-warning { color: var(--danger); }
+
 .app__footer {
   margin-top: 26px;
   text-align: center;
@@ -978,6 +980,21 @@ summary {
     /* 23:00–24:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun']
   ];
 
+  /*
+   * 行星別名 → 內部 key。
+   * 外部資料來源（例如 planetaryhours.net）回傳的名稱可能是英文、拉丁文或中文，
+   * 一律先在這裡正規化，再去 PLANETS 取對應的守護天使。
+   */
+  var PLANET_ALIASES = {
+    sun: 'sun', sol: 'sun', 太陽: 'sun', 日: 'sun',
+    moon: 'moon', luna: 'moon', 月亮: 'moon', 月: 'moon',
+    mars: 'mars', 火星: 'mars', 火: 'mars',
+    mercury: 'mercury', mercurius: 'mercury', 水星: 'mercury', 水: 'mercury',
+    jupiter: 'jupiter', iuppiter: 'jupiter', jove: 'jupiter', 木星: 'jupiter', 木: 'jupiter',
+    venus: 'venus', 金星: 'venus', 金: 'venus',
+    saturn: 'saturn', saturnus: 'saturn', 土星: 'saturn', 土: 'saturn'
+  };
+
   /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
@@ -1000,6 +1017,7 @@ summary {
   PA.data = {
     PLANETS: PLANETS,
     HOUR_RULERS: HOUR_RULERS,
+    PLANET_ALIASES: PLANET_ALIASES,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS
@@ -1024,14 +1042,26 @@ summary {
   var D = PA.data;
 
   var CONFIG = {
-    mode: 'mock',                       // 'mock' | 'remote'
-    endpoint: '/api/planetary-angel',   // remote 模式使用
-    timeoutMs: 8000,
+    /*
+     * 'table'  = 用 data.js 的 HOUR_RULERS 對照表（目前預設，離線可用）
+     * 'remote' = 出生時間的行星時改由外部來源查詢（見下方 remote 設定與 README）
+     */
+    mode: 'table',
+
+    remote: {
+      /* 你自己的端點或 proxy。留空時 query() 會直接退回對照表。
+         注意：瀏覽器的同源政策會擋掉直接呼叫第三方網站，
+         除非對方回應 Access-Control-Allow-Origin，否則這裡要填自己的 proxy。 */
+      endpoint: '',
+      method: 'POST',
+      timeoutMs: 8000,
+      /* 外部查詢失敗時是否退回本機對照表（建議 true，頁面才不會整個不能用） */
+      fallbackToTable: true
+    },
+
     mockLatencyMs: 420,                 // 模擬網路延遲，讓 loading 狀態看得出來
-    schemaVersion: '1.1',
-    /* 行星時的取法。'fixed-table' = 直接查 data.js 的 HOUR_RULERS 對照表
-       （00:00 起算、每時段 60 分鐘、以星期分欄）。
-       日後若後端改用日出日落分割不等長的行星時，這裡會換成別的值。 */
+    schemaVersion: '1.2',
+    /* 行星時的取法。'fixed-table' = 00:00 起算、每時段 60 分鐘、以星期分欄。 */
     hourSystem: 'fixed-table'
   };
 
@@ -1072,12 +1102,24 @@ summary {
   /* ---------- 對外入口 ---------- */
 
   function query(request) {
-    return CONFIG.mode === 'remote' ? remoteProvider(request) : mockProvider(request);
+    if (CONFIG.mode !== 'remote' || !CONFIG.remote.endpoint) return tableProvider(request);
+
+    return remoteProvider(request).catch(function (err) {
+      if (!CONFIG.remote.fallbackToTable) throw err;
+
+      // 外部查詢失敗就退回對照表，並把失敗原因標在結果上，不讓頁面整個不能用
+      return tableProvider(request).then(function (res) {
+        res.meta.fallback = true;
+        res.meta.error = (err && err.message) || String(err);
+        res.meta.notes += '　外部來源查詢失敗（' + res.meta.error + '），已改用本機對照表。';
+        return res;
+      });
+    });
   }
 
-  /* ---------- provider：假資料（本機簡化推算） ---------- */
+  /* ---------- provider：本機對照表 ---------- */
 
-  function mockProvider(request) {
+  function tableProvider(request) {
     return new Promise(function (resolve) {
       setTimeout(function () {
         resolve(compute(request));
@@ -1085,23 +1127,90 @@ summary {
     });
   }
 
-  /* ---------- provider：真 API（預留，尚未啟用） ---------- */
+  /* ---------- provider：外部來源 ---------- */
 
   function remoteProvider(request) {
     var controller = new AbortController();
-    var timer = setTimeout(function () { controller.abort(); }, CONFIG.timeoutMs);
+    var timer = setTimeout(function () { controller.abort(); }, CONFIG.remote.timeoutMs);
+    var url = CONFIG.remote.endpoint;
+    var init = { signal: controller.signal, headers: { Accept: 'application/json' } };
 
-    return fetch(CONFIG.endpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(request),
-      signal: controller.signal
-    }).then(function (res) {
-      if (!res.ok) throw new Error('API 回應狀態 ' + res.status);
+    if (CONFIG.remote.method === 'GET') {
+      url += (url.indexOf('?') === -1 ? '?' : '&') + toQueryString(request);
+    } else {
+      init.method = 'POST';
+      init.headers['Content-Type'] = 'application/json';
+      init.body = JSON.stringify(request);
+    }
+
+    return fetch(url, init).then(function (res) {
+      if (!res.ok) throw new Error('外部來源回應狀態 ' + res.status);
       return res.json();
+    }).then(function (raw) {
+      return adaptRemoteResponse(raw, request);
     }).finally(function () {
       clearTimeout(timer);
     });
+  }
+
+  function toQueryString(request) {
+    var b = request.birth;
+    return 'date=' + pad(b.year, 4) + '-' + pad(b.month, 2) + '-' + pad(b.day, 2) +
+      '&time=' + pad(b.hour24, 2) + ':' + pad(b.minute, 2) +
+      '&city=' + encodeURIComponent(request.city);
+  }
+
+  /**
+   * 把外部來源的回應轉成本專案的 response 格式。
+   *
+   * 預期的最小內容（欄位名稱可在此調整，其餘程式不受影響）：
+   *   { hourPlanet: 'Venus', dayPlanet: 'Saturn', start: '00:00', end: '01:00' }
+   *
+   * 行星名稱經 PLANET_ALIASES 正規化，**天使一律由本專案的 angels.tsv 對應**，
+   * 因為外部來源通常只給行星，不給天使名。
+   */
+  function adaptRemoteResponse(raw, request) {
+    var hourKey = resolvePlanetKey(raw.hourPlanet || raw.planet || raw.hour);
+    var dayKey = resolvePlanetKey(raw.dayPlanet || raw.day);
+
+    if (!hourKey) throw new Error('外部來源沒有可辨識的行星名稱');
+
+    var weekdayIndex = new Date(request.birth.year, request.birth.month - 1, request.birth.day).getDay();
+    if (!dayKey) dayKey = D.WEEKDAY_RULERS[weekdayIndex];
+
+    var hour = request.birth.hour24;
+
+    return {
+      meta: {
+        source: 'remote',
+        schemaVersion: CONFIG.schemaVersion,
+        generatedAt: new Date().toISOString(),
+        method: 'remote-lookup',
+        endpoint: CONFIG.remote.endpoint,
+        notes: '行星時由外部來源提供，守護天使仍依本專案的行星→天使對應表。',
+        raw: raw                       // 保留原始回應，方便比對與除錯
+      },
+      request: request,
+      result: {
+        weekday: { index: weekdayIndex, name: D.WEEKDAY_NAMES[weekdayIndex] },
+        planetaryDay: describe(dayKey),
+        planetaryHour: {
+          index: hour + 1,
+          isNight: hour < 6 || hour >= 18,
+          startTime: raw.start || formatMinutes(hour * 60),
+          endTime: raw.end || formatMinutes((hour + 1) * 60),
+          planet: describe(hourKey)
+        },
+        hourTable: buildHourTable(weekdayIndex)
+      }
+    };
+  }
+
+  /** 'Venus' / 'venus' / '金星' / 'Sol' … → 內部 key，無法辨識則回 null */
+  function resolvePlanetKey(name) {
+    if (!name) return null;
+    var normalized = String(name).trim().toLowerCase().replace(/[\s時的]/g, '');
+    return D.PLANET_ALIASES[normalized] || null;
   }
 
   /* ---------- 推算核心 ---------- */
@@ -1117,7 +1226,7 @@ summary {
 
     return {
       meta: {
-        source: CONFIG.mode,           // 'mock' — 之後接 API 會變成 'remote'
+        source: 'table',               // 本機對照表；外部來源查詢成功時會是 'remote'
         schemaVersion: CONFIG.schemaVersion,
         generatedAt: new Date().toISOString(),
         method: 'fixed-hour-table',
@@ -1215,7 +1324,9 @@ summary {
     buildRequest: buildRequest,
     toHour24: toHour24,
     query: query,
-    getWeekTable: getWeekTable
+    getWeekTable: getWeekTable,
+    resolvePlanetKey: resolvePlanetKey,
+    adaptRemoteResponse: adaptRemoteResponse
   };
 })(window);
   </script>
@@ -1494,8 +1605,10 @@ summary {
     renderWeekTable(b.hour24, r.weekday.index);
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
-    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機對照表' : 'API') +
+    el.resultNote.textContent = (res.meta.fallback ? '⚠ ' : '') +
+      '資料來源：' + (res.meta.source === 'remote' ? '外部來源' : '本機對照表') +
       '　※ ' + res.meta.notes;
+    el.resultNote.classList.toggle('is-warning', Boolean(res.meta.fallback));
 
     el.result.hidden = false;
     el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });

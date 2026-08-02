@@ -3,7 +3,8 @@
 純 HTML / CSS / JavaScript 的前端，無框架、無建置流程、無外部相依。
 輸入出生城市與日期時間後，顯示對應的**行星日**、**行星時**與**守護天使**。
 
-行星時取自 `data.js` 內建的 24×7 對照表（`mock` 模式，本機查表），資料結構已按「日後直接接 API」的形式設計。
+行星時預設取自 `data.js` 內建的 24×7 對照表（`table` 模式，離線可用）；
+也可切換成向外部來源查詢（`remote` 模式，見「改由外部網站查詢行星時」）。
 
 ## 執行方式
 
@@ -55,7 +56,7 @@ iOS 檔案 App 的 Quick Look、各種 App 的內建檔案預覽器、郵件附�
 | `hour-table.tsv` | **原始對照表**（你提供的 24 列時段 × 7 欄星期，週日起）。`data.js` 的 `HOUR_RULERS` 就是它的程式版本，保留原檔以便日後查核。 |
 | `verify-hour-table.js` | 把 168 格逐一丟進 `PA.api.query()` 與 `hour-table.tsv` 比對，並檢查 `angels.tsv` 的天使對應，全部相符才會過。改動資料後務必執行。 |
 | `data.js` | 靜態知識庫：**24×7 行星時對照表 `HOUR_RULERS`（本專案的權威資料來源）**、七行星資料（符號、中英文名、守護天使、關鍵字、幸運色、金屬、薰香、建議）、星期主星對照、表單選單的預設值與範圍。純資料，不含邏輯。 |
-| `api.js` | 資料層／服務層，**唯一要改的接 API 位置**。負責組 request、呼叫 provider、回傳統一格式的 response。內含 `mockProvider`（本機查表 + 模擬延遲）與 `remoteProvider`（`fetch` + timeout，已寫好但未啟用）。 |
+| `api.js` | 資料層／服務層，**唯一要改的接 API 位置**。負責組 request、呼叫 provider、回傳統一格式的 response。內含 `tableProvider`（本機查表 + 模擬延遲）與 `remoteProvider`（`fetch` + timeout + 失敗退回對照表，預設未啟用）。 |
 | `app.js` | UI 層：產生下拉選單、監聽事件、表單驗證、loading 狀態、渲染結果。完全不碰行星知識與查表邏輯。 |
 
 ## 元件拆分與資料流
@@ -73,7 +74,7 @@ validate() ──有錯──▶ renderErrors() 顯示各欄位錯誤，中止
 PA.api.buildRequest()  → request（= 未來的 API body）
       │
       ▼
-PA.api.query(request)   ← 這裡切換 mock / remote
+PA.api.query(request)   ← 這裡切換 table / remote
       │ Promise<response>
       ▼
 renderResult(response) → [行星日卡][行星時卡][細節列表][當日 24 時段][一週輪值表][JSON]
@@ -104,8 +105,8 @@ renderResult(response) → [行星日卡][行星時卡][細節列表][當日 24 
 ```json
 {
   "meta": {
-    "source": "mock",
-    "schemaVersion": "1.1",
+    "source": "table",
+    "schemaVersion": "1.2",
     "generatedAt": "2026-07-31T15:37:04.377Z",
     "method": "fixed-hour-table",
     "notes": "行星時依固定對照表：00:00 起算，每時段 60 分鐘，欄位為星期。…"
@@ -133,21 +134,50 @@ renderResult(response) → [行星日卡][行星時卡][細節列表][當日 24 
 }
 ```
 
-## 之後要接真 API 時
+## 改由外部網站查詢行星時
 
-1. 後端實作一個 `POST` 端點，接收上面的 request，回傳上面的 response。
-2. 修改 `api.js` 最上方的 `CONFIG`：
+預設是本機查表（`CONFIG.mode = 'table'`），離線可用。要改成向外部來源查詢出生時間的行星時：
 
 ```js
+// api.js 最上方
 var CONFIG = {
-  mode: 'remote',                         // 'mock' → 'remote'
-  endpoint: 'https://api.example.com/planetary-angel',
-  timeoutMs: 8000,
+  mode: 'remote',
+  remote: {
+    endpoint: 'https://你的網域/api/planetary-hour',  // 見下方「為什麼要自己的端點」
+    method: 'POST',            // 或 'GET'，GET 會帶 ?date=&time=&city=
+    timeoutMs: 8000,
+    fallbackToTable: true      // 查詢失敗時退回本機對照表
+  },
   ...
 };
 ```
 
-`remoteProvider()` 已寫好（`fetch` + `AbortController` timeout + 非 2xx 丟錯），`app.js` 的 `.catch()` 會把錯誤顯示在表單下方。不需要改任何其他檔案。
+### 端點要回傳什麼
+
+`adaptRemoteResponse()` 只認以下最小內容，其餘欄位一律忽略：
+
+```json
+{ "hourPlanet": "Venus", "dayPlanet": "Saturn", "start": "00:00", "end": "01:00" }
+```
+
+- `hourPlanet` 必填，其餘可省略：沒給 `dayPlanet` 就用星期主星，沒給 `start`/`end` 就用整點時段。
+- 行星名稱走 `data.js` 的 `PLANET_ALIASES` 正規化，英文（`Venus`）、拉丁文（`Iuppiter`、`Sol`）、
+  中文（`金星`、`金星時`）都認得；認不出來會當作查詢失敗。
+- **天使一律由本專案的 `angels.tsv` 對應**，不吃外部來源的天使名 —— 多數行星時網站只給行星。
+- 欄位名稱要換，只改 `adaptRemoteResponse()` 一個函式，其他檔案不受影響。
+
+### 為什麼要自己的端點
+
+瀏覽器的同源政策會擋掉前端直接呼叫第三方網站，除非對方回應 `Access-Control-Allow-Origin`。
+`planetaryhours.net` 這類網站通常不會，所以純前端無法直接抓它的結果，需要一個自己的
+後端或 serverless function 代為請求（Cloudflare Workers、Netlify Functions、Vercel Function 皆可），
+在那裡把對方的回應轉成上面的格式。這一層也順便解決了對方改版時只需要改一個地方的問題。
+
+### 失敗時的行為
+
+`fallbackToTable: true`（預設）時，外部查詢失敗會自動退回本機對照表，結果區會以紅字標示
+「⚠ 資料來源：本機對照表　※ …外部來源查詢失敗（原因）」，頁面不會整個不能用。
+設成 `false` 則錯誤會往外丟，由表單下方的錯誤區顯示。
 
 ## 表單驗證
 
@@ -190,5 +220,6 @@ var CONFIG = {
 ## 除錯
 
 - `PA.app.last()`：取得最近一次的完整 response。
-- `PA.api.CONFIG`：檢視／即時修改 mode、endpoint、hourSystem。
+- `PA.api.CONFIG`：檢視／即時修改 mode、remote.endpoint、hourSystem。
+- `PA.api.resolvePlanetKey('Venus')`：測試外部來源的行星名稱能不能被辨識。
 - 結果區的「檢視資料結構（JSON）」可直接看到當次的完整 payload。

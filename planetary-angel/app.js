@@ -272,8 +272,10 @@
     renderWeekTable(b.hour24, r.weekday.index);
 
     el.jsonOutput.textContent = JSON.stringify(res, null, 2);
-    el.resultNote.textContent = '資料來源：' + (res.meta.source === 'mock' ? '本機對照表' : 'API') +
+    el.resultNote.textContent = (res.meta.fallback ? '⚠ ' : '') +
+      '資料來源：' + (res.meta.source === 'remote' ? '外部來源' : '本機對照表') +
       '　※ ' + res.meta.notes;
+    el.resultNote.classList.toggle('is-warning', Boolean(res.meta.fallback));
 
     el.result.hidden = false;
     el.result.scrollIntoView({ behavior: 'smooth', block: 'start' });

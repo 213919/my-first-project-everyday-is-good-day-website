@@ -133,6 +133,21 @@
     /* 23:00–24:00 */ ['moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn', 'sun']
   ];
 
+  /*
+   * 行星別名 → 內部 key。
+   * 外部資料來源（例如 planetaryhours.net）回傳的名稱可能是英文、拉丁文或中文，
+   * 一律先在這裡正規化，再去 PLANETS 取對應的守護天使。
+   */
+  var PLANET_ALIASES = {
+    sun: 'sun', sol: 'sun', 太陽: 'sun', 日: 'sun',
+    moon: 'moon', luna: 'moon', 月亮: 'moon', 月: 'moon',
+    mars: 'mars', 火星: 'mars', 火: 'mars',
+    mercury: 'mercury', mercurius: 'mercury', 水星: 'mercury', 水: 'mercury',
+    jupiter: 'jupiter', iuppiter: 'jupiter', jove: 'jupiter', 木星: 'jupiter', 木: 'jupiter',
+    venus: 'venus', 金星: 'venus', 金: 'venus',
+    saturn: 'saturn', saturnus: 'saturn', 土星: 'saturn', 土: 'saturn'
+  };
+
   /* 星期 0=週日 … 6=週六，對應的行星日主星（即上表 06:00 那一列） */
   var WEEKDAY_RULERS = ['sun', 'moon', 'mars', 'mercury', 'jupiter', 'venus', 'saturn'];
 
@@ -155,6 +170,7 @@
   PA.data = {
     PLANETS: PLANETS,
     HOUR_RULERS: HOUR_RULERS,
+    PLANET_ALIASES: PLANET_ALIASES,
     WEEKDAY_RULERS: WEEKDAY_RULERS,
     WEEKDAY_NAMES: WEEKDAY_NAMES,
     FORM_OPTIONS: FORM_OPTIONS
