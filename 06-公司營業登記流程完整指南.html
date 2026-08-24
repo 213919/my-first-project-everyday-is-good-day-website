@@ -127,16 +127,23 @@ document.addEventListener('click',function(e){
       </div>
     </a>
     <ul class="nav-links"><li><a href="index.html">首頁</a></li>
-<li><a href="services.html">我們的服務</a></li>
-<li><a href="address-registration.html">借址登記</a></li>
-<li><a href="qingpu.html">青埔借址登記</a></li>
-<li><a href="office.html">辦公室出租</a></li>
-<li><a href="space.html">辦公環境</a></li>
-<li><a href="tour.html">ON LINE 全景參觀</a></li>
-<li><a href="news.html">最新消息</a></li>
-<li><a href="about.html">關於我們</a></li>
-<li><a href="contact.html">聯絡我們</a></li>
-<li><a href="faq.html">常見問題</a></li></ul>
+<li class="has-dropdown"><button class="nav-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="dd-about">關於我們<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="dropdown-panel" id="dd-about">
+<a href="about.html">公司介紹</a>
+<a href="qingpu.html">青埔館介紹</a>
+</div></li>
+<li class="has-dropdown"><button class="nav-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="dd-services">我們的服務<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="dropdown-panel mega" id="dd-services">
+<a href="address-registration.html"><span class="mega-ico" aria-hidden="true">🏠</span>借址登記</a>
+<a href="office.html"><span class="mega-ico" aria-hidden="true">🏢</span>辦公室出租</a>
+</div></li>
+<li class="has-dropdown"><button class="nav-trigger" aria-haspopup="true" aria-expanded="false" aria-controls="dd-env">辦公環境<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+<div class="dropdown-panel" id="dd-env">
+<a href="space.html">辦公環境</a>
+<a href="tour.html">ON LINE 全景參觀</a>
+</div></li>
+<li><a href="news.html" class="active">最新消息</a></li>
+<li><a href="contact.html">聯絡我們</a></li></ul>
     <a class="nav-cta" href="contact.html">立即預約</a>
     <button class="hamburger" id="hamburger" aria-label="開啟選單">
       <span></span><span></span><span></span>
@@ -145,16 +152,17 @@ document.addEventListener('click',function(e){
 </nav>
 <div class="mobile-menu" id="mobileMenu">
   <ul><li><a class="mlink" href="index.html">首頁</a></li>
-<li><a class="mlink" href="services.html">我們的服務</a></li>
-<li><a class="mlink" href="address-registration.html">借址登記</a></li>
-<li><a class="mlink" href="qingpu.html">青埔借址登記</a></li>
-<li><a class="mlink" href="office.html">辦公室出租</a></li>
-<li><a class="mlink" href="space.html">辦公環境</a></li>
-<li><a class="mlink" href="tour.html">ON LINE 全景參觀</a></li>
-<li><a class="mlink" href="news.html">最新消息</a></li>
-<li><a class="mlink" href="about.html">關於我們</a></li>
-<li><a class="mlink" href="contact.html">聯絡我們</a></li>
-<li><a class="mlink" href="faq.html">常見問題</a></li></ul>
+<li class="accordion-group"><button class="accordion-trigger" aria-expanded="false" aria-controls="acc-about">關於我們<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+<ul class="accordion-panel" id="acc-about" hidden><li><a class="mlink sub" href="about.html">公司介紹</a></li>
+<li><a class="mlink sub" href="qingpu.html">青埔館介紹</a></li></ul></li>
+<li class="accordion-group"><button class="accordion-trigger" aria-expanded="false" aria-controls="acc-services">我們的服務<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+<ul class="accordion-panel" id="acc-services" hidden><li><a class="mlink sub" href="address-registration.html">借址登記</a></li>
+<li><a class="mlink sub" href="office.html">辦公室出租</a></li></ul></li>
+<li class="accordion-group"><button class="accordion-trigger" aria-expanded="false" aria-controls="acc-env">辦公環境<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+<ul class="accordion-panel" id="acc-env" hidden><li><a class="mlink sub" href="space.html">辦公環境</a></li>
+<li><a class="mlink sub" href="tour.html">ON LINE 全景參觀</a></li></ul></li>
+<li><a class="mlink active" href="news.html">最新消息</a></li>
+<li><a class="mlink" href="contact.html">聯絡我們</a></li></ul>
   <div class="mobile-cta">
     <a class="mlink" href="tel:032759489">更多詳情與報價</a>
   </div>
@@ -357,7 +365,7 @@ document.addEventListener('click',function(e){
 <li><a href="tour.html">ON LINE 全景參觀</a></li>
         <li><a href="news.html">最新消息</a></li>
         <li><a href="contact.html">聯絡我們</a></li>
-      </ul></div>
+      <li><a href="faq.html">常見問題</a></li></ul></div>
       <div class="f-col"><h4>聯絡資訊</h4><ul>
         <li>桃園市中壢區延平路 261 號 9 樓</li>
         <li><a href="tel:032759489">03-275-9489</a></li>
@@ -412,5 +420,43 @@ body{padding-bottom:76px!important}
 <a class="cb-tour" href="tour.html" aria-label="ON LINE 全景參觀">線上參觀</a>
 <a class="cb-mail" href="mailto:edgd2619@gmail.com" aria-label="來信詢問">✉️</a>
 </div>
+<script>
+(function(){
+document.querySelectorAll('.nav-trigger').forEach(function(btn){
+  btn.addEventListener('click', function(e){
+    e.stopPropagation();
+    var li = btn.closest('.has-dropdown');
+    var isOpen = li.classList.contains('open');
+    document.querySelectorAll('.has-dropdown.open').forEach(function(o){
+      o.classList.remove('open');
+      o.querySelector('.nav-trigger').setAttribute('aria-expanded','false');
+    });
+    if(!isOpen){ li.classList.add('open'); btn.setAttribute('aria-expanded','true'); }
+  });
+});
+document.addEventListener('click', function(){
+  document.querySelectorAll('.has-dropdown.open').forEach(function(o){
+    o.classList.remove('open');
+    o.querySelector('.nav-trigger').setAttribute('aria-expanded','false');
+  });
+});
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape'){
+    document.querySelectorAll('.has-dropdown.open').forEach(function(o){
+      o.classList.remove('open');
+      o.querySelector('.nav-trigger').setAttribute('aria-expanded','false');
+    });
+  }
+});
+document.querySelectorAll('.accordion-trigger').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    var panel = document.getElementById(btn.getAttribute('aria-controls'));
+    var open = btn.getAttribute('aria-expanded')==='true';
+    btn.setAttribute('aria-expanded', open?'false':'true');
+    if(panel) panel.hidden = open;
+  });
+});
+})();
+</script>
 </body>
 </html>
