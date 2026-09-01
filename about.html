@@ -23,8 +23,7 @@
 <link rel="stylesheet" href="style.css?v=4"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"AboutPage","name":"關於日日好日商務中心","description":"日日好日商務中心成立於 2022 年，整合借址登記、共享辦公室與會計、命名、記帳等一站式資源，陪伴創業者從第一天到未來每一天。","url":"https://edgd2619.com/about.html","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"mainEntity":{"@type":"Organization","name":"日日好日商務中心","alternateName":"Every Day Good Day Business Center","foundingDate":"2022","url":"https://edgd2619.com","logo":"https://edgd2619.com/images/logo.webp","description":"桃園中壢與青埔的商務中心，提供公司借址登記、獨立辦公室出租、會計記帳、公司命名等一站式創業服務。"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://edgd2619.com"},{"@type":"ListItem","position":2,"name":"關於我們","item":"https://edgd2619.com/about.html"}]}</script>
-<!-- Google tag (gtag.js) - GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5"></script>
+<!-- Google tag (gtag.js) - GA4，主程式庫延後至瀏覽器閒置時才載入，避免阻塞首屏渲染；事件仍會正確排入佇列 -->
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
@@ -40,6 +39,14 @@ document.addEventListener('click',function(e){
     page_path:location.pathname
   });
 },{passive:true});
+function loadGtagLib(){
+  if(document.getElementById('gtag-lib'))return;
+  var s=document.createElement('script');
+  s.id='gtag-lib';s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
+  document.head.appendChild(s);
+}
+if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
 </script>
 </head>
 <body>
@@ -230,26 +237,6 @@ document.addEventListener('click',function(e){
       l.addEventListener('click',function(){hb.classList.remove('open');mm.classList.remove('open');document.body.style.overflow='';});
     });
   }
-  document.querySelectorAll('.faq-q').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const item=btn.closest('.faq-item');
-      const ans=item.querySelector('.faq-a');
-      const icon=btn.querySelector('.faq-icon');
-      const open=btn.getAttribute('aria-expanded')==='true';
-      document.querySelectorAll('.faq-item').forEach(i=>{
-        i.querySelector('.faq-q').setAttribute('aria-expanded','false');
-        i.querySelector('.faq-a').style.maxHeight='0';
-        i.querySelector('.faq-a').style.padding='0 24px';
-        i.querySelector('.faq-icon').style.transform='rotate(0deg)';
-      });
-      if(!open){
-        btn.setAttribute('aria-expanded','true');
-        ans.style.maxHeight=ans.scrollHeight+'px';
-        ans.style.padding='0 24px';
-        icon.style.transform='rotate(45deg)';
-      }
-    });
-  });
   var ro=new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}

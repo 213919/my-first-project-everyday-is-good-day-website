@@ -25,8 +25,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://edgd2619.com"},{"@type":"ListItem","position":2,"name":"青埔借址登記","item":"https://edgd2619.com/qingpu.html"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"日日好日商務中心 青埔館","alternateName":"Every Day Good Day Business Center - Qingpu","image":"https://edgd2619.com/images/og-share.webp","telephone":"03-275-9489","email":"edgd2619@gmail.com","url":"https://edgd2619.com/qingpu.html","address":{"@type":"PostalAddress","streetAddress":"青商路59號2樓（新潤君頤）","addressLocality":"中壢區","addressRegion":"桃園市","postalCode":"320","addressCountry":"TW"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"10:30","closes":"19:00"}],"areaServed":[{"@type":"Place","name":"青埔"},{"@type":"AdministrativeArea","name":"中壢區"},{"@type":"City","name":"桃園市"}],"makesOffer":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"青埔借址登記"}}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"青埔館現在還有借址登記名額嗎？","acceptedAnswer":{"@type":"Answer","text":"目前青埔館借址登記約剩 19 個名額（依實際洽詢時為準，數量會隨時異動），建議來電 03-275-9489 提早預約以免向隅。"}},{"@type":"Question","name":"青埔館可以租獨立辦公室嗎？","acceptedAnswer":{"@type":"Answer","text":"青埔館的獨立辦公室目前已滿租，現階段僅提供借址登記服務。若需要實體辦公空間，歡迎參考中壢館的獨立辦公室方案，或來電洽詢青埔館後續是否有釋出名額。"}},{"@type":"Question","name":"青埔館交通方便嗎？離高鐵桃園站近嗎？","acceptedAnswer":{"@type":"Answer","text":"青埔館位於桃園市中壢區青商路59號2樓，鄰近高鐵桃園站，商辦大樓形象新穎。大樓旁即有停車場，從停車場走到辦公室僅約一分鐘，開車洽公也很方便。一樓並設有會客用咖啡廳，接待客戶更有質感。"}},{"@type":"Question","name":"青埔館成立多久了，可以信任嗎？","acceptedAnswer":{"@type":"Answer","text":"青埔館自 2024 年開始經營，與中壢館同屬日日好日商務中心，服務內容、合約條款與地址使用授權文件均一致，可放心洽詢。"}}]}</script>
-<!-- Google tag (gtag.js) - GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5"></script>
+<!-- Google tag (gtag.js) - GA4，主程式庫延後至瀏覽器閒置時才載入，避免阻塞首屏渲染；事件仍會正確排入佇列 -->
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
@@ -42,6 +41,14 @@ document.addEventListener('click',function(e){
     page_path:location.pathname
   });
 },{passive:true});
+function loadGtagLib(){
+  if(document.getElementById('gtag-lib'))return;
+  var s=document.createElement('script');
+  s.id='gtag-lib';s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
+  document.head.appendChild(s);
+}
+if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
 </script>
 </head>
 <body>
@@ -236,26 +243,6 @@ document.addEventListener('click',function(e){
       l.addEventListener('click',function(){hb.classList.remove('open');mm.classList.remove('open');document.body.style.overflow='';});
     });
   }
-  document.querySelectorAll('.faq-q').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const item=btn.closest('.faq-item');
-      const ans=item.querySelector('.faq-a');
-      const icon=btn.querySelector('.faq-icon');
-      const open=btn.getAttribute('aria-expanded')==='true';
-      document.querySelectorAll('.faq-item').forEach(i=>{
-        i.querySelector('.faq-q').setAttribute('aria-expanded','false');
-        i.querySelector('.faq-a').style.maxHeight='0';
-        i.querySelector('.faq-a').style.padding='0 24px';
-        i.querySelector('.faq-icon').style.transform='rotate(0deg)';
-      });
-      if(!open){
-        btn.setAttribute('aria-expanded','true');
-        ans.style.maxHeight=ans.scrollHeight+'px';
-        ans.style.padding='0 24px';
-        icon.style.transform='rotate(45deg)';
-      }
-    });
-  });
   var ro=new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}

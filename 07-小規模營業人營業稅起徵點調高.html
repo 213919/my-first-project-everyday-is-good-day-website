@@ -105,22 +105,6 @@ h1{margin:16px 0 12px;font-size:clamp(30px,4.2vw,48px);line-height:1.2;letter-sp
 .notice-box .notice-body{flex:1;}
 .notice-box .notice-title{font-weight:700;color:#2D5016;font-size:15px;margin-bottom:4px;}
 .notice-box .notice-text{color:#6d655d;font-size:15px;line-height:1.8;margin:0;}
-/* FAQ block */
-.faq-block{margin:36px 0;border-radius:24px;overflow:hidden;border:1px solid var(--line);}
-.faq-block-header{background:linear-gradient(135deg,#2D5016 0%,#896348 100%);padding:20px 28px;display:flex;align-items:center;gap:12px;}
-.faq-block-header .faq-icon{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
-.faq-block-header h3{margin:0;color:#fff;font-size:20px;}
-.faq-item{border-top:1px solid var(--line);background:#fff;}
-.faq-item:first-of-type{border-top:none;}
-.faq-q{width:100%;text-align:left;padding:18px 24px;background:none;border:none;cursor:pointer;display:flex;align-items:flex-start;gap:14px;font-family:inherit;}
-.faq-q-icon{width:26px;height:26px;border-radius:50%;background:rgba(106,80,68,.1);color:#2D5016;font-size:13px;font-weight:800;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;}
-.faq-q-text{flex:1;text-align:left;font-size:16px;font-weight:700;color:#2D5016;line-height:1.5;}
-.faq-arrow{font-size:14px;color:#9E9994;margin-left:auto;padding-left:12px;flex-shrink:0;transition:transform .25s;margin-top:3px;}
-.faq-item.open .faq-arrow{transform:rotate(180deg);}
-.faq-a{display:none;padding:0 24px 20px 64px;}
-.faq-item.open .faq-a{display:block;}
-.faq-a p{margin:0;font-size:15.5px;color:#6d655d;line-height:1.85;}
-@media(max-width:720px){.faq-a{padding-left:24px;}}
 @media(max-width:980px){.hero-grid,.content-grid{grid-template-columns:1fr}.aside{position:static}}
 @media(max-width:720px){.hero{padding-top:42px}.hero-copy,.article{padding:26px}.split-note{grid-template-columns:1fr}.compare-row,.compare-header{grid-template-columns:1fr}.compare-row .old,.compare-row .new{padding:8px 18px}.compare-row:first-child .label{border-radius:0}}
 </style>
@@ -132,8 +116,7 @@ h1{margin:16px 0 12px;font-size:clamp(30px,4.2vw,48px);line-height:1.2;letter-sp
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://edgd2619.com"},{"@type":"ListItem","position":2,"name":"最新消息","item":"https://edgd2619.com/news.html"},{"@type":"ListItem","position":3,"name":"小規模營業人稅籍登記起徵點調高","item":"https://edgd2619.com/07-小規模營業人營業稅起徵點調高.html"}]}</script>
 <link rel="preload" href="style.css?v=4" as="style" onload="this.onload=null;this.rel='stylesheet'"/>
 <noscript><link rel="stylesheet" href="style.css?v=4"/></noscript>
-<!-- Google tag (gtag.js) - GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5"></script>
+<!-- Google tag (gtag.js) - GA4，主程式庫延後至瀏覽器閒置時才載入，避免阻塞首屏渲染；事件仍會正確排入佇列 -->
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
@@ -149,6 +132,14 @@ document.addEventListener('click',function(e){
     page_path:location.pathname
   });
 },{passive:true});
+function loadGtagLib(){
+  if(document.getElementById('gtag-lib'))return;
+  var s=document.createElement('script');
+  s.id='gtag-lib';s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
+  document.head.appendChild(s);
+}
+if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
 </script>
 </head>
 <body>
@@ -411,13 +402,6 @@ document.addEventListener('click',function(e){
     hamburger?.classList.remove('open');
     mobileMenu?.classList.remove('open');
   }));
-</script>
-<script>
-function toggleFaq(btn) {
-  const item = btn.closest('.faq-item');
-  const isOpen = item.classList.contains('open');
-  item.classList.toggle('open', !isOpen);
-}
 </script>
 <style>
 .callbar{display:none}

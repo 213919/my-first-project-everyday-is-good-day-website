@@ -25,8 +25,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"首頁","item":"https://edgd2619.com"},{"@type":"ListItem","position":2,"name":"中壢共享辦公室出租","item":"https://edgd2619.com/office.html"}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"日日好日商務中心","image":"https://edgd2619.com/images/og-share.webp","telephone":"03-275-9489","email":"edgd2619@gmail.com","url":"https://edgd2619.com","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","postalCode":"320","addressCountry":"TW"},"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday","Wednesday","Thursday","Friday"],"opens":"10:30","closes":"19:00"}],"makesOffer":[{"@type":"Offer","itemOffered":{"@type":"Service","name":"獨立辦公室出租（1–5人）"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"8499","priceCurrency":"TWD","unitText":"MONTH"},"eligibleDuration":{"@type":"QuantitativeValue","minValue":12,"unitCode":"MON"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"年租共享辦公室"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"8499","priceCurrency":"TWD","unitText":"MONTH"},"eligibleDuration":{"@type":"QuantitativeValue","minValue":12,"unitCode":"MON"}},{"@type":"Offer","itemOffered":{"@type":"Service","name":"公司借址登記"},"priceSpecification":{"@type":"UnitPriceSpecification","price":"1680","priceCurrency":"TWD","unitText":"MONTH","billingIncrement":12}}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"中壢辦公室出租包含哪些設備與服務？","acceptedAnswer":{"@type":"Answer","text":"日日好日商務中心的辦公室為即租即用：含辦公家具、高速網路、冷氣與基本辦公設備，並享免費共用會議室、洽談區、櫃台公文與掛號代收。會計、法律諮詢、Logo 設計等一站式加值服務也能在館內取得。"}},{"@type":"Question","name":"租辦公室可以直接登記公司嗎？","acceptedAnswer":{"@type":"Answer","text":"可以。進駐日日好日商務中心的辦公室即可將公司登記於延平路 261 號 9 樓的合法商業地址，設立、稅籍與後續開立發票流程都與一般公司相同。"}},{"@type":"Question","name":"可以先線上看空間再決定嗎？","acceptedAnswer":{"@type":"Answer","text":"可以。網站提供 ON LINE 全景參觀，用手機即可瀏覽入口接待、日式走廊、辦公區與採光窗景；喜歡再來電 03-275-9489 預約現場參觀。"}}]}</script>
-<!-- Google tag (gtag.js) - GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5"></script>
+<!-- Google tag (gtag.js) - GA4，主程式庫延後至瀏覽器閒置時才載入，避免阻塞首屏渲染；事件仍會正確排入佇列 -->
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
@@ -42,6 +41,14 @@ document.addEventListener('click',function(e){
     page_path:location.pathname
   });
 },{passive:true});
+function loadGtagLib(){
+  if(document.getElementById('gtag-lib'))return;
+  var s=document.createElement('script');
+  s.id='gtag-lib';s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
+  document.head.appendChild(s);
+}
+if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
 </script>
 </head>
 <body>
@@ -251,26 +258,6 @@ document.addEventListener('click',function(e){
       l.addEventListener('click',function(){hb.classList.remove('open');mm.classList.remove('open');document.body.style.overflow='';});
     });
   }
-  document.querySelectorAll('.faq-q').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      const item=btn.closest('.faq-item');
-      const ans=item.querySelector('.faq-a');
-      const icon=btn.querySelector('.faq-icon');
-      const open=btn.getAttribute('aria-expanded')==='true';
-      document.querySelectorAll('.faq-item').forEach(i=>{
-        i.querySelector('.faq-q').setAttribute('aria-expanded','false');
-        i.querySelector('.faq-a').style.maxHeight='0';
-        i.querySelector('.faq-a').style.padding='0 24px';
-        i.querySelector('.faq-icon').style.transform='rotate(0deg)';
-      });
-      if(!open){
-        btn.setAttribute('aria-expanded','true');
-        ans.style.maxHeight=ans.scrollHeight+'px';
-        ans.style.padding='0 24px';
-        icon.style.transform='rotate(45deg)';
-      }
-    });
-  });
   var ro=new IntersectionObserver(function(entries){
     entries.forEach(function(en){
       if(en.isIntersecting){en.target.classList.add('visible');ro.unobserve(en.target);}

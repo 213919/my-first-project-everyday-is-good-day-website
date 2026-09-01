@@ -198,8 +198,7 @@ img{display:block}
   .intro .chev svg,.intro .swtxt{animation:none;opacity:1}
 }
 </style>
-<!-- Google tag (gtag.js) - GA4 -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5"></script>
+<!-- Google tag (gtag.js) - GA4，主程式庫延後至瀏覽器閒置時才載入，避免阻塞首屏渲染；事件仍會正確排入佇列 -->
 <script>
 window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}
 gtag('js',new Date());
@@ -215,6 +214,14 @@ document.addEventListener('click',function(e){
     page_path:location.pathname
   });
 },{passive:true});
+function loadGtagLib(){
+  if(document.getElementById('gtag-lib'))return;
+  var s=document.createElement('script');
+  s.id='gtag-lib';s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
+  document.head.appendChild(s);
+}
+if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
 </script>
 </head>
 <body>
