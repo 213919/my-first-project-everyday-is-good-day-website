@@ -300,14 +300,14 @@ if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:200
 (function(){
 'use strict';
 var SCENES=[
- {img:'images/tour/tour-1.webp',name:'大門入口',code:'01 · ENTRANCE',desc:'推開門,日日好日的一天從這裡開始。'},
- {img:'images/tour/tour-2.webp',name:'接待 ‧ 展示區',code:'02 · RECEPTION',desc:'溫潤木質的接待區,給訪客的第一印象。'},
- {img:'images/tour/tour-3.webp',name:'會議長桌區',code:'03 · MEETING AREA',desc:'辦公室租客免費使用開會區域。'},
- {img:'images/tour/tour-4.webp',name:'日式走廊',code:'04 · CORRIDOR',desc:'安靜的日式廊道,串起每一間辦公室。'},
- {img:'images/tour/tour-5.webp',name:'休憩交流區',code:'05 · LOUNGE',desc:'工作之間,留一段喘息與交流的時光。'},
- {img:'images/tour/tour-6.webp',name:'採光窗景吧台',code:'06 · WINDOW VIEW',desc:'面窗吧台,把城市天際線借進辦公室。'},
- {img:'images/tour/tour-7.webp',name:'窗邊工作區',code:'07 · WORKSPACE',desc:'自然採光的窗邊座位,效率與舒適兼得。'},
- {img:'images/tour/tour-8.webp',name:'迴廊 ‧ 返回入口',code:'08 · RETURN',desc:'走完一圈,歡迎預約實地參觀。'}
+ {img:'images/tour/tour-1.webp',name:'大門入口',code:'01 · ENTRANCE',desc:'推開門,日日好日的一天從這裡開始。',ar:1776/1400},
+ {img:'images/tour/tour-2.webp',name:'接待 ‧ 展示區',code:'02 · RECEPTION',desc:'溫潤木質的接待區,給訪客的第一印象。',ar:2487/1400},
+ {img:'images/tour/tour-3.webp',name:'會議長桌區',code:'03 · MEETING AREA',desc:'辦公室租客免費使用開會區域。',ar:2607/1400},
+ {img:'images/tour/tour-4.webp',name:'日式走廊',code:'04 · CORRIDOR',desc:'安靜的日式廊道,串起每一間辦公室。',ar:2789/1400},
+ {img:'images/tour/tour-5.webp',name:'休憩交流區',code:'05 · LOUNGE',desc:'工作之間,留一段喘息與交流的時光。',ar:4027/1400},
+ {img:'images/tour/tour-6.webp',name:'採光窗景吧台',code:'06 · WINDOW VIEW',desc:'面窗吧台,把城市天際線借進辦公室。',ar:3793/1400},
+ {img:'images/tour/tour-7.webp',name:'窗邊工作區',code:'07 · WORKSPACE',desc:'自然採光的窗邊座位,效率與舒適兼得。',ar:2887/1400},
+ {img:'images/tour/tour-8.webp',name:'迴廊 ‧ 返回入口',code:'08 · RETURN',desc:'走完一圈,歡迎預約實地參觀。',ar:2950/1400}
 ];
 var TRAVEL=1.5;                 // 每個場景佔用的捲動距離(視窗高度倍數)
 var N=SCENES.length;
@@ -358,12 +358,15 @@ function ensureLoaded(i){
 /* --- 幾何量測 --- */
 var vh=window.innerHeight,journeyTop=0,journeyScroll=1,stageW=0,stageH=0;
 function fitLayer(i){
-  /* 依舞台高度等比縮放,保留完整橫幅寬度供環景橫掃 */
-  var im=layers[i].firstChild;
-  if(!im.naturalWidth||reduceMotion)return;
-  var w=im.naturalWidth*(stageH/im.naturalHeight),h=stageH;
-  if(w<stageW){h=im.naturalHeight*(stageW/im.naturalWidth);w=stageW;}  // 窄圖改以寬度鋪滿
+  /* 依舞台高度等比縮放,保留完整橫幅寬度供環景橫掃
+     用預先量好的實際圖片比例(SCENES[i].ar)計算,不等圖片載入完成才量測,
+     避免圖片載入後才套用尺寸造成的版面跳動(CLS)。 */
+  if(reduceMotion||!stageH)return;
+  var ar=SCENES[i].ar;
+  var w=stageH*ar,h=stageH;
+  if(w<stageW){h=stageW/ar;w=stageW;}  // 窄圖改以寬度鋪滿
   dims[i]={w:w,h:h};
+  var im=layers[i].firstChild;
   im.classList.add('fitted');
   im.style.width=w+'px';im.style.height=h+'px';
 }
