@@ -67,7 +67,7 @@ function loadGtagLib(){
   s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
   document.head.appendChild(s);
 }
-if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
+['scroll','pointerdown','keydown','touchstart'].forEach(function(ev){window.addEventListener(ev,loadGtagLib,{once:true,passive:true});});if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:6000});}else{setTimeout(loadGtagLib,4000);}
 </script>
 </head>
 <body>

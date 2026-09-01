@@ -170,7 +170,7 @@ img{display:block}
   padding:16px 26px;border-radius:999px;font-size:.93rem;font-weight:700;letter-spacing:.1em;
   backdrop-filter:blur(18px) saturate(1.7);-webkit-backdrop-filter:blur(18px) saturate(1.7);
   border:1px solid rgba(255,255,255,.78);
-  transition:transform .2s var(--ease),box-shadow .2s var(--ease)}
+  transition:transform .2s var(--ease)}
 .obtn::before{content:'';position:absolute;inset:0;border-radius:999px;pointer-events:none;
   background:linear-gradient(165deg,rgba(255,255,255,.55) 0%,rgba(255,255,255,.08) 42%,transparent 60%,rgba(255,255,255,.22) 100%)}
 .obtn::after{content:'';position:absolute;top:-30%;left:-24%;width:44%;height:160%;pointer-events:none;
@@ -221,7 +221,7 @@ function loadGtagLib(){
   s.src='https://www.googletagmanager.com/gtag/js?id=G-SP670B7MC5';
   document.head.appendChild(s);
 }
-if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:2000});}else{setTimeout(loadGtagLib,1);}
+['scroll','pointerdown','keydown','touchstart'].forEach(function(ev){window.addEventListener(ev,loadGtagLib,{once:true,passive:true});});if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:6000});}else{setTimeout(loadGtagLib,4000);}
 </script>
 </head>
 <body>
