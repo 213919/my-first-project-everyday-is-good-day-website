@@ -101,17 +101,25 @@ function loadGtagLib(){
 <header class="page-hero">
 <div class="container">
 <div class="page-hero-inner">
-<nav class="page-hero-breadcrumb" aria-label="麵包屑">
+<nav class="page-hero-breadcrumb hero-anim" aria-label="麵包屑" style="animation-delay:.02s">
 <a href="index.html">首頁</a><span class="sep">／</span><a href="services.html">我們的服務</a><span class="sep">／</span><span>借址登記</span>
 </nav>
-<span class="eyebrow">ADDRESS REGISTRATION</span>
-<h1>中壢借址登記<br/>合法穩定・費用透明</h1>
-<div style="display:flex;gap:14px;flex-wrap:wrap;">
-<a href="contact.html" class="btn btn-primary">免費諮詢報價 →</a>
+<span class="eyebrow hero-anim" style="animation-delay:.08s">ADDRESS REGISTRATION</span>
+<h1 class="hero-anim" style="animation-delay:.16s">中壢借址登記<br/>合法穩定・費用透明</h1>
+<div class="hero-anim" style="display:flex;gap:14px;flex-wrap:wrap;animation-delay:.26s">
+<a href="contact.html" class="btn btn-primary hero-cta-pulse">免費諮詢報價 →</a>
 </div>
 </div>
 </div>
 </header>
+<style>
+@media(prefers-reduced-motion:no-preference){
+.hero-anim{animation:heroUp .6s cubic-bezier(.22,.61,.36,1) both}
+@keyframes heroUp{from{transform:translateY(16px)}to{transform:translateY(0)}}
+.hero-cta-pulse{animation:ctaPulse 2.4s ease-in-out .9s 3}
+@keyframes ctaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.035)}}
+}
+</style>
 
 <section class="section" style="background:var(--off-white)">
 <div class="container">
