@@ -1,0 +1,54 @@
+name: IndexNow 主動通知搜尋引擎
+
+# push 到 main 且有 .html 變動時，自動提交本次變動的頁面給 IndexNow（Bing 等）
+# 也可在 Actions 頁面手動觸發，選擇 all 一次提交 sitemap.xml 裡的全部網址
+on:
+  push:
+    branches: [main]
+    paths:
+      - "**.html"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "提交範圍：changed＝本次變動頁面／all＝sitemap 全部網址"
+        required: false
+        default: "all"
+        type: choice
+        options:
+          - changed
+          - all
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 取得程式碼
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: 設定 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 取得本次變動的 HTML 檔案
+        if: github.event_name == 'push'
+        run: |
+          git diff --name-only "${{ github.event.before }}" "${{ github.sha }}" -- '*.html' > changed_files.txt || true
+          {
+            echo "CHANGED_FILES<<EOF"
+            cat changed_files.txt
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+
+      - name: 提交 IndexNow（push：僅本次變動頁面）
+        if: github.event_name == 'push'
+        run: python3 indexnow-ping.py changed
+
+      - name: 提交 IndexNow（手動觸發）
+        if: github.event_name == 'workflow_dispatch'
+        run: python3 indexnow-ping.py "${{ github.event.inputs.mode }}"
