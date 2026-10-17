@@ -60,7 +60,7 @@ h1{margin:16px 0 12px;font-size:clamp(34px,4.6vw,52px);line-height:1.2;letter-sp
 .compare-row:first-child{border-top:none}
 .compare-row .label{background:#fcf8f3;padding:16px 18px;font-weight:700;color:#5a4331}
 .compare-row .value{padding:16px 18px;color:var(--sub)}
-.steps{margin:26px 0;display:flex;flex-direction:column;gap:0}
+.steps{margin:26px 0;display:flex;flex-direction:column;gap:0;list-style:none;padding:0}
 .step{display:block;border-left:2px solid var(--line);margin-left:28px;padding:0 0 28px 28px;position:relative}
 .step:last-child{padding-bottom:0;border-left:2px solid transparent}
 .step::before{content:attr(data-n);position:absolute;left:-28px;top:0;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--brand),#b47f53);color:#fff;font-size:18px;font-weight:800;display:flex;align-items:center;justify-content:center;font-family:'Noto Serif TC',serif;border:3px solid #faf7f3}
@@ -183,6 +183,7 @@ function loadGtagLib(){
       <h1>中壢借址登記怎麼辦？流程、注意事項一次看</h1>
       <time datetime="2026-06-11" class="article-date" style="display:block;font-size:.82rem;color:var(--text-light);margin:4px 0 12px;letter-spacing:.04em;">2026 年 6 月 11 日</time>
       <p class="lead">想在中壢設立公司登記地址，卻不確定借址登記的流程？這篇帶你從準備文件到完成登記，每個步驟都說清楚。</p>
+      <p>中壢借址登記簡單分三步驟：聯絡諮詢、簽約取得地址使用授權書、持文件辦理公司設立登記，最短租期一年、簽約收取兩個月押金。日日好日商務中心協助送件，服務範圍涵蓋中壢、青埔、新竹、桃園與新北。</p>
       <div class="hero-meta">
         <span class="meta-chip">主題：借址登記</span>
         <span class="meta-chip">地區：中壢</span>
@@ -232,14 +233,14 @@ function loadGtagLib(){
       </div>
 
       <h3>完整流程：從接洽到完成登記</h3>
-      <div class="steps">
-        <div class="step" data-n="1">
+      <ol class="steps">
+        <li class="step" data-n="1">
           <div class="step-body">
             <h4>聯繫商務中心，確認地址合法性</h4>
             <p>第一步是找到一家可信任的商務中心，確認其提供的地址確實為合法商業用途登記空間，且該地址可供公司設立登記使用。建議詢問是否能提供地址使用證明或同意書。</p>
           </div>
-        </div>
-        <div class="step" data-n="2">
+        </li>
+        <li class="step" data-n="2">
           <div class="step-body">
             <h4>完成公司名稱預查</h4>
             <p>向經濟部商業司線上系統提交名稱預查申請，取得電子公文核准函。這是後續辦理公司設立登記的必要前置步驟。</p>
@@ -248,14 +249,14 @@ function loadGtagLib(){
               <li>預查核准函有效期限約 6 個月，需在期限內完成設立</li>
             </ul>
           </div>
-        </div>
-        <div class="step" data-n="3">
+        </li>
+        <li class="step" data-n="3">
           <div class="step-body">
             <h4>簽署借址服務合約，取得地址同意書</h4>
             <p>與商務中心簽署服務合約後，取得地址同意書或出租同意書，這份文件是向主管機關申請公司設立登記時的必要附件。</p>
           </div>
-        </div>
-        <div class="step" data-n="4">
+        </li>
+        <li class="step" data-n="4">
           <div class="step-body">
             <h4>向主管機關辦理公司設立登記</h4>
             <p>備妥所有文件後，向桃園市政府或經濟部（視公司資本額而定）提出公司設立登記申請。審核時間約 1 至 3 週。</p>
@@ -264,14 +265,14 @@ function loadGtagLib(){
               <li>資本額 500 萬元以上，由經濟部商業司受理</li>
             </ul>
           </div>
-        </div>
-        <div class="step" data-n="5">
+        </li>
+        <li class="step" data-n="5">
           <div class="step-body">
             <h4>完成稅籍登記，取得統一編號</h4>
             <p>公司設立登記核准後，前往桃園國稅局辦理稅籍登記，取得統一編號，即可正式開始營業。</p>
           </div>
-        </div>
-      </div>
+        </li>
+      </ol>
 
       <h3>辦理中壢借址登記，有哪些常見注意事項？</h3>
       <p>根據我們協助客戶辦理的經驗，以下幾點是最常被忽略卻很重要的細節：</p>

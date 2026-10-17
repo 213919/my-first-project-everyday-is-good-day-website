@@ -60,6 +60,13 @@ h1{margin:16px 0 12px;font-size:clamp(34px,4.6vw,52px);line-height:1.2;letter-sp
 .compare-row:first-child{border-top:none}
 .compare-row .label{background:#fcf8f3;padding:16px 18px;font-weight:700;color:#5a4331}
 .compare-row .value{padding:16px 18px;color:var(--sub)}
+.compare-3col{margin:26px 0;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff;width:100%;border-collapse:collapse}
+.compare-3col thead tr{display:grid;grid-template-columns:140px 1fr 1fr;background:#fcf8f3;border-bottom:1px solid var(--line)}
+.compare-3col thead th{padding:14px 16px;font-weight:700;color:#5a4331;font-size:15px;text-align:left}
+.compare-3col tbody tr{display:grid;grid-template-columns:140px 1fr 1fr;border-top:1px solid var(--line)}
+.compare-3col tbody td{padding:14px 16px;color:var(--sub);font-size:15px}
+.compare-3col tbody th{padding:14px 16px;background:#fdf9f5;font-weight:700;color:#5a4331;text-align:left;font-size:15px}
+@media (max-width:720px){.compare-3col thead tr,.compare-3col tbody tr{grid-template-columns:1fr}}
 .aside{position:sticky;top:20px;display:grid;gap:18px}
 .aside-card{padding:24px}
 .aside-card h4{margin:0 0 12px;font-size:18px;color:#2D5016}
@@ -173,6 +180,7 @@ function loadGtagLib(){
       <h1>公司登記地址可以用住家嗎？借址登記差在哪？</h1>
       <time datetime="2026-06-11" class="article-date" style="display:block;font-size:.82rem;color:var(--text-light);margin:4px 0 12px;letter-spacing:.04em;">2026 年 6 月 11 日</time>
       <p class="lead">住家地址登記公司，技術上可行，但有哪些風險與限制？和借址登記相比，差異遠不只是地址不同而已。</p>
+      <p>用住家地址登記公司技術上可行，但可能影響房屋稅／地價稅，也會把個人住址曝光在公開的公司登記資料上；借址登記則是用合法商業地址取代，費用新台幣 1,680 元起／月，服務範圍涵蓋中壢、青埔、新竹、桃園與新北。</p>
       <div class="hero-meta">
         <span class="meta-chip">主題：登記地址比較</span>
         <span class="meta-chip">關鍵字：住家地址登記</span>
@@ -225,14 +233,23 @@ function loadGtagLib(){
       </ul>
 
       <h3>住家地址 vs <a href="address-registration.html" style="color:var(--brand);font-weight:600;">借址登記</a>：完整比較</h3>
-      <div class="compare">
-        <div class="compare-row"><div class="label">費用</div><div class="value">住家地址：幾乎零成本。借址登記：年費約兩萬到兩萬二，可列入公司費用申報。</div></div>
-        <div class="compare-row"><div class="label">隱私保護</div><div class="value">住家地址：居住地點完全公開。借址登記：個人住址不對外揭露，有效保護隱私。</div></div>
-        <div class="compare-row"><div class="label">合法性</div><div class="value">住家地址：需確認建築用途及社區規約。借址登記：透過合法商務中心，地址合規性有保障。</div></div>
-        <div class="compare-row"><div class="label">形象</div><div class="value">住家地址：住宅地址形象較弱，部分客戶可能有疑慮。借址登記：商業地址形象專業，提升客戶信任感。</div></div>
-        <div class="compare-row"><div class="label">搬家影響</div><div class="value">住家地址：搬家需辦理地址變更。借址登記：個人搬家不影響公司地址，行政穩定性高。</div></div>
-        <div class="compare-row"><div class="label">郵件處理</div><div class="value">住家地址：郵件直接送到住家。借址登記：商務中心代收，通知後轉寄，不漏件。</div></div>
-      </div>
+      <table class="compare-3col">
+        <thead>
+        <tr>
+          <th scope="col">比較項目</th>
+          <th scope="col">住家地址</th>
+          <th scope="col">借址登記</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr><th scope="row">費用</th><td>幾乎零成本</td><td>年費約兩萬到兩萬二，可列入公司費用申報</td></tr>
+        <tr><th scope="row">隱私保護</th><td>居住地點完全公開</td><td>個人住址不對外揭露，有效保護隱私</td></tr>
+        <tr><th scope="row">合法性</th><td>需確認建築用途及社區規約</td><td>透過合法商務中心，地址合規性有保障</td></tr>
+        <tr><th scope="row">形象</th><td>住宅地址形象較弱，部分客戶可能有疑慮</td><td>商業地址形象專業，提升客戶信任感</td></tr>
+        <tr><th scope="row">搬家影響</th><td>搬家需辦理地址變更</td><td>個人搬家不影響公司地址，行政穩定性高</td></tr>
+        <tr><th scope="row">郵件處理</th><td>郵件直接送到住家</td><td>商務中心代收，通知後轉寄，不漏件</td></tr>
+        </tbody>
+      </table>
 
       <div class="cta" style="margin:32px 0;">
         <h3>想改用商業地址登記公司？</h3>

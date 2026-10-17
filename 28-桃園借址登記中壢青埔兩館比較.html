@@ -75,14 +75,14 @@ h1{margin:16px 0 12px;font-size:clamp(34px,4.6vw,52px);line-height:1.2;letter-sp
 .checklist{list-style:none;padding:0;margin:0 0 18px}
 .checklist li{display:flex;align-items:flex-start;gap:10px;font-size:17px;color:var(--sub);margin-bottom:12px;padding:14px 16px;background:#fffaf5;border-radius:14px;border:1px solid var(--line)}
 .checklist li::before{content:"✓";flex-shrink:0;width:22px;height:22px;border-radius:50%;background:var(--brand);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
-.compare-3col{margin:26px 0;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff}
-.compare-3col .c-head{display:grid;grid-template-columns:160px 1fr 1fr;background:#fcf8f3;border-bottom:1px solid var(--line)}
-.compare-3col .c-head div{padding:14px 16px;font-weight:700;color:#5a4331;font-size:15px}
-.compare-3col .c-row{display:grid;grid-template-columns:160px 1fr 1fr;border-top:1px solid var(--line)}
-.compare-3col .c-row div{padding:14px 16px;color:var(--sub);font-size:15px}
-.compare-3col .c-row .c-label{background:#fdf9f5;font-weight:700;color:#5a4331}
+.compare-3col{margin:26px 0;border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff;width:100%;border-collapse:collapse}
+.compare-3col thead tr{display:grid;grid-template-columns:160px 1fr 1fr;background:#fcf8f3;border-bottom:1px solid var(--line)}
+.compare-3col thead th{padding:14px 16px;font-weight:700;color:#5a4331;font-size:15px;text-align:left}
+.compare-3col tbody tr{display:grid;grid-template-columns:160px 1fr 1fr;border-top:1px solid var(--line)}
+.compare-3col tbody td{padding:14px 16px;color:var(--sub);font-size:15px}
+.compare-3col tbody th{padding:14px 16px;background:#fdf9f5;font-weight:700;color:#5a4331;text-align:left;font-size:15px}
 @media (max-width:980px){.hero-grid,.content-grid{grid-template-columns:1fr}.aside{position:static}}
-@media (max-width:720px){.hero{padding-top:42px}.hero-copy,.article{padding:26px}.split-note{grid-template-columns:1fr}.compare-row{grid-template-columns:1fr}.compare-3col .c-head,.compare-3col .c-row{grid-template-columns:1fr}}
+@media (max-width:720px){.hero{padding-top:42px}.hero-copy,.article{padding:26px}.split-note{grid-template-columns:1fr}.compare-row{grid-template-columns:1fr}.compare-3col thead tr,.compare-3col tbody tr{grid-template-columns:1fr}}
 </style>
 <style>
 .article-back-wrap{max-width:var(--max);margin:0 auto;padding:18px 24px 0;}
@@ -183,6 +183,7 @@ function loadGtagLib(){
       <h1>桃園借址登記推薦：中壢館 vs 青埔館，哪個適合你？</h1>
       <time datetime="2026-06-11" class="article-date" style="display:block;font-size:.82rem;color:var(--text-light);margin:4px 0 12px;letter-spacing:.04em;">2026 年 6 月 11 日</time>
       <p class="lead">同樣是桃園的借址登記服務，中壢延平路館與青埔高鐵館各有不同優勢。這篇從地點、交通、適合族群六個維度逐一比較，幫你選對最符合需求的館別。</p>
+      <p>簡單說：中壢館交通便利、生活機能完整，適合以桃園本地為主要市場的業主；青埔館鄰近高鐵桃園站，適合頻繁往來雙北或接待外縣市客戶的創業者。兩館借址登記皆合法可行，服務範圍並涵蓋新竹、桃園與新北。</p>
       <div class="hero-meta">
         <span class="meta-chip">主題：借址登記</span>
         <span class="meta-chip">關鍵字：桃園借址</span>
@@ -274,43 +275,47 @@ function loadGtagLib(){
       <h2>中壢 vs 青埔：六大比較維度</h2>
       <p>以下用六個最常被詢問的維度，直接比較兩館的差異：</p>
 
-      <div class="compare-3col">
-        <div class="c-head">
-          <div>比較維度</div>
-          <div>中壢延平路館</div>
-          <div>青埔館</div>
-        </div>
-        <div class="c-row">
-          <div class="c-label">地點特色</div>
-          <div>市中心主要幹道，商辦林立，熱鬧便利</div>
-          <div>新興商業特定區，航空城計畫核心，發展潛力強</div>
-        </div>
-        <div class="c-row">
-          <div class="c-label">交通便利性</div>
-          <div>開車約五分鐘可達台鐵中壢站</div>
-          <div>開車約五分鐘可達高鐵桃園站，連結全台高速鐵路</div>
-        </div>
-        <div class="c-row">
-          <div class="c-label">地址形象</div>
-          <div>穩重傳統，適合本地企業往來</div>
-          <div>現代新穎，適合跨城市或國際業務</div>
-        </div>
-        <div class="c-row">
-          <div class="c-label">停車便利性</div>
-          <div>周邊停車場多，但尖峰時段需提前找位</div>
-          <div>周邊空間較新、停車場規劃完善，停車較易</div>
-        </div>
-        <div class="c-row">
-          <div class="c-label">生活機能</div>
-          <div>銀行、餐廳、便利商店等一應俱全，成熟生活圈</div>
-          <div>新興商業區，餐廳與商業設施持續增加中</div>
-        </div>
-        <div class="c-row">
-          <div class="c-label">費用參考</div>
-          <div>年費約 20,000–22,000 元（依方案）</div>
-          <div>年費約 20,000–22,000 元（依方案）</div>
-        </div>
-      </div>
+      <table class="compare-3col">
+        <thead>
+        <tr>
+          <th scope="col">比較維度</th>
+          <th scope="col">中壢延平路館</th>
+          <th scope="col">青埔館</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <th scope="row">地點特色</th>
+          <td>市中心主要幹道，商辦林立，熱鬧便利</td>
+          <td>新興商業特定區，航空城計畫核心，發展潛力強</td>
+        </tr>
+        <tr>
+          <th scope="row">交通便利性</th>
+          <td>開車約五分鐘可達台鐵中壢站</td>
+          <td>開車約五分鐘可達高鐵桃園站，連結全台高速鐵路</td>
+        </tr>
+        <tr>
+          <th scope="row">地址形象</th>
+          <td>穩重傳統，適合本地企業往來</td>
+          <td>現代新穎，適合跨城市或國際業務</td>
+        </tr>
+        <tr>
+          <th scope="row">停車便利性</th>
+          <td>周邊停車場多，但尖峰時段需提前找位</td>
+          <td>周邊空間較新、停車場規劃完善，停車較易</td>
+        </tr>
+        <tr>
+          <th scope="row">生活機能</th>
+          <td>銀行、餐廳、便利商店等一應俱全，成熟生活圈</td>
+          <td>新興商業區，餐廳與商業設施持續增加中</td>
+        </tr>
+        <tr>
+          <th scope="row">費用參考</th>
+          <td>年費約 20,000–22,000 元（依方案）</td>
+          <td>年費約 20,000–22,000 元（依方案）</td>
+        </tr>
+        </tbody>
+      </table>
 
       <h2>如何選擇適合你的館別</h2>
       <p>根據業務類型，以下提供選館建議：</p>
