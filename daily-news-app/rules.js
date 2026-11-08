@@ -17,7 +17,7 @@
   const TIER = {
     main:   { label: '主要來源', w: 3, maxAgeH: 72 },
     bg:     { label: '補充背景', w: 2, maxAgeH: 72 },
-    local:  { label: '中文來源', w: 1, maxAgeH: 72 },
+    local:  { label: '中文來源', w: 1.5, maxAgeH: 72 },
     origin: { label: '原始資料', w: 2, maxAgeH: 24 * 7 },
     check:  { label: '事實查核', w: 1, maxAgeH: 24 * 21 }
   };
@@ -26,25 +26,31 @@
   const GN = (q, zh) => 'https://news.google.com/rss/search?q=' + encodeURIComponent(q) +
     (zh ? '&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' : '&hl=en-US&gl=US&ceid=US:en');
 
-  /* url：主要網址；alt：主要網址失敗時的備援；gn：Google 新聞（只有標題）；mixed：依內容再分板塊；exclude：不收的標題 */
+  /* 天氣、意外等與國際情勢無關的新聞不收 */
+  const WEATHER = /颱風|地震|豪雨|大雨|天氣|氣溫|寒流|冷氣團|鋒面|車禍|火警|火災|停水|停電|登革熱|流感/;
+  /* url：主要網址；alt：失敗時的備援；gn：Google 新聞（只有標題，只用來交叉查證）；mixed：依內容再分板塊；exclude：不收的標題 */
   const SOURCES = [
+    /* 有內文的來源：逐字稿的內容來自這些 */
+    { id: 'bbc',          name: 'BBC',          tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://feeds.bbci.co.uk/zhongwen/trad/rss.xml' },
+    { id: 'cna-world',    name: '中央社',       tier: 'local',  cat: '全球政治', mixed: true, url: 'https://feeds.feedburner.com/rsscna/intworld', exclude: WEATHER },
+    { id: 'cna-fin',      name: '中央社',       tier: 'local',  cat: '全球經濟', mixed: true, url: 'https://feeds.feedburner.com/rsscna/finance', exclude: WEATHER },
+    { id: 'npr-world',    name: 'NPR',          tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://feeds.npr.org/1004/rss.xml' },
+    { id: 'npr-biz',      name: 'NPR',          tier: 'bg',     cat: '全球經濟', mixed: true, url: 'https://feeds.npr.org/1006/rss.xml' },
+    { id: 'npr-tech',     name: 'NPR',          tier: 'bg',     cat: '全球科技', mixed: true, url: 'https://feeds.npr.org/1019/rss.xml' },
+    { id: 'aje',          name: '半島電視台',   tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://www.aljazeera.com/xml/rss/all.xml' },
+    { id: 'france24',     name: '法國24',       tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://www.france24.com/en/rss' },
+    { id: 'dw',           name: '德國之聲',     tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://rss.dw.com/rdf/rss-chi-all' },
+    { id: 'un',           name: '聯合國',       tier: 'origin', cat: '全球政治', mixed: true, url: 'https://news.un.org/feed/subscribe/en/news/all/rss.xml' },
+    { id: 'un-econ',      name: '聯合國',       tier: 'origin', cat: '全球經濟', mixed: true, url: 'https://news.un.org/feed/subscribe/en/news/topic/economic-development/feed/rss.xml' },
+    { id: 'technews',     name: '科技新報',     tier: 'local',  cat: '全球科技', mixed: true, url: 'https://technews.tw/feed/' },
+    { id: 'pts',          name: '公視新聞',     tier: 'local',  cat: '對台灣的影響', url: 'https://news.pts.org.tw/xml/newsfeed.xml', exclude: WEATHER },
+    /* 只有標題：不單獨播報，用來交叉查證，並讓多家都報導的新聞排得更前面 */
     { id: 'reuters',      name: '路透社',       tier: 'main',   cat: '全球政治', mixed: true, gn: true, url: GN('site:reuters.com/world when:2d') },
     { id: 'reuters-biz',  name: '路透社',       tier: 'main',   cat: '全球經濟', mixed: true, gn: true, url: GN('site:reuters.com/business when:2d') },
     { id: 'reuters-tech', name: '路透社',       tier: 'main',   cat: '全球科技', mixed: true, gn: true, url: GN('site:reuters.com/technology when:2d') },
     { id: 'reuters-tw',   name: '路透社',       tier: 'main',   cat: '對台灣的影響', gn: true, url: GN('site:reuters.com Taiwan when:3d') },
     { id: 'ap',           name: '美聯社',       tier: 'main',   cat: '全球政治', mixed: true, gn: true, url: GN('site:apnews.com/article when:2d') },
-    { id: 'ap-tw',        name: '美聯社',       tier: 'main',   cat: '對台灣的影響', gn: true, url: GN('site:apnews.com Taiwan when:3d') },
-    { id: 'bbc',          name: 'BBC',          tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://feeds.bbci.co.uk/zhongwen/trad/rss.xml' },
-    { id: 'npr',          name: 'NPR',          tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://feeds.npr.org/1004/rss.xml' },
-    { id: 'aje',          name: '半島電視台',   tier: 'bg',     cat: '全球政治', mixed: true, url: 'https://www.aljazeera.com/xml/rss/all.xml' },
-    { id: 'technews',     name: '科技新報',     tier: 'local',  cat: '全球科技', url: 'https://technews.tw/feed/' },
-    { id: 'cna-tw',       name: '中央社',       tier: 'local',  cat: '對台灣的影響', gn: true, url: GN('site:cna.com.tw (影響 OR 衝擊) when:2d', true),
-      exclude: /颱風|地震|豪雨|大雨|天氣|氣溫|寒流|冷氣團|鋒面|車禍|火警|火災|停水|停電/ },
-    { id: 'un',           name: '聯合國',       tier: 'origin', cat: '全球政治', mixed: true, url: 'https://news.un.org/feed/subscribe/en/news/all/rss.xml', alt: GN('site:news.un.org when:3d') },
-    { id: 'imf',          name: '國際貨幣基金', tier: 'origin', cat: '全球經濟', gn: true, url: GN('site:imf.org/en/News when:7d') },
-    { id: 'worldbank',    name: '世界銀行',     tier: 'origin', cat: '全球經濟', gn: true, url: GN('site:worldbank.org/en/news when:7d') },
-    { id: 'wto',          name: '世界貿易組織', tier: 'origin', cat: '全球經濟', url: 'https://www.wto.org/library/rss/latest_news_e.xml', alt: GN('site:wto.org when:7d') },
-    { id: 'mofa-tw',      name: '我國外交部',   tier: 'origin', cat: '對台灣的影響', gn: true, url: GN('site:mofa.gov.tw when:7d', true) }
+    { id: 'cna-tw',       name: '中央社',       tier: 'local',  cat: '對台灣的影響', gn: true, url: GN('site:cna.com.tw (影響 OR 衝擊) when:2d', true), exclude: WEATHER }
   ];
 
   /* ---------- 小工具 ---------- */
@@ -95,7 +101,9 @@
 
   /* ---------- 分類（四大板塊） ----------
      標題提到台灣 → 對台灣的影響；其他依內容分全球科技、全球經濟、全球政治 */
-  const TW_ZH = /台灣|臺灣|台海|兩岸|對台|台美|美台|台日|台歐|國台辦|台積電/;
+  const TW_ZH = /台灣|臺灣|台海|兩岸|對台|台美|美台|台日|台歐|國台辦|台積電|台股|新台幣|行政院|立法院|經濟部|金管會|主計總處|國發會|國防部|陸委會/;
+  /* 在地來源歸到「對台灣的影響」時，需與國際情勢有關（排除純國內新聞） */
+  const GLOBAL = /美國|美方|中國|大陸|中共|北京|日本|韓國|歐盟|歐洲|俄羅斯|烏克蘭|中東|關稅|出口|進口|外銷|國際|全球|世界|聯準會|美股|美元|半導體|晶片|供應鏈|兩岸|外交|美中|川普|國防|軍演|制裁|地緣|戰爭|台積電/;
   const TW_EN = /\b(Taiwan|Taiwanese|Taipei|TSMC)\b/i;
   const TECH_ZH = /科技|晶片|半導體|人工智慧|輝達|蘋果|谷歌|微軟|特斯拉|手機|電動車|太空|衛星|資安|網路攻擊|駭客|演算法|機器人|量子|雲端|軟體|社群媒體|抖音|AI|OpenAI|Google|Meta|TikTok/;
   const TECH_EN = /\b(tech|technology|chips?|chipmakers?|semiconductors?|AI|artificial intelligence|Nvidia|Apple|Google|Alphabet|Microsoft|Meta|OpenAI|Tesla|smartphones?|electric vehicles?|EVs?|satellites?|space|cyber\w*|hack\w*|robot\w*|quantum|cloud|software|TikTok|social media)\b/i;
@@ -136,7 +144,7 @@
   /* 新聞來源之間合併成同一則；官方發布與事實查核保持獨立，只互相列為相關報導 */
   function cluster(items) {
     const news = items.filter(x => NEWS_TIERS.includes(x.tier))
-      .sort((a, b) => TIER[b.tier].w - TIER[a.tier].w || (b.summary ? 1 : 0) - (a.summary ? 1 : 0) || b.time - a.time);
+      .sort((a, b) => (b.summary ? 1 : 0) - (a.summary ? 1 : 0) || TIER[b.tier].w - TIER[a.tier].w || b.time - a.time);
     const groups = [];
     for (const it of news) {
       let best = null, lvl = 0;
@@ -159,7 +167,11 @@
 
   /* 排序：主要來源、多家來源、較新者優先 */
   const IMPACT = /影響|衝擊|波及|受惠|關稅|出口|供應鏈|半導體|晶片|美中|制裁|軍演|國防|外交|安全/;
-  function score(a, now) { const ageH = a.time ? (now - a.time) / 3600e3 : 48; return TIER[a.tier].w + (a.related && a.related.length ? 2 : 0) + 2 * Math.max(0, 1 - ageH / 48) + (a.category === '對台灣的影響' && IMPACT.test(a.title || '') ? 1 : 0); }
+  function score(a, now) {
+    const ageH = a.time ? (now - a.time) / 3600e3 : 48, rel = a.related || [];
+    const others = new Set(rel.map(r => r.source)).size, wire = rel.some(r => r.tier === 'main');
+    return TIER[a.tier].w + Math.min(3, others * 1.5) + (wire ? 1.5 : 0) + 2 * Math.max(0, 1 - ageH / 36) + (a.category === '對台灣的影響' && IMPACT.test(a.title || '') ? 1 : 0);
+  }
   function rank(items, now) { now = now || Date.now(); return items.slice().sort((a, b) => score(b, now) - score(a, now) || b.time - a.time); }
   /* 依四大板塊順序，各取前 n 則 */
   function topPerCat(list, n) { const out = []; CATS.forEach(c => out.push(...list.filter(a => a.category === c).slice(0, n || PER_CAT))); return out; }
@@ -231,7 +243,7 @@
       let img = xmlAttr(b, 'media:thumbnail', 'url') || xmlAttr(b, 'media:content', 'url');
       const enc = b.match(/<enclosure\s[^>]*>/i);
       if (!img && enc && /type=["']image\//i.test(enc[0])) img = (enc[0].match(/url=["']([^"']+)["']/i) || [])[1] || '';
-      return { title: xmlTag(b, 'title'), description: xmlTag(b, 'description') || xmlTag(b, 'content:encoded'),
+      return { title: xmlTag(b, 'title'), description: xmlTag(b, 'description') || xmlTag(b, 'content:encoded'), content: xmlTag(b, 'content:encoded'),
         link: decodeEntities(xmlTag(b, 'link') || xmlTag(b, 'guid')).trim(), pubDate: xmlTag(b, 'pubDate') || xmlTag(b, 'dc:date'), thumbnail: decodeEntities(img) };
     });
   }
@@ -250,12 +262,28 @@
     return /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : '';
   }
   const bare = x => String(x || '').replace(/[^\p{L}\p{N}]/gu, '');
+  const BOILER = [/The post .*? appeared first on .*$/i, /Continue reading.*$/i, /Read more.*$/i, /閱讀全文.*$/, /\[(…|\.\.\.)\]/g, /^（中央社[^）]{0,40}）/, /^\(?(AP|Reuters|AFP)\)?\s*[—–-]\s*/];
+  function trimSummary(t, max) {
+    t = BOILER.reduce((s, r) => s.replace(r, ''), String(t || '')).replace(/\s+/g, ' ').trim();
+    if (t.length <= max) return t;
+    const parts = t.match(/[^。！？!?.]+(?:[。！？!?.]+["」』”’）)]*)?\s*/g) || [t];
+    let out = '';
+    for (const p of parts) { if ((out + p).length > max) break; out += p; }
+    return (out || t.slice(0, max)).trim();
+  }
+  /* 描述與全文擇一：全文明顯較長時用全文的前段 */
+  function pickSummary(desc, full, zh) {
+    const max = zh ? 280 : 520;
+    const d = trimSummary(desc, max), f = trimSummary(full, max);
+    return f.length > d.length + 40 ? f : d;
+  }
   /* 單一來源的 RSS 項目 → 待翻譯的新聞資料（太舊、評論文章不收） */
   function normalize(src, items, gn, now) {
     now = now || Date.now();
     const maxAge = TIER[src.tier].maxAgeH * 3600e3, out = [];
     for (const i of (items || []).slice(0, 10)) {
-      let title = cleanText(i.title), summary = gn ? '' : cleanText(i.description || i.content).slice(0, 320);
+      let title = cleanText(i.title), summary = '';
+      if (!gn) { const desc = cleanText(i.description), full = cleanText(i.content); summary = pickSummary(desc || full, full, HAS_ZH.test(title)); }
       const link = String(i.link || i.guid || '').trim();
       if (gn) title = stripGnSuffix(title);
       if (!title || !/^https?:\/\//i.test(link)) continue;
@@ -308,10 +336,15 @@
       a.sensitive = sensitiveOf(a.title + ' ' + a.summary, it.sl === 'en' ? it.titleOrig + ' ' + it.summaryOrig : '');
       list.push(a);
     }
-    return { list: topPerCat(rank(cluster(list))), untranslated, judged };
+    const full = cluster(list).filter(a => {
+      if (!a.summary || bare(a.summary).length < 20) return false; /* 只有標題、沒有內文的不播報 */
+      if (a.category === '對台灣的影響' && a.tier === 'local' && !GLOBAL.test(a.title + ' ' + a.summary)) return false;
+      return true;
+    });
+    return { list: topPerCat(rank(full)), untranslated, judged, headlineOnly: list.length - full.length };
   }
 
-  const api = { CATS, PER_CAT, topPerCat, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
+  const api = { CATS, PER_CAT, topPerCat, trimSummary, pickSummary, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
     bigrams, sameStory, cluster, rank, splitSentences, buildScript, parseGtx,
     decodeEntities, cleanText, parseFeed, parseDate, pickImg, normalize, trKey, translationJobs, chunkJobs, gtxURL, gtxLines, finalize };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.NewsRules = api;

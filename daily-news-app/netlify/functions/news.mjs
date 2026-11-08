@@ -74,8 +74,8 @@ export default async (req) => {
   }));
   if (memo.size > 3000) [...memo.keys()].slice(0, memo.size - 2000).forEach(k => memo.delete(k));
 
-  const { list, untranslated, judged } = R.finalize(raw, (sl, t) => memo.get(R.trKey(sl, t)));
-  const body = { updated: Date.now(), articles: list, sources, untranslated, judged, translate: { total, failed }, ms: Date.now() - start };
+  const { list, untranslated, judged, headlineOnly } = R.finalize(raw, (sl, t) => memo.get(R.trKey(sl, t)));
+  const body = { updated: Date.now(), articles: list, sources, untranslated, judged, headlineOnly, translate: { total, failed }, ms: Date.now() - start };
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
