@@ -6,13 +6,7 @@
 按播放會依序播完四個板塊；每個板塊開頭會唸一句「接下來是…」。
 往下滑可看各板塊圖卡，左右滑動；點圖卡播那一則，「全部播放」播整個板塊。
 右上角 ⟳ 重新整理。
-
-【用 iPhone 的 Siri 聲音聽】
-iPhone 不開放網頁使用 Siri 聲音，播放器本身用系統國語語音。
-按「🎧 改用 iPhone 的 Siri 聲音朗讀」會打開今日新聞稿，再用：
-- Safari 網址列旁的選單（「大小」或「⋯」）→「聆聽頁面」（鎖定螢幕也能聽），或
-- 「設定 → 輔助使用 → 語音內容 → 朗讀螢幕」開啟後，兩指從螢幕頂端往下滑。
-從主畫面 App 開啟時，新聞稿頁右上角有「在 Safari 開啟」。
+主畫面圖示更新：若之前已加到主畫面，請先刪除舊圖示，再用 Safari「分享 → 加入主畫面」重新加入。
 
 【更新網站】
 建議連結 GitHub（新聞由伺服器整理，最快最穩）：
@@ -22,5 +16,5 @@ Base directory 填 daily-news-app。
 或把解壓縮後的資料夾拖到 Netlify「Deploys」頁面（index.html 要在最外層）。
 
 【檔案】
-index.html 播放器｜listen.html 新聞稿頁｜rules.js 新聞來源與整理規則（增減來源、調整分類改這個檔）
+index.html 播放器｜rules.js 新聞來源與整理規則（增減來源、調整分類改這個檔）
 netlify/functions/news.mjs 伺服器整理新聞｜netlify.toml、manifest.webmanifest、sw.js、_headers、icons/ 設定

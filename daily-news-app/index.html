@@ -4,184 +4,201 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,follow">
-<meta name="theme-color" content="#1b1e24">
+<meta name="theme-color" content="#121212">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
-<link rel="icon" type="image/png" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="聲讀">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="format-detection" content="telephone=no">
-<title>聲讀｜每日全球政經科技</title>
+<title>聲讀｜每日全球重點</title>
 <style>
-:root{color-scheme:dark;--bg:#1b1e24;--card:#363c46;--sheet:#2b3038;--fg:#fff;--mute:#aeb6c0;--line:#ffffff1f;--accent:#9fd3e6}
+@property --c1{syntax:'<color>';inherits:true;initial-value:#22305a}
+@property --c2{syntax:'<color>';inherits:true;initial-value:#1ed760}
+@property --l{syntax:'<color>';inherits:true;initial-value:#3b4f8f}
+:root{color-scheme:dark;--c1:#22305a;--c2:#1ed760;--l:#3b4f8f;--bg:#121212;--fg:#fff;--mute:#b3b3b3;--green:#1ed760;transition:--c1 .9s ease,--c2 .9s ease,--l .9s ease}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px system-ui,-apple-system,"PingFang TC","Noto Sans TC",sans-serif}
+html{-webkit-text-size-adjust:100%;background:var(--bg)}
+body{position:relative;margin:0;color:var(--fg);font:16px/1.5 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang TC","Noto Sans TC",sans-serif;min-height:100vh;overflow-x:hidden}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0;touch-action:manipulation;-webkit-user-select:none;user-select:none}
-input{font:inherit;color:inherit}
+input{font:inherit}
 button:disabled{opacity:.5;cursor:default}
 button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:8px}
-a{color:#c6e7ff}
 svg{display:block;fill:currentColor}
-.ico{width:26px;height:26px}
-.shell{max-width:460px;margin:0 auto;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
 
-/* ---------- 播放器 ---------- */
-.player{background:var(--card);border-radius:26px;padding:14px 20px 12px;display:flex;flex-direction:column;gap:12px;box-shadow:0 20px 60px #0007}
-.top{display:flex;justify-content:space-between;align-items:center}
-.top button{padding:6px;border-radius:10px}
-.brand{font-size:13px;color:var(--mute);letter-spacing:2px}
-.chev{transition:transform .2s}
+/* 背景：依目前板塊變色，往下漸層融入深色（像 Spotify 的專輯色） */
+.backdrop{position:absolute;top:0;left:0;right:0;height:min(1150px,150vh);z-index:-1;background:var(--c1);overflow:hidden;pointer-events:none}
+.backdrop::before{content:'';position:absolute;width:130vw;height:130vw;max-width:980px;max-height:980px;right:-45vw;top:-55vw;border-radius:50%;background:radial-gradient(circle,var(--c2) 0%,transparent 66%);opacity:.6}
+.backdrop::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(18,18,18,.12) 0%,rgba(18,18,18,.72) 34%,#121212 64%)}
+.shell{max-width:480px;margin:0 auto;padding:max(8px,env(safe-area-inset-top)) 16px calc(104px + env(safe-area-inset-bottom))}
+
+/* ---------- 正在播放 ---------- */
+.np-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;margin:2px 0 14px}
+.ibtn{width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
+.ibtn svg{width:26px;height:26px}
+.chev{transition:transform .25s}
 .compact-on .chev{transform:rotate(180deg)}
 .spin svg{animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
-.paper{position:relative;border-radius:24px;background:linear-gradient(#fff,#eaeef2);color:#11151a;display:flex;flex-direction:column;overflow:hidden;-webkit-touch-callout:none}
-.tagrow{padding:14px 18px 0;display:flex;gap:8px;align-items:center;min-height:30px;font-size:12px}
-.tag{display:inline-block;padding:1px 9px;border-radius:99px;border:1px solid currentColor}
-.t-全球政治{color:#b4452f}.t-全球經濟{color:#9a6b00}.t-全球科技{color:#2b64b0}.t-對台灣的影響{color:#2c7a4b}
-.script{position:relative;height:280px;height:clamp(170px,calc(100dvh - 450px),380px);overflow:auto;overscroll-behavior:contain;padding:10px 18px 14px;scroll-behavior:smooth;
-  -webkit-mask-image:linear-gradient(transparent,#000 10px,#000 calc(100% - 12px),transparent);mask-image:linear-gradient(transparent,#000 10px,#000 calc(100% - 12px),transparent)}
-.compact-on .script{height:110px}
-.para{margin:0 0 12px;font-size:19px;line-height:1.75;font-weight:600;color:#7a838e}
-.plabel{display:block;font-size:11.5px;font-weight:600;letter-spacing:1px;color:#a0a8b1;margin-bottom:1px}
-.s{cursor:pointer;transition:color .2s}
-.s.past{color:#aab2bb}
-.s.active{color:#4d5763}
-.s.active .r{color:#11151a}
-.para.intro{font-size:15px;font-weight:600;color:#5a6470}
-.para.notice{font-size:15px;line-height:1.6;color:#8a5a00;background:#fff4d6;border-radius:12px;padding:8px 12px}
-.para.notice .s.active,.para.notice .s.active .r{color:#5c3c00}
-.para.source{font-size:15px;line-height:1.6;font-weight:500}
-.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:30px;padding:0 18px 10px;flex:none}
-.wave i{display:block;width:3px;height:100%;border-radius:2px;background:#232a33;transform:scaleY(var(--h));opacity:.5}
-.is-playing .wave i{animation:eq 1s ease-in-out infinite alternate;animation-delay:var(--d);opacity:.9}
-@keyframes eq{from{transform:scaleY(calc(var(--h)*.35))}to{transform:scaleY(var(--h))}}
-.info h1{font-size:17px;line-height:1.45;margin:0;font-weight:650;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.info small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
-.srcs{font-size:12.5px;color:var(--mute);margin-top:3px;white-space:nowrap;overflow-x:auto;scrollbar-width:none}
+.np-title{text-align:center;line-height:1.3}
+.np-title small{display:block;font-size:11px;letter-spacing:.14em;color:rgba(255,255,255,.72)}
+.np-title b{font-size:14.5px;font-weight:700}
+
+/* 逐字稿：像 Spotify 的歌詞卡片 */
+.lyrics{position:relative;border-radius:16px;background:var(--l);box-shadow:0 18px 50px rgba(0,0,0,.45);overflow:hidden;isolation:isolate}
+.lyrics::before{content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(0,0,0,.25))}
+.lyr-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 0;font-size:14px;font-weight:800}
+.lyr-head b{display:flex;align-items:center;gap:8px}
+.lyr-head span{font-size:12.5px;font-weight:700;color:rgba(255,255,255,.72)}
+.eq{display:none;align-items:flex-end;gap:2px;height:12px}
+.eq i{width:3px;height:100%;background:#fff;border-radius:1px;animation:eqb .8s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:.25s}.eq i:nth-child(3){animation-delay:.5s}
+.is-playing .eq{display:flex}
+@keyframes eqb{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+.script{position:relative;height:300px;height:clamp(210px,calc(100dvh - 440px),400px);overflow:auto;overscroll-behavior:contain;padding:10px 18px 26px;scroll-behavior:smooth;
+  -webkit-mask-image:linear-gradient(transparent,#000 12px,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(transparent,#000 12px,#000 calc(100% - 26px),transparent)}
+.compact-on .script{height:132px}
+.para{margin:0 0 14px;font-size:22px;line-height:1.45;font-weight:800;color:rgba(0,0,0,.6)}
+.plabel{display:block;font-size:11.5px;font-weight:800;letter-spacing:.12em;color:rgba(255,255,255,.75);margin-bottom:2px}
+.s{cursor:pointer;transition:color .25s}
+.s.past{color:rgba(255,255,255,.7)}
+.s.active{color:rgba(255,255,255,.78)}
+.s.active .r{color:#fff}
+.para.intro{font-size:15px;color:rgba(255,255,255,.8)}
+.para.notice{font-size:15px;line-height:1.5;color:rgba(255,255,255,.88);background:rgba(0,0,0,.2);border-radius:10px;padding:8px 12px}
+.para.source{font-size:15px;line-height:1.5}
+
+.info{margin-top:22px}
+.info h1{font-size:21px;line-height:1.35;font-weight:800;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.info p{margin:4px 0 0;color:var(--mute);font-size:14.5px}
+.srcs{font-size:13px;color:var(--mute);margin-top:6px;white-space:nowrap;overflow-x:auto;scrollbar-width:none}
 .srcs::-webkit-scrollbar{display:none}
-.srcs a{text-decoration:none}
-input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer}
-input[type=range]::-webkit-slider-runnable-track{height:2px;background:#ffffff80;border-radius:2px}
-input[type=range]::-moz-range-track{height:2px;background:#ffffff80;border-radius:2px}
-input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;margin-top:-5px}
+.srcs a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(255,255,255,.35)}
+.prog{margin-top:16px}
+input[type=range]{--p:0%;-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;background:linear-gradient(90deg,#fff var(--p),rgba(255,255,255,.28) var(--p))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:linear-gradient(90deg,#fff var(--p),rgba(255,255,255,.28) var(--p))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;margin-top:-4px;box-shadow:0 2px 6px rgba(0,0,0,.4)}
 input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#fff}
-.pos{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:-6px}
-.ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
-.ctl .side{justify-self:center;min-width:48px;height:44px;border-radius:12px;color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center}
-.ctl .side[aria-pressed=true]{color:var(--accent)}
-.mid{display:flex;align-items:center;gap:14px}
-.mid .skip{width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
-#play{width:58px;height:58px;border-radius:50%;background:#fff;color:#1b1e24;display:grid;place-items:center}
+.times{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mute);font-variant-numeric:tabular-nums}
+.ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;margin-top:4px}
+.side{position:relative;justify-self:center;width:48px;height:48px;display:grid;place-items:center;color:var(--mute);font-size:14px;font-weight:800}
+.side svg{width:24px;height:24px}
+#loop[aria-pressed=true]{color:var(--green)}
+#loop[aria-pressed=true]::after{content:'';position:absolute;bottom:5px;left:50%;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:var(--green)}
+.mid{display:flex;align-items:center;gap:22px}
+.skip{width:48px;height:48px;display:grid;place-items:center}
+.skip svg{width:34px;height:34px}
+#play{width:66px;height:66px;border-radius:50%;background:#fff;color:#000;display:grid;place-items:center;box-shadow:0 8px 24px rgba(0,0,0,.35);transition:transform .1s}
+#play:active{transform:scale(.95)}
 #play svg{width:30px;height:30px}
-.siri{align-self:center;font-size:13px;color:var(--accent);padding:2px 8px}
-.status{font-size:12.5px;line-height:1.7;margin:0;color:#ffd88a}
+.status{font-size:12.5px;line-height:1.6;margin:6px 0 0;text-align:center;color:#ffd88a}
 .status:empty{display:none}
 
-/* ---------- 四大板塊（每列左右滑動） ---------- */
-.news{margin-top:24px}
-.news-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:0 2px 4px}
-.news-head h2{font-size:21px;margin:0}
-.news-head small{color:var(--mute);font-size:12.5px}
-.shelf{margin:18px 0 2px}
-.shelf-head{display:flex;align-items:center;gap:8px;margin:0 2px 8px}
-.shelf-head b{font-size:17px}
-.shelf-head .all{margin-left:auto;color:var(--accent);font-size:13.5px;font-weight:600;padding:6px 2px}
-.dot{width:9px;height:9px;border-radius:50%;flex:none}
-.d-全球政治{background:#ffb4a2}.d-全球經濟{background:#ffd88a}.d-全球科技{background:#9cc9ff}.d-對台灣的影響{background:#9fe0b4}
-.track{position:relative;display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:12px;padding:4px 12px 12px;margin:0 -12px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+/* ---------- 今日重點：四大板塊 ---------- */
+.home{margin-top:34px}
+.home-head{position:sticky;top:0;z-index:5;display:flex;align-items:baseline;justify-content:space-between;margin:0 -16px;padding:max(10px,env(safe-area-inset-top)) 16px 10px;
+  background:rgba(18,18,18,.55);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
+.home-head h2{margin:0;font-size:24px;font-weight:800}
+.home-head small{color:var(--mute);font-size:12.5px}
+.shelf{margin-top:20px}
+.shelf-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.shelf-head h3{margin:0;font-size:21px;font-weight:800}
+.shelf-head button{color:var(--mute);font-size:13px;font-weight:800;padding:6px 0 6px 10px}
+.track{display:flex;align-items:flex-start;gap:14px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:16px;padding:0 16px 8px;margin:0 -16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .track::-webkit-scrollbar{display:none}
-@media(hover:hover) and (pointer:fine){.track{scrollbar-width:thin;scrollbar-color:#ffffff40 transparent}.track::-webkit-scrollbar{display:block;height:6px}.track::-webkit-scrollbar-thumb{background:#ffffff40;border-radius:3px}}
-.card{flex:0 0 min(74%,280px);scroll-snap-align:start;background:var(--sheet);border:1px solid #ffffff14;border-radius:20px;overflow:hidden;display:flex}
-.card.playing{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
-.card-main{display:flex;flex-direction:column;width:100%;text-align:left}
-.thumb{position:relative;display:block;width:100%;aspect-ratio:16/9;overflow:hidden;background:#3a4250}
-.thumb img{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover}
-.ph{position:absolute;inset:0;display:flex;align-items:flex-end;padding:12px 14px;font-size:20px;font-weight:700;color:#fff}
-.g-全球政治{background:linear-gradient(135deg,#7a3a2c,#3b2433)}
-.g-全球經濟{background:linear-gradient(135deg,#7a5a1f,#3b3022)}
-.g-全球科技{background:linear-gradient(135deg,#2a5590,#22283f)}
-.g-對台灣的影響{background:linear-gradient(135deg,#25664a,#1f3330)}
-.now{position:absolute;z-index:2;right:10px;top:10px;display:none;align-items:center;gap:3px;font-size:11.5px;font-weight:700;padding:3px 10px;border-radius:99px;background:var(--accent);color:#10222b}
-.now i{display:inline-block;width:2px;height:10px;background:currentColor;border-radius:1px;margin-right:1px}
-.card.playing .now{display:flex}
-.is-playing .card.playing .now i{animation:eqs .7s ease-in-out infinite alternate}
-.now i:nth-child(2){animation-delay:.2s}.now i:nth-child(3){animation-delay:.4s}
-@keyframes eqs{from{transform:scaleY(.3)}to{transform:scaleY(1)}}
-.pbtn{position:absolute;z-index:2;right:10px;bottom:10px;width:36px;height:36px;border-radius:50%;background:#fff;color:#1b1e24;display:grid;place-items:center;box-shadow:0 4px 14px #0006}
-.pbtn svg{width:19px;height:19px}
-.cbody{display:block;padding:10px 14px 14px}
-.cmeta{display:block;font-size:12px;color:var(--mute)}
-.ctitle{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:15.5px;line-height:1.5;font-weight:650;margin:4px 0}
-.csum{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:13px;line-height:1.6;color:#c3cad2}
-.skel{flex-direction:column}
-.skel .thumb,.skel .sk{background:linear-gradient(90deg,#ffffff0d 25%,#ffffff1f 50%,#ffffff0d 75%);background-size:200% 100%;animation:sh 1.2s infinite linear}
-.sk{display:block;height:12px;border-radius:6px;margin:12px 14px}
+.card{flex:0 0 152px;scroll-snap-align:start;text-align:left}
+.cover{position:relative;display:block;width:152px;height:152px;border-radius:8px;overflow:hidden;background:linear-gradient(140deg,var(--a),var(--b));box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.cover::before{content:'';position:absolute;width:125%;height:125%;right:-60%;top:-60%;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.3),transparent 62%)}
+.cover::after{content:'';position:absolute;left:0;right:0;bottom:0;height:62%;z-index:1;background:linear-gradient(0deg,rgba(0,0,0,.5),transparent)}
+.cover img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.kick{position:absolute;z-index:2;left:10px;top:9px;font-size:10.5px;font-weight:800;letter-spacing:.08em;color:rgba(255,255,255,.92)}
+.csrc{position:absolute;z-index:2;left:10px;right:10px;bottom:9px;font-size:19px;font-weight:900;line-height:1.1;color:#fff}
+.pl{position:absolute;z-index:3;right:8px;bottom:8px;width:40px;height:40px;border-radius:50%;background:var(--green);color:#000;display:none;place-items:center;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+.pl svg{width:20px;height:20px}
+.card.playing .pl{display:grid}
+.ctitle{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:14px;line-height:1.4;font-weight:700;margin-top:8px}
+.card.playing .ctitle{color:var(--green)}
+.cmeta{display:block;font-size:12.5px;color:var(--mute);margin-top:2px}
+.k-全球政治{--a:#e13300;--b:#7d1838}
+.k-全球經濟{--a:#e8a10c;--b:#9a3b00}
+.k-全球科技{--a:#4f9bf5;--b:#2b2ab8}
+.k-對台灣的影響{--a:#1ed760;--b:#0a5f5a}
+.skel .cover{background:linear-gradient(90deg,#222 25%,#2e2e2e 50%,#222 75%);background-size:200% 100%;animation:sh 1.2s infinite linear;box-shadow:none}
+.skel .cover::before,.skel .cover::after{display:none}
+.sk{display:block;height:11px;border-radius:6px;margin-top:10px;background:#2a2a2a}
 @keyframes sh{from{background-position:200% 0}to{background-position:-200% 0}}
 .empty{color:var(--mute);text-align:center;padding:30px 0;font-size:14px}
 
-/* ---------- 迷你播放列 ---------- */
-.mini{position:fixed;z-index:15;left:0;right:0;margin:0 auto;bottom:calc(10px + env(safe-area-inset-bottom));width:min(calc(100% - 20px),440px);display:flex;align-items:center;gap:8px;padding:8px 8px 8px 14px;border-radius:18px;background:#2b3038f0;border:1px solid #ffffff1f;box-shadow:0 12px 32px #000a;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);transform:translateY(calc(100% + 40px));visibility:hidden;transition:transform .25s ease,visibility 0s linear .25s}
-.mini.show{transform:none;visibility:visible;transition:transform .25s ease}
-.mini-main{flex:1;min-width:0;text-align:left}
+/* ---------- 迷你播放列（半透明毛玻璃） ---------- */
+.mini{position:fixed;z-index:20;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom));max-width:464px;margin:0 auto;height:62px;display:flex;align-items:center;gap:10px;padding:0 4px 0 8px;border-radius:12px;overflow:hidden;isolation:isolate;
+  background:rgba(36,36,36,.55);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);border:1px solid rgba(255,255,255,.08);box-shadow:0 12px 32px rgba(0,0,0,.5);
+  transform:translateY(150%);visibility:hidden;transition:transform .28s ease,visibility 0s linear .28s}
+.mini::before{content:'';position:absolute;inset:0;z-index:-1;background:var(--c1);opacity:.5}
+.mini.show{transform:none;visibility:visible;transition:transform .28s ease}
+.mcov{width:44px;height:44px;border-radius:6px;flex:none;background:linear-gradient(140deg,var(--a),var(--b));box-shadow:0 4px 10px rgba(0,0,0,.35)}
+.mini-main{flex:1;min-width:0;text-align:left;line-height:1.3}
 .mini-main b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mini-main small{color:var(--mute);font-size:12px}
-.mini .mp{width:42px;height:42px;border-radius:50%;background:#fff;color:#1b1e24;display:grid;place-items:center;flex:none}
-.mini .mp svg{width:22px;height:22px}
-.mini .mn{width:40px;height:40px;display:grid;place-items:center;flex:none}
-@media(min-width:520px){.shell{padding-top:28px}}
+.mini-main small{font-size:12.5px;color:rgba(255,255,255,.75)}
+.mp,.mn{width:44px;height:44px;display:grid;place-items:center;flex:none}
+.mp svg{width:30px;height:30px}.mn svg{width:26px;height:26px}
+.mbar{position:absolute;left:10px;right:10px;bottom:0;height:2px;border-radius:1px;background:rgba(255,255,255,.25)}
+.mbar i{display:block;height:100%;width:0;border-radius:1px;background:#fff;transition:width .3s}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
+<div class="backdrop" aria-hidden="true"></div>
 <div class="shell">
-<section class="player" id="player" aria-label="新聞播放器">
-  <div class="top">
-    <button id="collapse" aria-label="收合／展開逐字稿" aria-expanded="true"><svg class="ico chev" viewBox="0 0 24 24"><path d="M3.5 8.5 12 17l8.5-8.5-1.4-1.4L12 14.2 4.9 7.1z"/></svg></button>
-    <span class="brand">聲讀 DAILY</span>
-    <button id="refresh" aria-label="重新整理新聞"><svg class="ico" viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
-  </div>
+<section class="np" id="player" aria-label="正在播放">
+  <header class="np-head">
+    <button class="ibtn" id="collapse" aria-label="收合／展開逐字稿" aria-expanded="true"><svg class="chev" viewBox="0 0 24 24"><path d="M3.5 8.5 12 17l8.5-8.5-1.4-1.4L12 14.2 4.9 7.1z"/></svg></button>
+    <div class="np-title"><small>正在播放</small><b id="npCat">今日重點</b></div>
+    <button class="ibtn" id="refresh" aria-label="重新整理新聞"><svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.95 7.95 0 0 0 12 4a8 8 0 1 0 7.75 10h-2.08A6 6 0 1 1 12 6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg></button>
+  </header>
 
-  <div class="paper">
-    <div class="tagrow" id="tagrow"></div>
+  <div class="lyrics">
+    <div class="lyr-head"><b>逐字稿<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span></b><span id="npPos"></span></div>
     <div class="script" id="script"><p class="para"><span class="s">新聞載入中…</span></p></div>
-    <div class="wave" id="wave" aria-hidden="true"></div>
   </div>
 
   <div class="info">
-    <h1 id="title">今日全球重點新聞</h1><small id="meta">等待新聞載入</small><div class="srcs" id="srcs"></div>
+    <h1 id="title">今日全球重點</h1>
+    <p id="meta">等待新聞載入</p>
+    <div class="srcs" id="srcs"></div>
   </div>
 
-  <div>
-    <input id="seek" type="range" min="0" max="1" step="1" value="0" aria-label="句子進度">
-    <div class="pos"><span id="position"></span><span id="eta"></span></div>
+  <div class="prog">
+    <input id="seek" type="range" min="0" max="1" step="1" value="0" aria-label="朗讀進度">
+    <div class="times"><span id="tCur">0:00</span><span id="tLeft">-0:00</span></div>
   </div>
 
   <div class="ctl" id="ctl">
     <button class="side" id="rateBtn" aria-label="切換語速">1.0x</button>
     <div class="mid">
-      <button class="skip" id="prev" aria-label="上一則"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 18V6z"/></svg></button>
+      <button class="skip" id="prev" aria-label="上一則"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 18V6z"/></svg></button>
       <button id="play" aria-label="播放"></button>
-      <button class="skip" id="next" aria-label="下一則"><svg class="ico" viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+      <button class="skip" id="next" aria-label="下一則"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
     </div>
-    <button class="side" id="loop" aria-label="循環播放" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+    <button class="side" id="loop" aria-label="循環播放" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
   </div>
-  <button class="siri" id="siri">🎧 改用 iPhone 的 Siri 聲音朗讀 ›</button>
   <p id="audio" class="status" role="status"></p>
 </section>
 
-<section class="news" id="news" aria-labelledby="newsHead">
-  <div class="news-head"><h2 id="newsHead">今日重點</h2><small id="newsStatus">載入中…</small></div>
+<section class="home" id="news" aria-labelledby="newsHead">
+  <div class="home-head"><h2 id="newsHead">今日重點</h2><small id="newsStatus">載入中…</small></div>
   <div id="shelves"></div>
 </section>
 </div>
 
 <div class="mini" id="mini" role="region" aria-label="正在播放">
+  <span class="mcov" id="miniCov" aria-hidden="true"></span>
   <button class="mini-main" id="miniMain" aria-label="回到播放器"><b id="miniTitle"></b><small id="miniMeta"></small></button>
   <button class="mp" id="miniPlay" aria-label="播放"></button>
-  <button class="mn" id="miniNext" aria-label="下一則"><svg class="ico" viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+  <button class="mn" id="miniNext" aria-label="下一則"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+  <span class="mbar" aria-hidden="true"><i id="miniBar"></i></span>
 </div>
 
 <script src="/rules.js"></script>
@@ -191,7 +208,9 @@ const R=window.NewsRules;
 const $=id=>document.getElementById(id),synth=window.speechSynthesis;
 const CATS=R.CATS,PER=R.PER_CAT;
 const SECTION_NAME={'全球政治':'全球政治重點','全球經濟':'全球經濟重點','全球科技':'全球科技重點','對台灣的影響':'對台灣影響的相關新聞'};
-const RATES=[0.8,1,1.2,1.4],CACHE_KEY='news-v6',TR_KEY='news-tr-v1';
+/* 各板塊的主題色：背景主色、背景光暈、逐字稿卡片（較亮，未唸到的深色字才看得清楚） */
+const THEME={'全球政治':['#a3243b','#ff7a45','#d63a4b'],'全球經濟':['#8f5a00','#ffc93c','#c27c00'],'全球科技':['#2a3aa8','#4fc3f7','#4766e8'],'對台灣的影響':['#0f6e57','#1ed760','#15936b']};
+const RATES=[0.8,1,1.2,1.4],CACHE_KEY='news-v6',TR_KEY='news-tr-v1',CPS=4.2;
 const IOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
 const MAXU=IOS?220:100; /* 同一段的句子合併成一次朗讀（最多幾個字），減少句子之間的停頓 */
 const ICON_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>';
@@ -206,6 +225,8 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.
 function status(t,warn){$('audio').textContent=warn?t:''}
 const isPlaying=()=>mode==='playing'||mode==='starting';
 const hm=t=>new Date(t).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
+const mmss=s=>{s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function setTheme(cat){const t=THEME[cat];if(!t)return;const r=document.documentElement.style;r.setProperty('--c1',t[0]);r.setProperty('--c2',t[1]);r.setProperty('--l',t[2])}
 
 /* ---------- iPhone 靜音模式也能播放 ----------
    1. navigator.audioSession.type='playback'（iOS 16.4+）：宣告本頁是媒體播放
@@ -234,7 +255,7 @@ function prime(){
   if(synth&&!speechPrimed){speechPrimed=true;try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;synth.speak(u)}catch(e){}}
 }
 
-/* ---------- 語音：iPhone 不開放網頁使用 Siri 聲音；固定使用系統國語（台灣）語音，有高品質版本時優先 ---------- */
+/* ---------- 語音：固定使用系統國語（台灣）語音，有高品質版本時優先 ---------- */
 const inApp=/Line\/|FBAN|FBAV|Instagram|MicroMessenger|MQQBrowser|; wv\)/i.test(navigator.userAgent);
 function pickVoice(){
   if(!synth)return;
@@ -250,10 +271,10 @@ if(inApp)status('偵測到 App 內建瀏覽器，可能無法發聲；請改用 
 
 /* ---------- 語速、循環 ---------- */
 rate=store.get('news-rate',1);loop=store.get('news-loop',false);
-function paintRate(){$('rateBtn').textContent=rate.toFixed(1)+'x'}
+function paintRate(){$('rateBtn').textContent=rate.toFixed(1)+'x';$('rateBtn').style.color=rate===1?'':'#fff'}
 function paintLoop(){$('loop').setAttribute('aria-pressed',String(loop))}
 paintRate();paintLoop();
-$('rateBtn').onclick=()=>{const i=RATES.indexOf(rate);rate=RATES[(i+1)%RATES.length];store.set('news-rate',rate);paintRate();eta()};
+$('rateBtn').onclick=()=>{const i=RATES.indexOf(rate);rate=RATES[(i+1)%RATES.length];store.set('news-rate',rate);paintRate();progressAt(0)};
 $('loop').onclick=()=>{loop=!loop;store.set('news-loop',loop);paintLoop()};
 
 /* ---------- 逐字稿 ---------- */
@@ -273,18 +294,25 @@ function ago(t){
   if(!t)return'';const m=Math.round((Date.now()-t)/6e4);
   if(m<1)return'剛剛';if(m<60)return m+' 分鐘前';if(m<1440)return Math.round(m/60)+' 小時前';return Math.round(m/1440)+' 天前';
 }
-function eta(){
-  const chars=sents.slice(sentence).reduce((n,s)=>n+s.text.length,0),sec=Math.round(chars/(4.2*rate));
-  $('eta').textContent=sents.length?'約剩 '+(sec>=60?Math.floor(sec/60)+' 分 ':'')+(sec%60)+' 秒':'';
+/* 進度條與時間（依字數與語速估算） */
+function progressAt(extra){
+  const total=sents.reduce((n,s)=>n+s.text.length,0);if(!total){$('tCur').textContent='0:00';$('tLeft').textContent='-0:00';return}
+  const done=Math.min(total,sents.slice(0,sentence).reduce((n,s)=>n+s.text.length,0)+(extra||0)),pct=done/total*100;
+  $('seek').style.setProperty('--p',pct.toFixed(1)+'%');$('miniBar').style.width=pct.toFixed(1)+'%';
+  $('tCur').textContent=mmss(done/(CPS*rate));$('tLeft').textContent='-'+mmss((total-done)/(CPS*rate));
 }
-function paintMeta(){const a=queue[idx];if(!a)return;$('meta').textContent=`${a.source}${a.time?' · '+ago(a.time):''} · ${idx+1}/${queue.length}`;paintMini()}
+function paintMeta(){
+  const a=queue[idx];if(!a)return;
+  $('meta').textContent=a.source+(a.time?' · '+ago(a.time):'');
+  $('npCat').textContent=a.category;$('npPos').textContent=`${idx+1} / ${queue.length}`;paintMini();
+}
 /* 原文連結：主要來源＋相關報導 */
 function paintSources(a){
   const box=$('srcs');box.replaceChildren();const seen=new Set();
   [{source:a.source,link:a.link}].concat(a.related||[]).forEach(r=>{
     if(!r.link||seen.has(r.link)||!/^https?:\/\//i.test(r.link))return;seen.add(r.link);
-    box.append(box.childNodes.length?'、':'原文：');
-    const el=document.createElement('a');el.href=r.link;el.target='_blank';el.rel='noopener noreferrer';el.textContent=r.source+' ↗';box.append(el);
+    box.append(box.childNodes.length?'　':'原文　');
+    const el=document.createElement('a');el.href=r.link;el.target='_blank';el.rel='noopener noreferrer';el.textContent=r.source;box.append(el);
   });
 }
 /* 把一則新聞排成段落；每一句可點選從該句開始朗讀 */
@@ -303,15 +331,13 @@ function setArticle(){
     });
     if(el.querySelector('.s'))box.append(el);
   });
-  box.scrollTop=0;
-  const tg=document.createElement('span');tg.className='tag t-'+a.category;tg.textContent=a.category;$('tagrow').replaceChildren(tg);
+  box.scrollTop=0;setTheme(a.category);
   $('title').textContent=a.title;paintMeta();paintSources(a);
   highlight();markPlaying();updateSession(a);
 }
 function setRead(i,n){const s=sents[i];if(!s)return;s.r.textContent=s.text.slice(0,n);s.u.textContent=s.text.slice(n)}
 function highlight(){
-  const seek=$('seek');seek.max=Math.max(1,sents.length-1);seek.value=sentence;
-  $('position').textContent=sents.length?`第 ${Math.min(sentence+1,sents.length)} / ${sents.length} 句`:'';eta();
+  const seek=$('seek');seek.max=Math.max(1,sents.length-1);seek.value=sentence;progressAt(0);
   sents.forEach((s,i)=>{s.el.classList.toggle('active',i===sentence);s.el.classList.toggle('past',i<sentence);if(i!==sentence)setRead(i,0)});
   const sc=$('script'),n=sents[sentence]&&sents[sentence].el;
   if(n)sc.scrollTo({top:Math.max(0,n.offsetTop-sc.clientHeight/3),behavior:smooth()});
@@ -321,6 +347,7 @@ function seekTo(i,play){
   halt();sentence=Math.max(0,Math.min(sents.length-1,i));setRead(sentence,0);highlight();
   if(play||was){prime();speakFrom(sentence)}else{mode='paused';setPlayIcon(false)}
 }
+$('seek').oninput=()=>{const v=Number($('seek').value);$('seek').style.setProperty('--p',(v/Math.max(1,sents.length-1)*100).toFixed(1)+'%')};
 $('seek').onchange=()=>seekTo(Number($('seek').value),false);
 
 /* ---------- 朗讀：同一段的句子合併成一次朗讀，讀起來才連貫 ---------- */
@@ -330,7 +357,7 @@ function speakFrom(i){
   if(i>=sents.length){
     if(idx+1<queue.length){idx++;setArticle();i=0}
     else if(loop&&queue.length){idx=0;setArticle();i=0}
-    else{mode='ended';sentence=sents.length-1;setPlayIcon(false);keepStop();setSession('none');highlight();return}
+    else{mode='ended';sentence=sents.length-1;setPlayIcon(false);keepStop();setSession('none');highlight();progressAt(sents[sentence]?sents[sentence].text.length:0);return}
   }
   sentence=i;
   let j=i,len=sents[i].text.length;
@@ -342,9 +369,9 @@ function speakFrom(i){
   mode='starting';setPlayIcon(true);setRead(i,0);highlight();
   /* 依朗讀位置標示目前句子；沒有位置事件的瀏覽器用語速估算 */
   let heard=false,t0=0,est=0;
-  const mark=(ci,cl)=>{let k=offs.length-1;while(k>0&&offs[k]>ci)k--;if(i+k!==sentence){sentence=i+k;highlight()}setRead(sentence,ci-offs[k]+(cl||0))};
+  const mark=(ci,cl)=>{let k=offs.length-1;while(k>0&&offs[k]>ci)k--;if(i+k!==sentence){sentence=i+k;highlight()}const n=ci-offs[k]+(cl||0);setRead(sentence,n);progressAt(n)};
   u.onstart=()=>{if(t!==token)return;clearTimeout(watchdog);mode='playing';setSession('playing');status('');t0=Date.now();
-    est=setInterval(()=>{if(t!==token||heard){clearInterval(est);return}mark(Math.floor((Date.now()-t0)/1000*4.2*rate))},250)};
+    est=setInterval(()=>{if(t!==token||heard){clearInterval(est);return}mark(Math.floor((Date.now()-t0)/1000*CPS*rate))},250)};
   u.onboundary=e=>{if(t!==token||e.name==='sentence')return;heard=true;mark(e.charIndex,e.charLength)};
   u.onend=()=>{clearInterval(est);if(t!==token)return;clearTimeout(watchdog);speakFrom(j+1)};
   u.onerror=e=>{
@@ -403,27 +430,27 @@ function cardTap(list,i,key){
   playFrom(list,i,key);
 }
 function makeCard(a,onTap){
-  const card=document.createElement('article');card.className='card';card.dataset.link=a.link;card.setAttribute('role','listitem');
-  const main=document.createElement('button');main.className='card-main';main.setAttribute('aria-label','播放：'+a.title);main.onclick=onTap;
-  const th=document.createElement('span');th.className='thumb g-'+a.category;
-  const ph=document.createElement('span');ph.className='ph';ph.textContent=a.source;th.append(ph);
-  if(a.img){const im=document.createElement('img');im.alt='';im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();im.src=a.img;th.append(im)}
-  const now=document.createElement('span');now.className='now';now.innerHTML='<i></i><i></i><i></i>播放中';
-  const pb=document.createElement('span');pb.className='pbtn';pb.innerHTML=ICON_PLAY;
-  th.append(now,pb);
-  const body=document.createElement('span');body.className='cbody';
-  const meta=document.createElement('span');meta.className='cmeta';meta.textContent=a.source+(a.time?' · '+ago(a.time):'');
+  const card=document.createElement('button');card.className='card k-'+a.category;card.dataset.link=a.link;card.setAttribute('role','listitem');card.setAttribute('aria-label','播放：'+a.title);card.onclick=onTap;
+  const cov=document.createElement('span');cov.className='cover';
+  if(a.img){const im=document.createElement('img');im.alt='';im.loading='lazy';im.decoding='async';im.referrerPolicy='no-referrer';im.onerror=()=>im.remove();im.src=a.img;cov.append(im)}
+  const kick=document.createElement('span');kick.className='kick';kick.textContent=a.category;
+  const src=document.createElement('span');src.className='csrc';src.textContent=a.source;
+  const pl=document.createElement('span');pl.className='pl';pl.innerHTML=ICON_PLAY;
+  cov.append(kick,src,pl);
   const tt=document.createElement('span');tt.className='ctitle';tt.textContent=a.title;
-  body.append(meta,tt);
-  if(a.summary){const sm=document.createElement('span');sm.className='csum';sm.textContent=a.summary;body.append(sm)}
-  main.append(th,body);card.append(main);
+  const meta=document.createElement('span');meta.className='cmeta';meta.textContent=a.time?ago(a.time):a.source;
+  card.append(cov,tt,meta);
   return card;
 }
 function skeleton(){
-  const sec=document.createElement('section'),track=document.createElement('div');
-  sec.className='shelf';track.className='track';
-  for(let i=0;i<3;i++){const c=document.createElement('div');c.className='card skel';c.innerHTML='<span class="thumb"></span><span class="sk" style="width:40%"></span><span class="sk"></span><span class="sk" style="width:70%"></span>';track.append(c)}
-  sec.append(track);return sec;
+  const frag=document.createDocumentFragment();
+  CATS.slice(0,2).forEach(c=>{
+    const sec=document.createElement('section'),head=document.createElement('div'),h=document.createElement('h3'),track=document.createElement('div');
+    sec.className='shelf';head.className='shelf-head';h.textContent=c;head.append(h);track.className='track';
+    for(let i=0;i<3;i++){const k=document.createElement('div');k.className='card skel';k.innerHTML='<span class="cover"></span><span class="sk" style="width:90%"></span><span class="sk" style="width:60%"></span>';track.append(k)}
+    sec.append(head,track);frag.append(sec);
+  });
+  return frag;
 }
 function renderShelves(){
   const box=$('shelves'),pos={};
@@ -436,10 +463,10 @@ function renderShelves(){
   }
   CATS.forEach(c=>{
     const list=articles.filter(a=>a.category===c).slice(0,PER);if(!list.length)return;
-    const sec=document.createElement('section'),head=document.createElement('div'),d=document.createElement('span'),b=document.createElement('b'),all=document.createElement('button'),track=document.createElement('div');
-    sec.className='shelf';sec.setAttribute('aria-label',c);head.className='shelf-head';d.className='dot d-'+c;b.textContent=c;
-    all.className='all';all.textContent='全部播放 ▶';all.onclick=()=>playFrom(list,0,c);
-    head.append(d,b,all);
+    const sec=document.createElement('section'),head=document.createElement('div'),h=document.createElement('h3'),all=document.createElement('button'),track=document.createElement('div');
+    sec.className='shelf';sec.setAttribute('aria-label',c);head.className='shelf-head';h.textContent=c;
+    all.textContent='全部播放';all.onclick=()=>playFrom(list,0,c);
+    head.append(h,all);
     track.className='track';track.dataset.key=c;track.setAttribute('role','list');track.setAttribute('aria-label',c+'（左右滑動）');
     list.forEach((a,i)=>track.append(makeCard(a,()=>cardTap(list,i,c))));
     sec.append(head,track);box.append(sec);
@@ -452,21 +479,20 @@ function markPlaying(follow=true){
   document.querySelectorAll('#shelves .card[data-link]').forEach(c=>c.classList.toggle('playing',!!cur&&c.dataset.link===cur));
   if(!follow||!cur)return;
   const key=queueKey||(queue[idx]&&queue[idx].category);
-  const t=[...document.querySelectorAll('#shelves .track')].find(x=>x.dataset.key===key); /* 自動播下一則時，讓該張圖卡滑進畫面 */
+  const t=[...document.querySelectorAll('#shelves .track')].find(x=>x.dataset.key===key); /* 自動播下一則時，讓該張卡片滑進畫面 */
   const c=t&&[...t.children].find(x=>x.dataset.link===cur);
-  if(c)t.scrollTo({left:Math.max(0,c.offsetLeft-12),behavior:smooth()});
+  if(c)t.scrollTo({left:Math.max(0,c.offsetLeft-16),behavior:smooth()});
 }
 
-/* ---------- 迷你播放列：往下滑看圖卡時顯示 ---------- */
+/* ---------- 迷你播放列：往下滑看新聞時顯示 ---------- */
 function paintMini(){
   const a=queue[idx];
   $('mini').classList.toggle('show',!ctlVisible&&!!a);
-  if(a){$('miniTitle').textContent=a.title;$('miniMeta').textContent=`${a.category} · ${idx+1}/${queue.length}`}
+  if(a){$('miniTitle').textContent=a.title;$('miniMeta').textContent=a.category+' · '+a.source;$('miniCov').className='mcov k-'+a.category}
 }
 if('IntersectionObserver' in window)new IntersectionObserver(([e])=>{ctlVisible=e.isIntersecting;paintMini()}).observe($('ctl'));
 $('miniMain').onclick=scrollToPlayer;
 $('collapse').onclick=()=>{const on=$('player').classList.toggle('compact-on');$('collapse').setAttribute('aria-expanded',String(!on))};
-(function(){const w=$('wave');let h=.5;for(let i=0;i<34;i++){h=Math.max(.2,Math.min(1,h+(Math.random()-.5)*.7));const b=document.createElement('i');b.style.setProperty('--h',h.toFixed(2));b.style.setProperty('--d',(i*.05%.9).toFixed(2)+'s');w.append(b)}})();
 
 /* ---------- 取得新聞 ----------
    1. 先向自己網站的 /api/news 要整理好的新聞（網站連結 GitHub 部署時，由 Netlify 伺服器整理，最快最穩）
@@ -582,14 +608,6 @@ async function load(fresh){
   }
 }
 $('refresh').onclick=()=>load(true);
-/* 用 iPhone 的 Siri 聲音：把今日四大板塊重點帶到新聞稿頁，用 Safari「聆聽頁面」或「朗讀螢幕」朗讀 */
-$('siri').onclick=()=>{
-  if(isPlaying())togglePlay();
-  const list=digest(); /* 新聞稿＝今日四大板塊重點 */
-  if(!list.length){status('尚無新聞，請稍候或按右上角重新整理。',true);return}
-  store.set('news-listen',{saved:lastUpdated,at:Date.now(),list:list.slice(0,20)});
-  location.href='/listen.html';
-};
 
 /* ---------- Service Worker（加到主畫面後可離線開啟播放器） ---------- */
 if('serviceWorker' in navigator&&location.protocol==='https:')

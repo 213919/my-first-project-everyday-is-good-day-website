@@ -1,14 +1,14 @@
 {
-  "name": "聲讀｜每日全球政經科技",
+  "name": "聲讀｜每日全球重點",
   "short_name": "聲讀",
-  "description": "朗讀每日全球政治、經濟、財經與科技新聞摘要的播放器",
+  "description": "每日全球政治、經濟、科技與對台灣影響的重點新聞朗讀",
   "lang": "zh-Hant",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#1b1e24",
-  "theme_color": "#1b1e24",
+  "background_color": "#121212",
+  "theme_color": "#121212",
   "icons": [
     {
       "src": "/icons/icon-192.png",
