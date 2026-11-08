@@ -1,11 +1,12 @@
 /* 聲讀 Service Worker：只快取播放器本身，新聞資料一律走網路 */
-const CACHE = 'daily-news-v1';
+const CACHE = 'daily-news-v2';
 const SHELL = [
-  '/daily-news.html',
-  '/daily-news.webmanifest',
-  '/images/daily-news-180.png',
-  '/images/daily-news-192.png',
-  '/images/daily-news-512.png'
+  '/',
+  '/index.html',
+  '/manifest.webmanifest',
+  '/icons/icon-180.png',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png'
 ];
 
 self.addEventListener('install', e => {
@@ -33,6 +34,6 @@ self.addEventListener('fetch', e => {
         caches.open(CACHE).then(c => c.put(req, copy));
         return res;
       })
-      .catch(() => caches.match(req).then(r => r || caches.match('/daily-news.html')))
+      .catch(() => caches.match(req).then(r => r || caches.match('/')))
   );
 });

@@ -4,7 +4,7 @@
 // 點任一則標題：用 Safari 打開聲讀播放器並準備朗讀該則；點右上「五分鐘快訊」：準備播報快訊。
 // 若網站網址不同，請修改下一行。
 
-const APP = 'https://edgd2619.com/daily-news.html';
+const APP = 'https://ada868.netlify.app/';
 
 // [來源, 預設分類, RSS 網址, 是否綜合來源（以關鍵字再分類）]
 const SOURCES = [

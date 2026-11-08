@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#1b1e24">
-<link rel="manifest" href="/daily-news.webmanifest">
-<link rel="apple-touch-icon" href="/images/daily-news-180.png">
-<link rel="icon" type="image/png" href="/images/daily-news-192.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="聲讀">
@@ -211,7 +211,7 @@ ul.list{list-style:none;margin:8px 0 0;padding:0}
         <li>長按小工具 →「編輯小工具」→ Script 選「聲讀」。</li>
       </ol>
       點標題會用 Safari 打開這頁並準備朗讀那則新聞，再點一下即可開始。
-      <div class="row"><button class="btn" id="copyWidget">複製小工具程式碼</button><a class="btn" href="/daily-news-widget.js" target="_blank" rel="noopener">查看程式碼</a></div>
+      <div class="row"><button class="btn" id="copyWidget">複製小工具程式碼</button><a class="btn" href="/widget.js" target="_blank" rel="noopener">查看程式碼</a></div>
       <small id="widgetMsg" class="status" role="status"></small>
     </div>
   </div>
@@ -559,7 +559,7 @@ async function load(){
   if(ios&&!standalone&&!inApp&&!store.get('news-install-dismissed',false))$('install').classList.add('show');
   $('installClose').onclick=()=>{$('install').classList.remove('show');store.set('news-install-dismissed',true)};
   if('serviceWorker' in navigator&&location.protocol==='https:')
-    addEventListener('load',()=>navigator.serviceWorker.register('/daily-news-sw.js',{scope:'/daily-news.html'}).catch(()=>{}));
+    addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{}));
 })();
 buildCats();
 const cache=store.get('news-glass-v2',null);
@@ -594,7 +594,7 @@ if(cache&&Array.isArray(cache.articles)){
 
 /* 複製小工具程式碼（iOS Safari 需在點擊當下寫入剪貼簿） */
 $('copyWidget').onclick=async()=>{
-  const msg=$('widgetMsg'),url='/daily-news-widget.js';
+  const msg=$('widgetMsg'),url='/widget.js';
   const getText=()=>fetch(url).then(r=>{if(!r.ok)throw Error(r.status);return r.text()});
   try{
     if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)
