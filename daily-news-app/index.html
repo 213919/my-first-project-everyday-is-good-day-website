@@ -87,6 +87,7 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
 .mid .skip{width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
 #play{width:58px;height:58px;border-radius:50%;background:#fff;color:#1b1e24;display:grid;place-items:center}
 #play svg{width:30px;height:30px}
+.siri{align-self:center;font-size:13px;color:var(--accent);padding:2px 8px}
 .status{font-size:12.5px;line-height:1.7;margin:0;color:#ffd88a}
 .status:empty{display:none}
 
@@ -158,9 +159,7 @@ dialog::backdrop{background:#000a}
 .sh-body{overflow:auto;padding:4px 18px calc(22px + env(safe-area-inset-bottom))}
 .btn{background:#ffffff14;border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px}
 .btn.primary{background:#fff;color:#1b1e24;border-color:#fff}
-.field{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px}
-select{width:100%;background:#ffffff12;border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-size:16px;-webkit-appearance:none;appearance:none}
-select option{color:#000}
+.vnote{font-size:13px;line-height:1.7;color:var(--mute);margin:12px 0 0}
 details{margin-top:14px;border-top:1px solid var(--line);padding-top:12px}
 summary{cursor:pointer;font-size:15px;font-weight:600;list-style:none;display:flex;justify-content:space-between}
 summary::-webkit-details-marker{display:none}
@@ -215,6 +214,7 @@ details[open] summary::after{content:'－'}
     </div>
     <button class="side" id="loop" aria-label="循環播放" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
   </div>
+  <button class="siri" id="siri">🎧 改用 iPhone 的 Siri 聲音朗讀 ›</button>
   <p id="audio" class="status" role="status"></p>
 </section>
 
@@ -235,8 +235,7 @@ details[open] summary::after{content:'－'}
   <div class="sh-head"><b>設定</b><button id="setClose" aria-label="關閉"><svg class="ico" viewBox="0 0 24 24"><path d="M5.6 4.2 12 10.6l6.4-6.4 1.4 1.4-6.4 6.4 6.4 6.4-1.4 1.4-6.4-6.4-6.4 6.4-1.4-1.4 6.4-6.4-6.4-6.4z"/></svg></button></div>
   <div class="sh-body">
     <button class="btn primary" id="test">測試中文語音</button>
-    <label class="field" for="voice">中文語音</label>
-    <select id="voice"><option value="">系統預設中文語音</option></select>
+    <p class="vnote" id="vnote">播放器語音：系統國語語音</p>
     <details><summary id="srcSum">新聞來源</summary><p class="srcnote" id="srcNote"></p><ul class="srclist" id="srcList"></ul></details>
     <details><summary>編輯原則</summary>
       <ol class="rules">
@@ -265,7 +264,7 @@ const ICON_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11
 const ICON_PAUSE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)'),smooth=()=>reduceMotion.matches?'auto':'smooth';
 
-let articles=[],queue=[],idx=0,sents=[],sentence=0,mode='idle',token=0,voices=[],loading=false,loadedOnce=false,watchdog,
+let articles=[],queue=[],idx=0,sents=[],sentence=0,mode='idle',token=0,voices=[],voice=null,loading=false,loadedOnce=false,watchdog,
     current=null,lastCancel=0,loop=false,rate=1,favs=[],speechPrimed=false,ctlVisible=true,autoQueue=true,queueKey='',
     srcState=[],trNote='',lastUpdated=0,serverMode=false,loadStats=null;
 
@@ -306,22 +305,20 @@ function prime(){
 
 /* ---------- 語音初始化與診斷 ---------- */
 const inApp=/Line\/|FBAN|FBAV|Instagram|MicroMessenger|MQQBrowser|; wv\)/i.test(navigator.userAgent);
+/* iPhone 不開放網頁使用 Siri 聲音；播放器固定使用系統的國語（台灣）語音，有高品質版本時優先 */
 function populate(){
   if(!synth)return;
-  voices=synth.getVoices().filter(v=>/^zh|^cmn|^yue/i.test(v.lang));
-  const saved=store.get('news-voice',''),sel=$('voice');
-  sel.replaceChildren(new Option('系統預設中文語音',''));
-  voices.forEach((v,i)=>sel.add(new Option(v.name+' · '+v.lang,String(i))));
-  const si=voices.findIndex(v=>v.name===saved);
-  if(si>=0)sel.value=String(si);
-  else{const i=voices.findIndex(v=>/TW|Hant/i.test(v.lang));if(i>=0)sel.value=String(i)}
+  voices=synth.getVoices().filter(v=>/^zh|^cmn/i.test(v.lang));
+  const tw=voices.filter(v=>/TW|Hant/i.test(v.lang)),pool=tw.length?tw:voices.filter(v=>!/HK|yue/i.test(v.lang));
+  voice=pool.find(v=>/premium|enhanced|增強|優化|高品質/i.test(v.name+' '+(v.voiceURI||'')))||pool.find(v=>v.localService)||pool[0]||null;
+  $('vnote').textContent='播放器語音：'+(voice?voice.name:'系統國語語音')+'。iPhone 不開放網頁使用 Siri 聲音；想用 Siri 聲音，請按播放器下方「改用 iPhone 的 Siri 聲音朗讀」。';
   diag();
 }
 function diag(){
   const d=[
     '語音功能：'+(synth?'支援':'不支援'),
     '中文語音數：'+voices.length,
-    '目前語音：'+((voices[Number($('voice').value)]||{}).name||'系統預設'),
+    '目前語音：'+(voice?voice.name+'（'+voice.lang+'）':'系統預設'),
     '靜音模式：'+(hasAudioSession?'已宣告為媒體播放':'此版本不支援宣告（需 iOS 16.4 以上）')
   ];
   if(inApp)d.push('⚠ 偵測到 App 內建瀏覽器（LINE／FB 等），常不支援語音，請改用 Safari 開啟。');
@@ -341,7 +338,6 @@ function paintLoop(){$('loop').setAttribute('aria-pressed',String(loop))}
 paintRate();paintLoop();
 $('rateBtn').onclick=()=>{const i=RATES.indexOf(rate);rate=RATES[(i+1)%RATES.length];store.set('news-rate',rate);paintRate();eta()};
 $('loop').onclick=()=>{loop=!loop;store.set('news-loop',loop);paintLoop()};
-$('voice').onchange=()=>{const v=voices[Number($('voice').value)];store.set('news-voice',v?v.name:'');diag()};
 
 /* ---------- 逐字稿 ---------- */
 function setPlayIcon(on){
@@ -430,8 +426,7 @@ function speakFrom(i){
   const offs=[];let acc=0;for(let k=i;k<=j;k++){offs.push(acc);acc+=sents[k].text.length}
   const t=token,u=new SpeechSynthesisUtterance(sents.slice(i,j+1).map(s=>s.text).join(''));
   current=u; /* 保留參考，避免被回收導致朗讀中斷 */
-  const v=voices[Number($('voice').value)];
-  u.lang=v?v.lang:'zh-TW';if(v)u.voice=v;u.rate=rate;
+  u.lang=voice?voice.lang:'zh-TW';if(voice)u.voice=voice;u.rate=rate;
   mode='starting';setPlayIcon(true);setRead(i,0);highlight();
   /* 依朗讀位置標示目前句子；沒有位置事件的瀏覽器用語速估算 */
   let heard=false,t0=0,est=0;
@@ -471,7 +466,7 @@ $('test').onclick=()=>{
   if(!synth){status('此瀏覽器不支援語音。',true);return}
   halt();mode='idle';setPlayIcon(false);prime();populate();
   const t=token,u=new SpeechSynthesisUtterance('這是中文語音測試。如果您聽到這段話，表示目前裝置可以播放中文語音。');current=u;
-  const v=voices[Number($('voice').value)];u.lang=v?v.lang:'zh-TW';if(v)u.voice=v;
+  u.lang=voice?voice.lang:'zh-TW';if(voice)u.voice=voice;
   u.onend=()=>{if(t===token)keepStop()};
   u.onerror=e=>{if(t===token){status('語音測試失敗：'+e.error+'。請看「語音診斷」。',true);keepStop()}};
   const wait=200-(Date.now()-lastCancel);setTimeout(()=>{if(t===token){if(synth.paused)synth.resume();synth.speak(u)}},Math.max(0,wait));
@@ -734,6 +729,14 @@ async function load(fresh){
   }
 }
 $('refresh').onclick=()=>load(true);
+/* 用 iPhone 的 Siri 聲音：把目前的播放清單帶到新聞稿頁，用 Safari「聆聽頁面」或「朗讀螢幕」朗讀 */
+$('siri').onclick=()=>{
+  if(isPlaying())togglePlay();
+  const list=queue.length?queue.slice(idx).concat(queue.slice(0,idx)):briefing(BRIEF_ALL);
+  if(!list.length){status('尚無新聞，請稍候或按右上角重新整理。',true);return}
+  store.set('news-listen',{saved:lastUpdated,at:Date.now(),list:list.slice(0,15)});
+  location.href='/listen.html';
+};
 
 /* ---------- 加到主畫面提示與 Service Worker ---------- */
 (function(){
