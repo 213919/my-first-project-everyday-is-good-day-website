@@ -4,123 +4,181 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,follow">
-<meta name="theme-color" content="#11171e">
+<meta name="theme-color" content="#1b1e24">
 <title>聲讀｜每日全球政經科技</title>
 <style>
-:root{color-scheme:dark;--fg:#fafafa;--mute:#bbc1c5;--line:#ffffff20;--glass:#ffffff0a;--accent:#b5dae5}
-*{box-sizing:border-box}
-body{margin:0;background:radial-gradient(ellipse at 0 30%,#174a53,transparent 65%),radial-gradient(ellipse at 100% 0,#695025,transparent 65%),#11171e;background-attachment:fixed;color:var(--fg);font:16px system-ui,-apple-system,"Noto Sans TC",sans-serif;min-height:100vh}
-main{max-width:1180px;margin:auto;padding:28px 20px}
-header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
-small,.muted{color:var(--mute)}
-button,select,input[type=search]{font:inherit;color:inherit;border:1px solid var(--line);background:#ffffff12;border-radius:14px;padding:11px 15px;cursor:pointer}
-button:hover{background:#ffffff25}
-button[aria-pressed=true]{background:#fafafa;color:#15191d;border-color:#fafafa}
-button:disabled{opacity:.5;cursor:default}
-button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
-a{color:#c6e7ff}
-.glass{border:1px solid var(--line);background:var(--glass);border-radius:28px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
-.player{display:grid;grid-template-columns:42% 58%;padding:40px;min-height:470px}
-.left{padding-right:40px;display:flex;flex-direction:column;justify-content:center}
-.art{background:linear-gradient(135deg,#4c8588,#41405d 55%,#8c633e);border:1px solid #ffffff30;border-radius:20px;padding:28px;margin-bottom:22px;font-size:28px;font-weight:700;letter-spacing:3px}
-h1{font-size:26px;line-height:1.5;margin:12px 0}
-progress{width:100%;accent-color:#fff;height:5px;margin:20px 0 8px}
-.transport{display:flex;justify-content:center;gap:10px;margin:22px 0}
-.transport button{min-width:48px}
-.transport #play{background:#fafafa;color:#15191d;min-width:84px}
-.ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.script{height:390px;overflow:auto;overscroll-behavior:contain;padding:15px 12px 80px 28px;scroll-behavior:smooth}
-.line{display:block;text-align:left;width:100%;border:0;background:none;border-radius:0;padding:12px 0;font-size:25px;font-weight:650;line-height:1.65;color:#ffffff65;transition:color .2s}
-.line.active{color:#fff}
-.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 10px;align-items:center}
-.toolbar .sep{flex:1}
-input[type=search]{cursor:text;min-width:160px;flex:0 1 220px}
-.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.page{display:contents}
-.card{padding:20px;border-radius:20px;background:#ffffff09;border:1px solid #ffffff18;min-width:0;display:flex;flex-direction:column}
-.card.active{border-color:var(--accent)}
-.card h3{font-size:17px;line-height:1.6;margin:6px 0}
-.card p{font-size:14px;line-height:1.8;color:#bec5cc;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1}
-.card .row{display:flex;gap:12px;align-items:center}
-.card button{font-size:14px}
-.tag{display:inline-block;font-size:12px;padding:1px 9px;border-radius:99px;border:1px solid #ffffff30;margin-right:6px}
-.t-全球政治{color:#ffb4a2}.t-全球經濟{color:#ffd88a}.t-財經{color:#9fe0b4}.t-科技{color:#9cc9ff}
-.status{font-size:13px;line-height:1.8;color:#c5cbd0}
-.empty{grid-column:1/-1;text-align:center;padding:40px 0}
-footer{font-size:12px;color:#aebac3;margin:25px 0;line-height:1.8}
-label{font-size:13px}
-select{max-width:100%;font-size:13px}
-input[type=range]{accent-color:#fff;max-width:140px}
-@media(max-width:720px){
-main{padding:18px 14px}
-.player{grid-template-columns:1fr;padding:22px}
-.left{padding:0}.art{display:none}
-h1{font-size:22px}
-.script{padding:8px 0 35px;height:250px;border-top:1px solid #ffffff15}
-.line{font-size:21px}
-.transport{margin:15px 0}
-.grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding-bottom:15px}
-.page{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;flex:0 0 100%;scroll-snap-align:start}
-.card{padding:13px}.card h3{font-size:15px}.card p{font-size:13px}
-.glass{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-.toolbar .sep{display:none}
-input[type=search]{flex:1 1 100%}
-}
-@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+:root{color-scheme:dark;--bg:#1b1e24;--card:#363c46;--sheet:#2b3038;--fg:#fff;--mute:#aeb6c0;--line:#ffffff1f;--accent:#9fd3e6}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px system-ui,-apple-system,"Noto Sans TC",sans-serif}
+button,select,input{font:inherit;color:inherit}
+button{border:0;background:none;cursor:pointer;padding:0}
+button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:8px}
+svg{display:block;fill:currentColor}
+.ico{width:26px;height:26px}
+.shell{max-width:440px;margin:0 auto;min-height:100dvh;padding:12px;display:flex;flex-direction:column}
+.player{flex:1;background:var(--card);border-radius:26px;padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px #0007}
+.top{display:flex;justify-content:space-between;align-items:center;color:#fff}
+.top button{padding:6px;border-radius:10px}
+.top .brand{font-size:13px;color:var(--mute);letter-spacing:2px}
+.chev{transition:transform .2s}
+.compact-on .chev{transform:rotate(180deg)}
+
+/* 逐字稿卡片 */
+.paper{position:relative;border-radius:24px;background:linear-gradient(#fff,#eaeef2);color:#11151a;display:flex;flex-direction:column;overflow:hidden}
+.paper .tagrow{padding:14px 18px 0;font-size:12px;color:#5a6470;display:flex;gap:8px;align-items:center;min-height:30px}
+.tag{display:inline-block;font-size:12px;padding:1px 9px;border-radius:99px;border:1px solid currentColor}
+.t-全球政治{color:#b4452f}.t-全球經濟{color:#9a6b00}.t-財經{color:#2c7a4b}.t-科技{color:#2b64b0}
+.script{position:relative;height:min(42dvh,360px);overflow:auto;overscroll-behavior:contain;padding:10px 18px 14px;scroll-behavior:smooth}
+.compact-on .script{height:112px}
+.line{display:block;width:100%;text-align:left;padding:7px 0;font-size:20px;line-height:1.6;font-weight:650;color:#7a838e;transition:color .2s}
+.line .r{color:#11151a}
+.line.past{color:#a4acb6}
+.line.active{color:#4d5763}
+.line.active .r{color:#11151a}
+.wave{display:flex;align-items:center;justify-content:center;gap:3px;height:34px;padding:0 18px 10px;flex:none}
+.wave i{display:block;width:3px;height:100%;border-radius:2px;background:#232a33;transform:scaleY(var(--h));transform-origin:center;opacity:.55}
+.playing .wave i{animation:eq 1s ease-in-out infinite alternate;animation-delay:var(--d);opacity:.9}
+@keyframes eq{from{transform:scaleY(calc(var(--h)*.35))}to{transform:scaleY(var(--h))}}
+
+/* 標題列 */
+.info{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.info h1{font-size:17px;line-height:1.45;margin:0;font-weight:650;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.info small{color:var(--mute);font-size:13px}
+.info>div{min-width:0}
+.info button{flex:none;padding:6px}
+
+/* 進度 */
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:2px;background:#ffffff80;border-radius:2px}
+input[type=range]::-moz-range-track{height:2px;background:#ffffff80;border-radius:2px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;border-radius:50%;background:#fff;margin-top:-5px}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radius:50%;background:#fff}
+.pos{display:flex;justify-content:space-between;font-size:12px;color:var(--mute);margin-top:-6px}
+
+/* 控制 */
+.ctl{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
+.ctl .side{justify-self:center;min-width:48px;height:44px;border-radius:12px;color:#fff;font-size:15px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.ctl .side[aria-pressed=true]{color:var(--accent)}
+.mid{display:flex;align-items:center;gap:14px}
+.mid .skip{width:44px;height:44px;display:grid;place-items:center;border-radius:50%}
+#play{width:58px;height:58px;border-radius:50%;background:#fff;color:#1b1e24;display:grid;place-items:center}
+#play svg{width:30px;height:30px}
+.bottom{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px}
+#fav[aria-pressed=true]{color:#ff6b81}
+#fav[aria-pressed=false] svg path{fill:none;stroke:currentColor;stroke-width:2}
+.status{font-size:12.5px;line-height:1.7;color:var(--mute);margin:0;min-height:1.7em}
+.status.warn{color:#ffd88a}
+.foot{font-size:11.5px;color:#8b95a1;line-height:1.7;padding:10px 6px 0}
+
+/* 底部面板 */
+dialog.sheet{border:0;margin:auto auto 0;width:min(100%,480px);max-height:88dvh;border-radius:24px 24px 0 0;background:var(--sheet);color:#fff;padding:0;overflow:hidden}
+dialog.sheet[open]{display:flex;flex-direction:column}
+dialog::backdrop{background:#000a}
+.sh-head{display:flex;justify-content:space-between;align-items:center;padding:16px 18px 8px}
+.sh-head b{font-size:17px}
+.sh-body{overflow:auto;padding:4px 18px 22px}
+.btn{background:#ffffff14;border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:14px}
+.btn:hover{background:#ffffff26}
+.btn:disabled{opacity:.5}
+.btn.primary{background:#fff;color:#1b1e24;border-color:#fff}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.chips button{padding:7px 13px;border-radius:99px;border:1px solid var(--line);background:#ffffff0f;font-size:13.5px}
+.chips button[aria-pressed=true]{background:#fff;color:#1b1e24;border-color:#fff}
+input[type=search],select{width:100%;background:#ffffff12;border:1px solid var(--line);border-radius:14px;padding:11px 14px;font-size:15px}
+select option{color:#000}
+ul.list{list-style:none;margin:8px 0 0;padding:0}
+.item{display:block;width:100%;text-align:left;padding:13px 4px;border-bottom:1px solid #ffffff14}
+.item.active{background:#ffffff10;border-radius:12px;padding-left:10px}
+.item .tag{margin-right:6px}
+.item .t-全球政治{color:#ffb4a2}.item .t-全球經濟{color:#ffd88a}.item .t-財經{color:#9fe0b4}.item .t-科技{color:#9cc9ff}
+.item h3{font-size:15.5px;line-height:1.55;margin:6px 0 2px;font-weight:600}
+.item small{color:var(--mute);font-size:12.5px}
+.item a{color:#c6e7ff;margin-left:8px;font-size:12.5px}
+.empty{text-align:center;color:var(--mute);padding:30px 0}
+.field{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px}
+.diag{font-size:12.5px;line-height:1.9;color:var(--mute);background:#ffffff0c;border-radius:12px;padding:10px 12px;margin-top:14px;white-space:pre-line}
+@media(min-width:520px){.shell{padding:28px 12px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<main>
-<header>
-  <div><b>聲讀 DAILY</b><br><small>全球政治 · 全球經濟 · 財經 · 科技</small></div>
-  <button id="test">測試中文語音</button>
-</header>
-
-<section class="player glass" aria-label="播放器">
-  <div class="left">
-    <div class="art">每日五分鐘<br><small>全球政經快訊</small></div>
-    <small id="meta">等待選擇新聞</small>
-    <h1 id="title">先試聽，再開始今日快訊</h1>
-    <progress id="progress" max="1" value="0"></progress>
-    <small id="position">以完成句數顯示進度，非精確秒數</small>
-    <div class="transport">
-      <button id="prev" aria-label="上一則">上一則</button>
-      <button id="play">播放</button>
-      <button id="next" aria-label="下一則">下一則</button>
-      <button id="stop">停止</button>
-    </div>
-    <div class="ctrl">
-      <label>語速 <input id="rate" type="range" min="0.7" max="1.4" step="0.05" value="1"></label>
-      <select id="voice" aria-label="中文語音"><option value="">系統中文語音</option></select>
-    </div>
-    <p id="audio" class="status" role="status">按「測試中文語音」可獨立測試，不必等新聞載入。空白鍵可播放／暫停。</p>
+<div class="shell">
+<section class="player" id="player" aria-label="新聞播放器">
+  <div class="top">
+    <button id="collapse" aria-label="收合／展開逐字稿" aria-expanded="true"><svg class="ico chev" viewBox="0 0 24 24"><path d="M3.5 8.5 12 17l8.5-8.5-1.4-1.4L12 14.2 4.9 7.1z"/></svg></button>
+    <span class="brand">聲讀 DAILY</span>
+    <button id="menu" aria-label="新聞清單"><svg class="ico" viewBox="0 0 24 24"><path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/></svg></button>
   </div>
+
+  <div class="paper">
+    <div class="tagrow" id="tagrow"><span>逐字稿</span></div>
+    <div class="script" id="script" aria-live="off"><p class="line">按右上角清單選擇新聞，或直接按播放開始今日快訊。</p></div>
+    <div class="wave" id="wave" aria-hidden="true"></div>
+  </div>
+
+  <div class="info">
+    <div><h1 id="title">先試聽，再開始今日快訊</h1><small id="meta">等待新聞載入</small></div>
+    <button id="gear" aria-label="設定與語音測試"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="4" stroke-dasharray="3.14 3.14"/><path fill-rule="evenodd" d="M12 5.8a6.2 6.2 0 1 0 0 12.4 6.2 6.2 0 1 0 0-12.4zm0 3.7a2.5 2.5 0 1 1 0 5 2.5 2.5 0 1 1 0-5z"/></svg></button>
+  </div>
+
   <div>
-    <small>播報稿 · 點句子可從該句開始</small>
-    <div id="script" class="script"><p class="muted">新聞載入後，這裡會顯示實際朗讀的標題與摘要。播放時逐句高亮。</p></div>
+    <input id="seek" type="range" min="0" max="1" step="1" value="0" aria-label="句子進度">
+    <div class="pos"><span id="position">第 0 / 0 句</span><span id="eta"></span></div>
   </div>
+
+  <div class="ctl">
+    <button class="side" id="rateBtn" aria-label="切換語速">1.0x</button>
+    <div class="mid">
+      <button class="skip" id="prev" aria-label="上一則"><svg class="ico" viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 18V6z"/></svg></button>
+      <button id="play" aria-label="播放"></button>
+      <button class="skip" id="next" aria-label="下一則"><svg class="ico" viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+    </div>
+    <button class="side" id="loop" aria-label="循環播放" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"/></svg></button>
+  </div>
+
+  <div class="bottom">
+    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zM16.5 12a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg>
+    <input id="vol" type="range" min="0" max="1" step="0.05" value="1" aria-label="音量">
+    <button id="fav" aria-label="收藏這則" aria-pressed="false"><svg class="ico" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></button>
+  </div>
+  <p id="audio" class="status" role="status">請先按播放；若沒聲音，點右上角齒輪做語音測試。空白鍵可播放／暫停。</p>
 </section>
-
-<div class="toolbar" role="group" aria-label="快訊與分類">
-  <button id="refresh">更新新聞</button>
-  <button id="daily">約五分鐘快訊</button>
-  <button id="world">全球政經快訊</button>
-  <span class="sep"></span>
-  <input id="q" type="search" placeholder="搜尋標題／摘要" aria-label="搜尋新聞">
+<p class="foot">僅朗讀來源提供的標題與摘要，非新聞全文，亦非獨立查證的分析；分類為依來源與關鍵字自動判定，可能有誤。新聞來自第三方 RSS 服務，可用性不保證。</p>
 </div>
-<div class="toolbar" id="cats" role="group" aria-label="分類篩選" style="margin-top:0"></div>
-<p id="newsStatus" class="status" role="status">正在載入新聞；手機下方可左右滑動，每頁兩則。</p>
-<div id="grid" class="grid"></div>
 
-<footer>僅朗讀來源提供的標題與摘要，並非新聞全文，亦非獨立查證的分析；分類為依來源與關鍵字自動判定，可能有誤。
-新聞更新需連線，頁面開啟期間每半小時更新。語音及來源服務可用性取決於裝置與第三方服務（rss2json／allorigins）。</footer>
-</main>
+<!-- 新聞清單 -->
+<dialog class="sheet" id="listDlg" aria-label="新聞清單">
+  <div class="sh-head"><b>新聞清單</b><button id="listClose" aria-label="關閉"><svg class="ico" viewBox="0 0 24 24"><path d="M5.6 4.2 12 10.6l6.4-6.4 1.4 1.4-6.4 6.4 6.4 6.4-1.4 1.4-6.4-6.4-6.4 6.4-1.4-1.4 6.4-6.4-6.4-6.4z"/></svg></button></div>
+  <div class="sh-body">
+    <div class="row">
+      <button class="btn primary" id="daily">約五分鐘快訊</button>
+      <button class="btn" id="world">全球政經快訊</button>
+      <button class="btn" id="refresh">更新新聞</button>
+    </div>
+    <input id="q" type="search" placeholder="搜尋標題／摘要" aria-label="搜尋新聞">
+    <div class="row chips" id="cats" role="group" aria-label="分類篩選"></div>
+    <p id="newsStatus" class="status" role="status">正在載入新聞…</p>
+    <ul class="list" id="list"></ul>
+  </div>
+</dialog>
+
+<!-- 設定 -->
+<dialog class="sheet" id="setDlg" aria-label="設定">
+  <div class="sh-head"><b>語音設定</b><button id="setClose" aria-label="關閉"><svg class="ico" viewBox="0 0 24 24"><path d="M5.6 4.2 12 10.6l6.4-6.4 1.4 1.4-6.4 6.4 6.4 6.4-1.4 1.4-6.4-6.4-6.4 6.4-1.4-1.4 6.4-6.4-6.4-6.4z"/></svg></button></div>
+  <div class="sh-body">
+    <button class="btn primary" id="test">測試中文語音</button>
+    <label class="field" for="voice">中文語音</label>
+    <select id="voice"><option value="">系統預設中文語音</option></select>
+    <div class="diag" id="diag"></div>
+  </div>
+</dialog>
 
 <script>
 'use strict';
 const $=id=>document.getElementById(id),synth=window.speechSynthesis;
-const CATS=['全部','全球政治','全球經濟','財經','科技'];
-/* [來源, 預設分類, RSS 網址, 是否為綜合來源（以關鍵字再分類）] */
+const CATS=['全部','全球政治','全球經濟','財經','科技','收藏'];
+const ALL4=['全球政治','全球經濟','財經','科技'];
+/* [來源, 預設分類, RSS 網址, 是否綜合來源（以關鍵字再分類）] */
 const SOURCES=[
  ['BBC 中文','全球政治','https://feeds.bbci.co.uk/zhongwen/trad/rss.xml',1],
  ['德國之聲','全球政治','https://rss.dw.com/rdf/rss-chi-all',1],
@@ -132,105 +190,187 @@ const SOURCES=[
  ['自由時報財經','財經','https://news.ltn.com.tw/rss/business.xml',0],
  ['科技新報','科技','https://technews.tw/feed/',0]
 ];
-const ECON=/經濟|通膨|通脹|物價|利率|升息|降息|央行|聯準會|關稅|貿易|貨幣|匯率|股市|債|油價|能源|供應鏈|制裁|財政|赤字|失業|就業|景氣|衰退|成長|GDP|IMF|世銀|世界銀行|經貿|出口|進口|投資|銀行|OPEC/i;
-const POL=/選舉|總統|總理|首相|議會|國會|戰爭|衝突|停火|談判|外交|峰會|聯合國|北約|軍|飛彈|制裁|地緣|川普|拜登|普廷|普京|習近平|烏克蘭|加薩|以色列|伊朗|台海|北韓|歐盟/;
-const MAX_AGE=3*864e5; /* 只保留三天內 */
-let articles=[],queue=[],idx=0,lines=[],sentence=0,mode='idle',token=0,voices=[],category='全部',keyword='',loading=false,watchdog;
+const ECON=/經濟|通膨|通脹|物價|利率|升息|降息|央行|聯準會|關稅|貿易|貨幣|匯率|股市|債|油價|能源|供應鏈|財政|赤字|失業|就業|景氣|衰退|成長|GDP|IMF|世銀|世界銀行|經貿|出口|進口|投資|銀行|OPEC/i;
+const POL=/選舉|總統|總理|首相|議會|國會|戰爭|衝突|停火|談判|外交|峰會|聯合國|北約|軍|飛彈|地緣|川普|拜登|普廷|普京|習近平|烏克蘭|加薩|以色列|伊朗|台海|北韓|歐盟/;
+const MAX_AGE=3*864e5;
+const RATES=[0.8,1,1.2,1.4];
+const ICON_PLAY='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',ICON_PAUSE='<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
+
+let articles=[],queue=[],idx=0,lines=[],nodes=[],sentence=0,mode='idle',token=0,voices=[],category='全部',keyword='',loading=false,watchdog,
+    current=null,lastCancel=0,loop=false,rate=1,favs=[],unlocked=false;
 
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-function status(t){$('audio').textContent=t}
+function status(t,warn){const e=$('audio');e.textContent=t;e.classList.toggle('warn',!!warn)}
 
-/* ---------- 語音 ---------- */
+/* ---------- 語音：初始化 ---------- */
+const inApp=/Line\/|FBAN|FBAV|Instagram|MicroMessenger|MQQBrowser|; wv\)/i.test(navigator.userAgent);
 function populate(){
   if(!synth)return;
   voices=synth.getVoices().filter(v=>/^zh|^cmn|^yue/i.test(v.lang));
   const saved=store.get('news-voice',''),sel=$('voice');
-  sel.replaceChildren(new Option('系統中文語音',''));
+  sel.replaceChildren(new Option('系統預設中文語音',''));
   voices.forEach((v,i)=>sel.add(new Option(v.name+' · '+v.lang,String(i))));
   const si=voices.findIndex(v=>v.name===saved);
   if(si>=0)sel.value=String(si);
   else{const i=voices.findIndex(v=>/TW|Hant/i.test(v.lang));if(i>=0)sel.value=String(i)}
+  diag();
 }
-if(synth){populate();synth.addEventListener('voiceschanged',populate)}else status('此瀏覽器未提供語音合成功能，請使用其他瀏覽器。');
-$('voice').onchange=()=>{const v=voices[Number($('voice').value)];store.set('news-voice',v?v.name:'')};
-$('rate').value=store.get('news-rate',1);
-$('rate').onchange=()=>store.set('news-rate',Number($('rate').value));
+function diag(){
+  const lines=[
+    '語音功能：'+(synth?'支援':'不支援'),
+    '中文語音數：'+voices.length+(synth&&!voices.length?'（尚未偵測到，請見下方建議）':''),
+    '目前語音：'+(voices[Number($('voice').value)]?.name||'系統預設'),
+    '引擎狀態：'+(synth?(synth.speaking?'朗讀中':synth.paused?'暫停':'待命'):'—')
+  ];
+  if(inApp)lines.push('⚠ 偵測到 App 內建瀏覽器（LINE／FB 等），常不支援語音，請改用 Chrome 或 Safari 開啟。');
+  if(synth&&!voices.length)lines.push('建議：Android 到「設定→系統→語言→文字轉語音」安裝／啟用中文語音（Google 文字轉語音）；iPhone 到「設定→輔助使用→語音內容→聲音」下載中文語音，並確認未開靜音鍵、媒體音量已調高。');
+  $('diag').textContent=lines.join('\n');
+}
+if(synth){
+  populate();synth.addEventListener('voiceschanged',populate);
+  let tries=0;const poll=setInterval(()=>{if(voices.length||++tries>10)clearInterval(poll);else populate()},500); /* Android 常延遲才有語音清單 */
+}else status('此瀏覽器不支援語音合成，請改用 Chrome 或 Safari。',true);
+if(inApp)status('偵測到 App 內建瀏覽器，可能無法發聲；請改用 Chrome 或 Safari 開啟。',true);
 
-function cancel(){token++;clearTimeout(watchdog);if(synth)synth.cancel();mode='idle';$('play').textContent='播放';setSession('none')}
+/* iOS／部分瀏覽器：第一次互動時先「解鎖」語音引擎 */
+function unlock(){
+  if(unlocked||!synth)return;unlocked=true;
+  try{const u=new SpeechSynthesisUtterance(' ');u.volume=0;synth.speak(u)}catch(e){}
+}
+['pointerdown','touchend','keydown'].forEach(ev=>addEventListener(ev,unlock,{passive:true}));
+
+/* ---------- 設定值 ---------- */
+rate=store.get('news-rate',1);loop=store.get('news-loop',false);favs=store.get('news-favs',[]);
+$('vol').value=store.get('news-vol',1);
+function paintRate(){$('rateBtn').textContent=rate.toFixed(1)+'x'}
+function paintLoop(){$('loop').setAttribute('aria-pressed',String(loop))}
+paintRate();paintLoop();
+$('rateBtn').onclick=()=>{let i=RATES.indexOf(rate);rate=RATES[(i+1)%RATES.length];store.set('news-rate',rate);paintRate();eta()};
+$('loop').onclick=()=>{loop=!loop;store.set('news-loop',loop);paintLoop()};
+$('vol').onchange=()=>store.set('news-vol',Number($('vol').value));
+$('voice').onchange=()=>{const v=voices[Number($('voice').value)];store.set('news-voice',v?v.name:'');diag()};
+
+/* ---------- 播放核心 ---------- */
+function setPlayIcon(on){$('play').innerHTML=on?ICON_PAUSE:ICON_PLAY;$('play').setAttribute('aria-label',on?'暫停':'播放');$('player').classList.toggle('playing',on)}
+setPlayIcon(false);
+function halt(){token++;clearTimeout(watchdog);if(synth){synth.cancel();lastCancel=Date.now()}}
+function cancel(){halt();mode='idle';setPlayIcon(false);setSession('none')}
 function clean(s){const d=new DOMParser().parseFromString(s||'','text/html');d.querySelectorAll('script,style').forEach(n=>n.remove());return(d.body.textContent||'').replace(/\s+/g,' ').trim()}
 const ABBR=[[/TechNews/gi,'科技新報'],[/\bAI\b/g,'人工智慧'],[/\bGDP\b/g,'國內生產毛額'],[/\bETF\b/g,'指數股票型基金'],
  [/\bFed\b/g,'聯準會'],[/\bIMF\b/g,'國際貨幣基金'],[/\bWTO\b/g,'世界貿易組織'],[/\bOPEC\+?/g,'石油輸出國組織'],
- [/\bNATO\b/g,'北約'],[/\bEU\b/g,'歐盟'],[/\bUN\b/g,'聯合國'],[/\bUS\b|\bUSA\b/g,'美國'],[/\bG7\b/g,'七大工業國集團'],
+ [/\bNATO\b/g,'北約'],[/\bEU\b/g,'歐盟'],[/\bUN\b/g,'聯合國'],[/\bUSA?\b/g,'美國'],[/\bG7\b/g,'七大工業國集團'],
  [/\bG20\b/g,'二十國集團'],[/\bCPI\b/g,'消費者物價指數'],[/\bECB\b/g,'歐洲央行'],[/\bIPO\b/g,'首次公開募股'],
- [/\bEV\b/g,'電動車'],[/\bChatGPT\b/gi,'聊天機器人'],[/\bNVIDIA\b|輝達/gi,'輝達'],[/\bTSMC\b/g,'台積電']];
+ [/\bEV\b/g,'電動車'],[/\bChatGPT\b/gi,'聊天機器人'],[/\bNVIDIA\b/gi,'輝達'],[/\bTSMC\b/g,'台積電']];
 function spoken(s){
   ABBR.forEach(([r,t])=>{s=s.replace(r,t)});
   let n=0;
-  s=s.replace(/[A-Za-z][A-Za-z0-9 .+&'-]*/g,()=>n++?'':'（外文名稱略）'); /* 同一句多次外文只讀一次 */
+  s=s.replace(/[A-Za-z][A-Za-z0-9 .+&'-]*/g,()=>n++?'':'（外文名稱略）');
   return s.replace(/\s+/g,' ').trim();
 }
-function splitSentences(t){return t.match(/[^。！？!?；;]+[。！？!?；;]?/g)||[]}
+/* 以句號切句；過長再以逗號切，避免 Chrome 長句中斷 */
+function splitSentences(t){
+  const out=[];
+  (t.match(/[^。！？!?；;]+[。！？!?；;]?/g)||[]).forEach(s=>{
+    if(s.length<=70){out.push(s);return}
+    let buf='';(s.match(/[^，、,]+[，、,]?/g)||[s]).forEach(p=>{if((buf+p).length>60&&buf){out.push(buf);buf=p}else buf+=p});if(buf)out.push(buf);
+  });
+  return out;
+}
+function eta(){
+  const chars=lines.slice(sentence).join('').length,sec=Math.round(chars/(4.2*rate));
+  $('eta').textContent=lines.length?('約剩 '+(sec>=60?Math.floor(sec/60)+' 分 ':'')+(sec%60)+' 秒'):'';
+}
 
 function setArticle(){
   const a=queue[idx];if(!a)return;sentence=0;
   lines=[a.category+'消息。',spoken(a.title)+'。',...splitSentences(spoken(a.summary)||'來源未提供摘要。')].filter(t=>t.trim());
   $('title').textContent=a.title;
-  $('meta').textContent=`第 ${idx+1} / ${queue.length} 則 · ${a.source} · ${ago(a.time)}`;
-  const sc=$('script');sc.replaceChildren();
-  lines.forEach((t,i)=>{const b=document.createElement('button');b.className='line';b.textContent=t;b.onclick=()=>{cancel();sentence=i;speakLine()};sc.append(b)});
-  highlight();render();updateSession(a);
+  $('meta').textContent=`${a.source} · ${ago(a.time)} · 第 ${idx+1}/${queue.length} 則`;
+  $('tagrow').innerHTML='';const tg=document.createElement('span');tg.className='tag t-'+a.category;tg.textContent=a.category;
+  const lb=document.createElement('span');lb.textContent='逐字稿';$('tagrow').append(tg,lb);
+  const sc=$('script');sc.replaceChildren();nodes=[];
+  lines.forEach((t,i)=>{
+    const b=document.createElement('button'),r=document.createElement('span'),u=document.createElement('span');
+    b.className='line';r.className='r';u.textContent=t;b.append(r,u);
+    b.onclick=()=>{unlock();seekTo(i,true)};sc.append(b);nodes.push({b,r,u});
+  });
+  highlight();paintList();paintFav();updateSession(a);
 }
+function setRead(i,n){const nd=nodes[i];if(!nd)return;nd.r.textContent=lines[i].slice(0,n);nd.u.textContent=lines[i].slice(n)}
 function highlight(){
-  $('progress').max=Math.max(1,lines.length);$('progress').value=sentence;
-  $('position').textContent=`第 ${Math.min(sentence+1,lines.length)} / ${lines.length} 句`;
-  const sc=$('script');[...sc.children].forEach((n,i)=>n.classList.toggle('active',i===sentence));
-  const n=sc.children[sentence];
-  if(n)sc.scrollTo({top:Math.max(0,n.offsetTop-sc.offsetTop-65),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+  const seek=$('seek');seek.max=Math.max(1,lines.length-1);seek.value=sentence;
+  $('position').textContent=`第 ${Math.min(sentence+1,lines.length)} / ${lines.length} 句`;eta();
+  nodes.forEach((nd,i)=>{
+    nd.b.classList.toggle('active',i===sentence);nd.b.classList.toggle('past',i<sentence);
+    setRead(i,0);
+  });
+  const sc=$('script'),n=nodes[sentence]?.b;
+  if(n)sc.scrollTo({top:Math.max(0,n.offsetTop-sc.clientHeight/2+n.offsetHeight/2),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
 }
+function seekTo(i,play){
+  const was=mode==='playing'||mode==='starting';
+  halt();sentence=Math.max(0,Math.min(lines.length-1,i));highlight();
+  if(play||was){mode='idle';speakLine()}else{mode='paused';setPlayIcon(false)}
+}
+$('seek').onchange=()=>{unlock();seekTo(Number($('seek').value),false)};
+
 function speakLine(){
-  if(!synth){status('此瀏覽器不支援語音合成。');return}
+  if(!synth){status('此瀏覽器不支援語音合成。',true);return}
+  if(!lines.length){status('尚無新聞可播報。');return}
   if(sentence>=lines.length){
     if(idx+1<queue.length){idx++;setArticle()}
-    else{mode='ended';$('play').textContent='重新播放';status('快訊播報完畢。');setSession('none');return}
+    else if(loop&&queue.length){idx=0;setArticle()}
+    else{mode='ended';setPlayIcon(false);status('快訊播報完畢。');setSession('none');return}
   }
-  const t=token,u=new SpeechSynthesisUtterance(lines[sentence]);
-  u.lang='zh-TW';u.rate=Number($('rate').value);
-  const sel=$('voice').value;if(sel!==''&&voices[Number(sel)])u.voice=voices[Number(sel)];
-  mode='starting';$('play').textContent='暫停';highlight();
-  u.onstart=()=>{if(t!==token)return;clearTimeout(watchdog);mode='playing';setSession('playing');status('正在朗讀。右側顯示相同播報稿。')};
+  const t=token,si=sentence,u=new SpeechSynthesisUtterance(lines[sentence]);
+  current=u; /* 保留參考，避免被垃圾回收導致 onend 不觸發、朗讀中斷 */
+  const v=voices[Number($('voice').value)];
+  u.lang=v?v.lang:'zh-TW';if(v)u.voice=v;
+  u.rate=rate;u.volume=Number($('vol').value);
+  mode='starting';setPlayIcon(true);highlight();
+  u.onstart=()=>{if(t!==token)return;clearTimeout(watchdog);mode='playing';setSession('playing');status('正在朗讀。')};
+  u.onboundary=e=>{if(t===token&&si===sentence&&e.name!=='sentence')setRead(si,e.charIndex+(e.charLength||0))};
   u.onend=()=>{if(t!==token)return;clearTimeout(watchdog);sentence++;speakLine()};
-  u.onerror=e=>{if(t!==token||e.error==='canceled'||e.error==='interrupted')return;clearTimeout(watchdog);mode='error';$('play').textContent='重試';status('語音錯誤：'+e.error+'。可重試或更換中文語音。')};
-  watchdog=setTimeout(()=>{if(t===token&&mode==='starting')status('尚未收到語音開始訊號。請按停止，再試中文語音；也可改用一般瀏覽器開啟。')},7000);
-  synth.speak(u);
+  u.onerror=e=>{
+    if(t!==token||e.error==='canceled'||e.error==='interrupted')return;
+    clearTimeout(watchdog);mode='error';setPlayIcon(false);
+    const m={'not-allowed':'瀏覽器擋下自動發聲，請再按一次播放。','synthesis-unavailable':'此裝置沒有可用的語音引擎或中文語音，請看設定內建議。','language-unavailable':'此裝置沒有中文語音，請看設定內建議。','audio-busy':'音訊裝置忙碌中，請稍後再試。'}[e.error];
+    status(m||('語音錯誤：'+e.error+'。可重試或更換中文語音。'),true);
+  };
+  watchdog=setTimeout(()=>{if(t===token&&mode==='starting')status('尚未收到發聲訊號：請確認媒體音量（iPhone 另需關閉靜音）、已安裝中文語音，或改用 Chrome／Safari。點齒輪可做語音測試。',true)},5000);
+  const go=()=>{if(t!==token)return;try{if(synth.paused)synth.resume();synth.speak(u)}catch(err){status('無法啟動語音：'+err.message,true)}};
+  /* cancel 後立即 speak 在 Chrome 可能被吃掉，需稍等 */
+  const wait=180-(Date.now()-lastCancel);wait>0?setTimeout(go,wait):go();
 }
 function togglePlay(){
-  if(!synth)return;
-  if(mode==='playing'||mode==='starting'){synth.pause();mode='paused';$('play').textContent='繼續';setSession('paused');return}
-  if(mode==='paused'){synth.resume();mode='playing';$('play').textContent='暫停';setSession('playing');return}
-  if(!queue.length){status('尚無新聞。可以先按測試中文語音。');return}
+  if(!synth)return;unlock();
+  if(mode==='playing'||mode==='starting'){halt();mode='paused';setPlayIcon(false);setSession('paused');status('已暫停；按播放會從本句重新開始。');return}
+  if(!queue.length){status('尚無新聞，請稍候或到清單更新。');return}
   if(mode==='ended'){idx=0;setArticle()}
   speakLine();
 }
 $('play').onclick=togglePlay;
-$('stop').onclick=()=>{cancel();status('已停止；播放將從目前句子重新開始。')};
-function jump(d){if(!queue.length)return;cancel();idx=Math.max(0,Math.min(queue.length-1,idx+d));setArticle();speakLine()}
+function jump(d){if(!queue.length)return;unlock();halt();idx=Math.max(0,Math.min(queue.length-1,idx+d));setArticle();mode='idle';speakLine()}
 $('prev').onclick=()=>jump(-1);$('next').onclick=()=>jump(1);
 document.addEventListener('keydown',e=>{
-  if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName)||document.querySelector('dialog[open]'))return;
   if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePlay()}
   else if(e.key==='ArrowRight')jump(1);else if(e.key==='ArrowLeft')jump(-1);
 });
+
 $('test').onclick=()=>{
-  cancel();if(!synth){status('此瀏覽器不支援語音。');return}
-  populate();const t=token,u=new SpeechSynthesisUtterance('這是中文語音測試。如果您聽到這段話，表示目前裝置可以播放中文語音。');
-  u.lang='zh-TW';if($('voice').value!=='')u.voice=voices[Number($('voice').value)];
-  u.onstart=()=>{if(t===token)status('系統已開始語音測試；是否實際聽到聲音，仍請您確認。')};
-  u.onend=()=>{if(t===token)status('語音測試已結束。若聽不到，請確認媒體音量、輸出裝置及中文語音。')};
-  u.onerror=e=>{if(t===token)status('測試錯誤：'+e.error)};
-  synth.speak(u);
+  unlock();if(!synth){status('此瀏覽器不支援語音。',true);return}
+  halt();mode='idle';setPlayIcon(false);populate();
+  const t=token,u=new SpeechSynthesisUtterance('這是中文語音測試。如果您聽到這段話，表示目前裝置可以播放中文語音。');current=u;
+  const v=voices[Number($('voice').value)];u.lang=v?v.lang:'zh-TW';if(v)u.voice=v;u.volume=Number($('vol').value);
+  u.onstart=()=>{if(t===token){status('測試已開始；若沒聽到聲音，請調高媒體音量、關閉靜音，或在上方更換語音。');diag()}};
+  u.onend=()=>{if(t===token){status('語音測試結束。');diag()}};
+  u.onerror=e=>{if(t===token)status('測試錯誤：'+e.error+'。請看下方診斷建議。',true)};
+  const wait=200-(Date.now()-lastCancel);setTimeout(()=>{if(t===token){if(synth.paused)synth.resume();synth.speak(u)}},Math.max(0,wait));
+  setTimeout(()=>{if(t===token&&!synth.speaking)status('沒有收到發聲訊號，此裝置／瀏覽器可能不支援中文語音，請看下方診斷。',true);diag()},4000);
 };
 
-/* ---------- 鎖定畫面／耳機控制（Media Session，支援度依瀏覽器而定） ---------- */
+/* ---------- 鎖定畫面／耳機控制 ---------- */
 function setSession(s){try{if('mediaSession' in navigator)navigator.mediaSession.playbackState=s}catch(e){}}
 function updateSession(a){
   try{
@@ -241,52 +381,61 @@ function updateSession(a){
   }catch(e){}
 }
 
-/* ---------- 新聞列表 ---------- */
+/* ---------- 收藏 ---------- */
+function isFav(a){return a&&favs.some(f=>f.link===a.link)}
+function paintFav(){const on=isFav(queue[idx]);$('fav').setAttribute('aria-pressed',String(on))}
+$('fav').onclick=()=>{
+  const a=queue[idx];if(!a)return;
+  favs=isFav(a)?favs.filter(f=>f.link!==a.link):[a,...favs].slice(0,50);
+  store.set('news-favs',favs);paintFav();paintList();
+};
+
+/* ---------- 清單面板 ---------- */
 function ago(t){
   if(!t)return'時間未知';const m=Math.round((Date.now()-t)/6e4);
   if(m<1)return'剛剛';if(m<60)return m+' 分鐘前';if(m<1440)return Math.round(m/60)+' 小時前';return Math.round(m/1440)+' 天前';
 }
-function classify(a,mixed,def){
-  if(!mixed)return def;
-  const s=a.title+' '+a.summary;
-  if(def==='全球政治'){if(ECON.test(a.title)||(ECON.test(s)&&!POL.test(a.title)))return'全球經濟'}
-  return def;
-}
 function visible(){
   const k=keyword.trim().toLowerCase();
-  return articles.filter(a=>(category==='全部'||a.category===category)&&(!k||(a.title+a.summary).toLowerCase().includes(k)));
+  const base=category==='收藏'?favs:articles.filter(a=>category==='全部'||a.category===category);
+  return base.filter(a=>!k||(a.title+a.summary).toLowerCase().includes(k));
 }
 function buildCats(){
   const box=$('cats');box.replaceChildren();
   CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.setAttribute('aria-pressed',String(c===category));
-    b.onclick=()=>{category=c;buildCats();render()};box.append(b)});
+    b.onclick=()=>{category=c;buildCats();paintList()};box.append(b)});
 }
-function render(){
-  const list=visible(),grid=$('grid');grid.replaceChildren();
-  if(!list.length){const p=document.createElement('p');p.className='empty muted';p.textContent=articles.length?'沒有符合的新聞。':'尚無新聞資料。';grid.append(p);return}
-  for(let i=0;i<list.length;i+=2){
-    const page=document.createElement('div');page.className='page';
-    list.slice(i,i+2).forEach(a=>{
-      const c=document.createElement('article');c.className='card'+(queue[idx]&&queue[idx].link===a.link?' active':'');
-      const m=document.createElement('small'),tag=document.createElement('span');
-      tag.className='tag t-'+a.category;tag.textContent=a.category;m.append(tag,a.source+' · '+ago(a.time));
-      const h=document.createElement('h3');h.textContent=a.title;
-      const p=document.createElement('p');p.textContent=a.summary||'來源未提供摘要';
-      const row=document.createElement('div');row.className='row';
-      const b=document.createElement('button');b.textContent='播報這則';
-      b.onclick=()=>{cancel();queue=list.slice();idx=list.indexOf(a);setArticle();speakLine()};
-      const l=document.createElement('a');l.textContent='原文';l.href=a.link;l.target='_blank';l.rel='noopener noreferrer';
-      row.append(b,l);c.append(m,h,p,row);page.append(c);
-    });
-    grid.append(page);
-  }
+function paintList(){
+  const list=visible(),ul=$('list');ul.replaceChildren();
+  if(!list.length){const li=document.createElement('li');li.className='empty';li.textContent=category==='收藏'?'尚未收藏。播放時按愛心即可加入。':articles.length?'沒有符合的新聞。':'尚無新聞資料。';ul.append(li);return}
+  list.forEach((a,i)=>{
+    const li=document.createElement('li'),b=document.createElement('button');
+    b.className='item'+(queue[idx]&&queue[idx].link===a.link?' active':'');
+    const m=document.createElement('small'),tag=document.createElement('span');
+    tag.className='tag t-'+a.category;tag.textContent=a.category;
+    m.append(tag,a.source+' · '+ago(a.time)+(isFav(a)?' · ♥':''));
+    const h=document.createElement('h3');h.textContent=a.title;
+    b.append(m,h);
+    b.onclick=()=>{unlock();halt();queue=list.slice();idx=i;setArticle();mode='idle';speakLine();$('listDlg').close()};
+    const l=document.createElement('a');l.textContent='原文';l.href=a.link;l.target='_blank';l.rel='noopener noreferrer';
+    l.onclick=e=>e.stopPropagation();m.append(l);
+    li.append(b);ul.append(li);
+  });
 }
-$('q').oninput=()=>{keyword=$('q').value;render()};
+$('q').oninput=()=>{keyword=$('q').value;paintList()};
+$('menu').onclick=()=>{paintList();$('listDlg').showModal()};
+$('listClose').onclick=()=>$('listDlg').close();
+$('gear').onclick=()=>{diag();$('setDlg').showModal()};
+$('setClose').onclick=()=>$('setDlg').close();
+document.querySelectorAll('dialog').forEach(d=>d.addEventListener('click',e=>{if(e.target===d)d.close()}));
+$('collapse').onclick=()=>{const on=$('player').classList.toggle('compact-on');$('collapse').setAttribute('aria-expanded',String(!on))};
+
+/* 波形裝飾 */
+(function(){const w=$('wave');let h=0.5;for(let i=0;i<34;i++){h=Math.max(.2,Math.min(1,h+(Math.random()-.5)*.7));const b=document.createElement('i');b.style.setProperty('--h',h.toFixed(2));b.style.setProperty('--d',(i*0.05%0.9).toFixed(2)+'s');w.append(b)}})();
 
 /* 約五分鐘快訊：各類輪流取，依字數估算 */
 function briefing(cats){
   const pools=cats.map(c=>articles.filter(a=>a.category===c)),out=[];let budget=0;
-  const rate=Number($('rate').value);
   for(let r=0;r<10;r++)for(const pool of pools){
     const a=pool[r];if(!a||out.length>=10)continue;
     const n=(a.title.length+a.summary.length+15)/(4*rate);
@@ -295,14 +444,19 @@ function briefing(cats){
   return out;
 }
 function startBrief(cats){
-  cancel();queue=briefing(cats);idx=0;
+  unlock();halt();queue=briefing(cats);idx=0;
   if(!queue.length){status('目前沒有可播報的新聞。');return}
-  setArticle();speakLine();
+  setArticle();mode='idle';speakLine();$('listDlg').close();
 }
-$('daily').onclick=()=>startBrief(['全球政治','全球經濟','財經','科技']);
+$('daily').onclick=()=>startBrief(ALL4);
 $('world').onclick=()=>startBrief(['全球政治','全球經濟']);
 
 /* ---------- 載入（rss2json，失敗改用 allorigins 後備） ---------- */
+function classify(a,mixed,def){
+  if(!mixed)return def;
+  if(def==='全球政治'&&(ECON.test(a.title)||(ECON.test(a.title+a.summary)&&!POL.test(a.title))))return'全球經濟';
+  return def;
+}
 async function fetchJSON(url,ms){
   const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),ms);
   try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw Error(r.status);return await r.json()}
@@ -336,19 +490,20 @@ async function load(){
   const seen=new Set();
   const fresh=results.flat().filter(a=>{const k=a.link,t=a.title.slice(0,18);if(seen.has(k)||seen.has(t))return false;seen.add(k);seen.add(t);return true}).sort((a,b)=>b.time-a.time);
   if(fresh.length){
-    articles=fresh;store.set('news-glass-v2',{saved:Date.now(),articles});render();
-    if(!queue.length||mode==='idle'||mode==='ended'){queue=briefing(['全球政治','全球經濟','財經','科技']);idx=0;setArticle()}
+    articles=fresh;store.set('news-glass-v2',{saved:Date.now(),articles});
+    if(!queue.length||mode==='idle'||mode==='ended'){queue=briefing(ALL4);idx=0;setArticle()}
+    paintList();
   }
   const n=c=>fresh.filter(a=>a.category===c).length;
   $('newsStatus').textContent=fresh.length
-    ?`已取得 ${fresh.length} 則（政治 ${n('全球政治')}・經濟 ${n('全球經濟')}・財經 ${n('財經')}・科技 ${n('科技')}）· ${failed}/${SOURCES.length} 個來源失敗 · 更新於 ${new Date().toLocaleTimeString('zh-TW')}。五分鐘為按字數估計。`
+    ?`已取得 ${fresh.length} 則（政治 ${n('全球政治')}・經濟 ${n('全球經濟')}・財經 ${n('財經')}・科技 ${n('科技')}）· ${failed}/${SOURCES.length} 個來源失敗 · ${new Date().toLocaleTimeString('zh-TW')} 更新`
     :'目前無法取得新聞。'+(articles.length?'保留上次快取；不是即時新聞。':'請確認網路或稍後重試。語音測試仍可使用。');
   loading=false;$('refresh').disabled=false;
 }
 buildCats();
 const cache=store.get('news-glass-v2',null);
 if(cache&&Array.isArray(cache.articles)){
-  articles=cache.articles;render();queue=briefing(['全球政治','全球經濟','財經','科技']);if(queue.length)setArticle();
+  articles=cache.articles;queue=briefing(ALL4);if(queue.length)setArticle();
   $('newsStatus').textContent='顯示上次快取（'+ago(cache.saved)+'），正在更新。';
 }
 $('refresh').onclick=load;load();
