@@ -1,0 +1,17 @@
+{
+  "name": "聲讀｜每日全球政經科技",
+  "short_name": "聲讀",
+  "description": "朗讀每日全球政治、經濟、財經與科技新聞摘要的播放器",
+  "lang": "zh-Hant",
+  "start_url": "/daily-news.html",
+  "scope": "/daily-news.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1b1e24",
+  "theme_color": "#1b1e24",
+  "icons": [
+    { "src": "/images/daily-news-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/images/daily-news-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/images/daily-news-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

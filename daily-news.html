@@ -5,17 +5,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#1b1e24">
+<link rel="manifest" href="/daily-news.webmanifest">
+<link rel="apple-touch-icon" href="/images/daily-news-180.png">
+<link rel="icon" type="image/png" href="/images/daily-news-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="聲讀">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="format-detection" content="telephone=no">
 <title>聲讀｜每日全球政經科技</title>
 <style>
 :root{color-scheme:dark;--bg:#1b1e24;--card:#363c46;--sheet:#2b3038;--fg:#fff;--mute:#aeb6c0;--line:#ffffff1f;--accent:#9fd3e6}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--fg);font:16px system-ui,-apple-system,"Noto Sans TC",sans-serif}
 button,select,input{font:inherit;color:inherit}
-button{border:0;background:none;cursor:pointer;padding:0}
+html{-webkit-text-size-adjust:100%}
+button{border:0;background:none;cursor:pointer;padding:0;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.line,.paper{-webkit-touch-callout:none}
 button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:8px}
 svg{display:block;fill:currentColor}
 .ico{width:26px;height:26px}
-.shell{max-width:440px;margin:0 auto;min-height:100dvh;padding:12px;display:flex;flex-direction:column}
+.shell{max-width:440px;margin:0 auto;min-height:100dvh;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));display:flex;flex-direction:column}
+.install{display:none;margin:0 0 10px;padding:12px 14px;border-radius:16px;background:#ffffff14;border:1px solid var(--line);font-size:13px;line-height:1.7;color:#e6ebf0}
+.install.show{display:flex;gap:10px;align-items:flex-start}
+.install span{flex:1}
+.install button{padding:4px 8px;color:var(--mute);font-size:13px}
 .player{flex:1;background:var(--card);border-radius:26px;padding:18px 20px 22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px #0007}
 .top{display:flex;justify-content:space-between;align-items:center;color:#fff}
 .top button{padding:6px;border-radius:10px}
@@ -103,6 +117,7 @@ ul.list{list-style:none;margin:8px 0 0;padding:0}
 </head>
 <body>
 <div class="shell">
+<div class="install" id="install" role="note"><span>📲 加到主畫面：點 Safari 下方的「分享」圖示 →「加入主畫面」，之後就能像 App 一樣全螢幕開啟。</span><button id="installClose" aria-label="關閉提示">關閉</button></div>
 <section class="player" id="player" aria-label="新聞播放器">
   <div class="top">
     <button id="collapse" aria-label="收合／展開逐字稿" aria-expanded="true"><svg class="ico chev" viewBox="0 0 24 24"><path d="M3.5 8.5 12 17l8.5-8.5-1.4-1.4L12 14.2 4.9 7.1z"/></svg></button>
@@ -500,6 +515,15 @@ async function load(){
     :'目前無法取得新聞。'+(articles.length?'保留上次快取；不是即時新聞。':'請確認網路或稍後重試。語音測試仍可使用。');
   loading=false;$('refresh').disabled=false;
 }
+/* ---------- 加到主畫面提示與 Service Worker ---------- */
+(function(){
+  const standalone=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
+  const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+  if(ios&&!standalone&&!inApp&&!store.get('news-install-dismissed',false))$('install').classList.add('show');
+  $('installClose').onclick=()=>{$('install').classList.remove('show');store.set('news-install-dismissed',true)};
+  if('serviceWorker' in navigator&&location.protocol==='https:')
+    addEventListener('load',()=>navigator.serviceWorker.register('/daily-news-sw.js',{scope:'/daily-news.html'}).catch(()=>{}));
+})();
 buildCats();
 const cache=store.get('news-glass-v2',null);
 if(cache&&Array.isArray(cache.articles)){
