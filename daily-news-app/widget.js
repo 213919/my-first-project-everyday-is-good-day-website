@@ -1,12 +1,29 @@
 // 聲讀 DAILY｜iPhone 桌面小工具（Scriptable 用）
 // 安裝：App Store 下載 Scriptable → 新增腳本並貼上本檔 → 命名「聲讀」
 //       → 主畫面長按 → 加入小工具 → Scriptable（中或大尺寸）→ 編輯小工具 → Script 選「聲讀」
-// 點任一則標題：用 Safari 打開聲讀播放器並準備朗讀該則；點右上「五分鐘快訊」：準備播報快訊。
+// 點任一則標題：在 Scriptable 裡全螢幕打開聲讀播放器並準備朗讀該則；點右上「五分鐘快訊」：準備播報快訊。
+// （iOS 不允許小工具直接打開「加到主畫面」的網頁 App，所以改在 Scriptable 裡全螢幕開啟同一個播放器。）
 // 來源與編輯原則與網頁版相同：優先路透社、美聯社；英文翻譯為繁體中文；評論性標題不收；
 // 情緒字眼改中性；戰爭、制裁、領土、人權議題標示「未經證實」。
 // 若網站網址不同，請修改下一行。
 
 const APP = 'https://ada868.netlify.app/';
+const P = args.queryParameters || {};
+
+// 播放器網址（embed=1：告訴網頁現在是在 Scriptable 裡開啟）
+function page(params) {
+  return APP + '?' + Object.entries(Object.assign({}, params, { embed: '1' })).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+}
+// 點小工具 → 執行本腳本 → 在 Scriptable 裡全螢幕打開播放器
+function openInScriptable(u) {
+  return 'scriptable:///run/' + encodeURIComponent(Script.name()) + '?u=' + encodeURIComponent(u);
+}
+async function showPlayer(u) {
+  if (!String(u).startsWith(APP)) u = page({}); // 只開自己的播放器
+  const wv = new WebView();
+  await wv.loadURL(u);
+  await wv.present(true); // 全螢幕
+}
 
 const GN = (q, zh) => 'https://news.google.com/rss/search?q=' + encodeURIComponent(q) +
   (zh ? '&hl=zh-TW&gl=TW&ceid=TW:zh-Hant' : '&hl=en-US&gl=US&ceid=US:en');
@@ -87,7 +104,7 @@ async function translate(lines) {
 function deepLink(a) {
   const p = { a: a.link, t: a.title, s: a.summary, src: a.source, c: a.category, tier: a.tier, tm: String(a.time || '') };
   if (a.translated) { p.tr = '1'; p.o = a.titleOrig; }
-  return APP + '?' + Object.entries(p).map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&');
+  return openInScriptable(page(p));
 }
 function ago(t) {
   if (!t) return '';
@@ -97,7 +114,8 @@ function ago(t) {
   return Math.round(m / 1440) + ' 天前';
 }
 
-// ---------- 取新聞、翻譯、套用規則 ----------
+// ---------- 取新聞、翻譯、套用規則，畫出小工具 ----------
+async function buildWidget() {
 const family = config.widgetFamily || 'large';
 const count = { small: 1, medium: 3, large: 6, extraLarge: 8 }[family] || 6;
 const lists = await Promise.all(SOURCES.map(fetchFeed));
@@ -130,7 +148,7 @@ g.locations = [0, 1];
 w.backgroundGradient = g;
 w.setPadding(14, 16, 14, 16);
 w.refreshAfterDate = new Date(Date.now() + 30 * 60 * 1000);
-w.url = APP;
+w.url = openInScriptable(page({}));
 
 const head = w.addStack();
 head.centerAlignContent();
@@ -142,7 +160,7 @@ if (family !== 'small') {
   const brief = head.addText('▶ 五分鐘快訊');
   brief.font = Font.semiboldSystemFont(12);
   brief.textColor = new Color('#9fd3e6');
-  brief.url = APP + '?play=daily';
+  brief.url = openInScriptable(page({ play: 'daily' }));
 }
 w.addSpacer(8);
 
@@ -167,10 +185,15 @@ if (!picks.length) {
   if (family === 'small') w.url = deepLink(picks[0]); // 小尺寸只能整塊點擊
 }
 w.addSpacer();
+return w;
+}
 
-if (config.runsInWidget) {
-  Script.setWidget(w);
+// ---------- 執行 ----------
+if (config.runsInApp && P.u) {
+  await showPlayer(P.u); // 從小工具點進來：全螢幕播放器
 } else {
-  await w.presentLarge();
+  const w = await buildWidget();
+  if (config.runsInWidget) Script.setWidget(w);
+  else await w.presentLarge(); // 在 Scriptable 裡手動執行：預覽小工具
 }
 Script.complete();

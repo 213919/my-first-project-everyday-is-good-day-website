@@ -315,6 +315,8 @@ let articles=[],queue=[],idx=0,lines=[],nodes=[],sentence=0,mode='idle',token=0,
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 function status(t,warn){const e=$('audio');e.textContent=t;e.classList.toggle('warn',!!warn)}
 const isPlaying=()=>mode==='playing'||mode==='starting';
+/* 從 Scriptable 小工具開啟（embed=1）：不顯示「加到主畫面」提示 */
+const EMBED=(()=>{try{const e=new URLSearchParams(location.search).get('embed')==='1';if(e)sessionStorage.setItem('news-embed','1');return e||sessionStorage.getItem('news-embed')==='1'}catch(e){return false}})();
 
 /* ---------- iPhone 靜音模式也能播放 ----------
    iOS 預設把網頁語音當「環境音」，會被靜音鍵關掉。這裡做兩件事：
@@ -835,7 +837,7 @@ async function load(){
 (function(){
   const standalone=navigator.standalone===true||matchMedia('(display-mode: standalone)').matches;
   const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
-  if(ios&&!standalone&&!inApp&&!store.get('news-install-dismissed',false))$('install').classList.add('show');
+  if(ios&&!standalone&&!inApp&&!EMBED&&!store.get('news-install-dismissed',false))$('install').classList.add('show');
   $('installClose').onclick=()=>{$('install').classList.remove('show');store.set('news-install-dismissed',true)};
   if('serviceWorker' in navigator&&location.protocol==='https:')
     addEventListener('load',()=>navigator.serviceWorker.register('/sw.js',{scope:'/'}).catch(()=>{}));
