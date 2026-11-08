@@ -110,6 +110,16 @@ ul.list{list-style:none;margin:8px 0 0;padding:0}
 .item a{color:#c6e7ff;margin-left:8px;font-size:12.5px}
 .empty{text-align:center;color:var(--mute);padding:30px 0}
 .field{display:block;font-size:13px;color:var(--mute);margin:14px 0 6px}
+.tap{position:fixed;inset:0;z-index:20;display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:32px;background:#13161bd9;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);text-align:center}
+.tap.show{display:flex}
+.tap .big{width:112px;height:112px;border-radius:50%;background:#fff;color:#1b1e24;display:grid;place-items:center;box-shadow:0 10px 40px #0008}
+.tap .big svg{width:52px;height:52px}
+.tap b{font-size:20px}
+.tap p{margin:0;font-size:16px;line-height:1.6;color:#dfe5ea;max-width:340px}
+.tap .later{color:var(--mute);font-size:14px;padding:8px 14px}
+.widget{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:13.5px;line-height:1.8;color:#dfe5ea}
+.widget ol{margin:6px 0 10px;padding-left:20px}
+.widget a{color:#c6e7ff}
 .diag{font-size:12.5px;line-height:1.9;color:var(--mute);background:#ffffff0c;border-radius:12px;padding:10px 12px;margin-top:14px;white-space:pre-line}
 @media(min-width:520px){.shell{padding:28px 12px}}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
@@ -158,6 +168,12 @@ ul.list{list-style:none;margin:8px 0 0;padding:0}
   </div>
   <p id="audio" class="status" role="status">請先按播放；若沒聲音，點右上角齒輪做語音測試。空白鍵可播放／暫停。</p>
 </section>
+<div class="tap" id="tap" role="dialog" aria-label="開始朗讀">
+  <button class="big" id="tapPlay" aria-label="開始朗讀"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+  <b>點一下開始朗讀</b>
+  <p id="tapTitle"></p>
+  <button class="later" id="tapLater">稍後再聽</button>
+</div>
 <p class="foot">僅朗讀來源提供的標題與摘要，非新聞全文，亦非獨立查證的分析；分類為依來源與關鍵字自動判定，可能有誤。新聞來自第三方 RSS 服務，可用性不保證。</p>
 </div>
 
@@ -185,6 +201,19 @@ ul.list{list-style:none;margin:8px 0 0;padding:0}
     <label class="field" for="voice">中文語音</label>
     <select id="voice"><option value="">系統預設中文語音</option></select>
     <div class="diag" id="diag"></div>
+    <div class="widget">
+      <b>iPhone 桌面新聞小工具</b>
+      <ol>
+        <li>App Store 下載免費的 <b>Scriptable</b>。</li>
+        <li>按下方「複製小工具程式碼」。</li>
+        <li>打開 Scriptable → 右上角「＋」→ 貼上 → 上方改名為「聲讀」。</li>
+        <li>主畫面長按 →「編輯」→「加入小工具」→ 選 Scriptable 的中或大尺寸。</li>
+        <li>長按小工具 →「編輯小工具」→ Script 選「聲讀」。</li>
+      </ol>
+      點標題會用 Safari 打開這頁並準備朗讀那則新聞，再點一下即可開始。
+      <div class="row"><button class="btn" id="copyWidget">複製小工具程式碼</button><a class="btn" href="/daily-news-widget.js" target="_blank" rel="noopener">查看程式碼</a></div>
+      <small id="widgetMsg" class="status" role="status"></small>
+    </div>
   </div>
 </dialog>
 
@@ -212,7 +241,8 @@ const RATES=[0.8,1,1.2,1.4];
 const ICON_PLAY='<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',ICON_PAUSE='<svg viewBox="0 0 24 24"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
 
 let articles=[],queue=[],idx=0,lines=[],nodes=[],sentence=0,mode='idle',token=0,voices=[],category='全部',keyword='',loading=false,watchdog,
-    current=null,lastCancel=0,loop=false,rate=1,favs=[],unlocked=false;
+    current=null,lastCancel=0,loop=false,rate=1,favs=[],unlocked=false,
+    autoQueue=true,deepArt=null,pendingBrief=null; /* autoQueue：佇列是否為自動產生（更新新聞時可替換） */
 
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 function status(t,warn){const e=$('audio');e.textContent=t;e.classList.toggle('warn',!!warn)}
@@ -300,7 +330,7 @@ function setArticle(){
   const a=queue[idx];if(!a)return;sentence=0;
   lines=[a.category+'消息。',spoken(a.title)+'。',...splitSentences(spoken(a.summary)||'來源未提供摘要。')].filter(t=>t.trim());
   $('title').textContent=a.title;
-  $('meta').textContent=`${a.source} · ${ago(a.time)} · 第 ${idx+1}/${queue.length} 則`;
+  paintMeta();
   $('tagrow').innerHTML='';const tg=document.createElement('span');tg.className='tag t-'+a.category;tg.textContent=a.category;
   const lb=document.createElement('span');lb.textContent='逐字稿';$('tagrow').append(tg,lb);
   const sc=$('script');sc.replaceChildren();nodes=[];
@@ -311,6 +341,7 @@ function setArticle(){
   });
   highlight();paintList();paintFav();updateSession(a);
 }
+function paintMeta(){const a=queue[idx];if(a)$('meta').textContent=`${a.source}${a.time?' · '+ago(a.time):''} · 第 ${idx+1}/${queue.length} 則`}
 function setRead(i,n){const nd=nodes[i];if(!nd)return;nd.r.textContent=lines[i].slice(0,n);nd.u.textContent=lines[i].slice(n)}
 function highlight(){
   const seek=$('seek');seek.max=Math.max(1,lines.length-1);seek.value=sentence;
@@ -431,7 +462,7 @@ function paintList(){
     m.append(tag,a.source+' · '+ago(a.time)+(isFav(a)?' · ♥':''));
     const h=document.createElement('h3');h.textContent=a.title;
     b.append(m,h);
-    b.onclick=()=>{unlock();halt();queue=list.slice();idx=i;setArticle();mode='idle';speakLine();$('listDlg').close()};
+    b.onclick=()=>{unlock();halt();queue=list.slice();idx=i;autoQueue=false;setArticle();mode='idle';speakLine();$('listDlg').close()};
     const l=document.createElement('a');l.textContent='原文';l.href=a.link;l.target='_blank';l.rel='noopener noreferrer';
     l.onclick=e=>e.stopPropagation();m.append(l);
     li.append(b);ul.append(li);
@@ -460,7 +491,8 @@ function briefing(cats){
 }
 function startBrief(cats){
   unlock();halt();queue=briefing(cats);idx=0;
-  if(!queue.length){status('目前沒有可播報的新聞。');return}
+  if(!queue.length){status('目前沒有可播報的新聞，請稍候新聞載入。');return}
+  autoQueue=false;
   setArticle();mode='idle';speakLine();$('listDlg').close();
 }
 $('daily').onclick=()=>startBrief(ALL4);
@@ -506,7 +538,12 @@ async function load(){
   const fresh=results.flat().filter(a=>{const k=a.link,t=a.title.slice(0,18);if(seen.has(k)||seen.has(t))return false;seen.add(k);seen.add(t);return true}).sort((a,b)=>b.time-a.time);
   if(fresh.length){
     articles=fresh;store.set('news-glass-v2',{saved:Date.now(),articles});
-    if(!queue.length||mode==='idle'||mode==='ended'){queue=briefing(ALL4);idx=0;setArticle()}
+    if(!queue.length||autoQueue&&(mode==='idle'||mode==='ended')){queue=briefing(ALL4);idx=0;autoQueue=true;setArticle()}
+    else if(deepArt&&queue.length===1&&queue[0]===deepArt){
+      /* 從小工具進來：播完這則後接著播同類新聞 */
+      queue.push(...fresh.filter(x=>x.category===deepArt.category&&x.link!==deepArt.link).slice(0,5));paintMeta();
+    }
+    if(pendingBrief){const c=pendingBrief;pendingBrief=null;startBrief(c)}
     paintList();
   }
   const n=c=>fresh.filter(a=>a.category===c).length;
@@ -530,6 +567,42 @@ if(cache&&Array.isArray(cache.articles)){
   articles=cache.articles;queue=briefing(ALL4);if(queue.length)setArticle();
   $('newsStatus').textContent='顯示上次快取（'+ago(cache.saved)+'），正在更新。';
 }
+
+/* ---------- 小工具深層連結：?a=原文網址&t=標題&s=摘要&src=來源&c=分類 或 ?play=daily|world ---------- */
+(function(){
+  const P=new URLSearchParams(location.search),t=(P.get('t')||'').trim(),a=P.get('a')||'',play=P.get('play');
+  let onTap=null,label='';
+  if(t){
+    const cat=ALL4.includes(P.get('c'))?P.get('c'):'全球政治';
+    deepArt={title:t.slice(0,200),summary:(P.get('s')||'').slice(0,400),
+      link:/^https?:\/\//i.test(a)?a:'#',  /* 只接受 http(s)，避免惡意連結 */
+      source:(P.get('src')||'桌面小工具').slice(0,30),category:cat,time:Number(P.get('tm'))||0};
+    queue=[deepArt];idx=0;autoQueue=false;setArticle();
+    label=deepArt.title;onTap=()=>speakLine();
+  }else if(play==='daily'||play==='world'){
+    label=play==='daily'?'約五分鐘全類快訊':'全球政經快訊';
+    const cats=play==='daily'?ALL4:['全球政治','全球經濟'];
+    onTap=()=>{if(articles.length)startBrief(cats);else{pendingBrief=cats;status('新聞載入中，載入完成後會自動開始播報…')}};
+  }
+  if(P.toString())history.replaceState(null,'',location.pathname); /* 清掉參數，重新整理不會重複觸發 */
+  if(!onTap)return;
+  $('tapTitle').textContent=label;$('tap').classList.add('show');
+  $('tapPlay').focus();
+  $('tapPlay').onclick=()=>{$('tap').classList.remove('show');unlock();onTap()};
+  $('tapLater').onclick=()=>$('tap').classList.remove('show');
+})();
+
+/* 複製小工具程式碼（iOS Safari 需在點擊當下寫入剪貼簿） */
+$('copyWidget').onclick=async()=>{
+  const msg=$('widgetMsg'),url='/daily-news-widget.js';
+  const getText=()=>fetch(url).then(r=>{if(!r.ok)throw Error(r.status);return r.text()});
+  try{
+    if(window.ClipboardItem&&navigator.clipboard&&navigator.clipboard.write)
+      await navigator.clipboard.write([new ClipboardItem({'text/plain':getText().then(t=>new Blob([t],{type:'text/plain'}))})]);
+    else await navigator.clipboard.writeText(await getText());
+    msg.textContent='已複製！接著打開 Scriptable →「＋」→ 貼上。';
+  }catch(e){msg.textContent='無法自動複製，請按「查看程式碼」，全選後複製。'}
+};
 $('refresh').onclick=load;load();
 setInterval(()=>{if(document.visibilityState==='visible')load()},1800000);
 </script>
