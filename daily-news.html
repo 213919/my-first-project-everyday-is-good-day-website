@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,follow">
+<meta name="theme-color" content="#11171e">
+<title>聲讀｜每日全球政經科技</title>
+<style>
+:root{color-scheme:dark;--fg:#fafafa;--mute:#bbc1c5;--line:#ffffff20;--glass:#ffffff0a;--accent:#b5dae5}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at 0 30%,#174a53,transparent 65%),radial-gradient(ellipse at 100% 0,#695025,transparent 65%),#11171e;background-attachment:fixed;color:var(--fg);font:16px system-ui,-apple-system,"Noto Sans TC",sans-serif;min-height:100vh}
+main{max-width:1180px;margin:auto;padding:28px 20px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
+small,.muted{color:var(--mute)}
+button,select,input[type=search]{font:inherit;color:inherit;border:1px solid var(--line);background:#ffffff12;border-radius:14px;padding:11px 15px;cursor:pointer}
+button:hover{background:#ffffff25}
+button[aria-pressed=true]{background:#fafafa;color:#15191d;border-color:#fafafa}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid #fff;outline-offset:2px}
+a{color:#c6e7ff}
+.glass{border:1px solid var(--line);background:var(--glass);border-radius:28px;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.player{display:grid;grid-template-columns:42% 58%;padding:40px;min-height:470px}
+.left{padding-right:40px;display:flex;flex-direction:column;justify-content:center}
+.art{background:linear-gradient(135deg,#4c8588,#41405d 55%,#8c633e);border:1px solid #ffffff30;border-radius:20px;padding:28px;margin-bottom:22px;font-size:28px;font-weight:700;letter-spacing:3px}
+h1{font-size:26px;line-height:1.5;margin:12px 0}
+progress{width:100%;accent-color:#fff;height:5px;margin:20px 0 8px}
+.transport{display:flex;justify-content:center;gap:10px;margin:22px 0}
+.transport button{min-width:48px}
+.transport #play{background:#fafafa;color:#15191d;min-width:84px}
+.ctrl{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.script{height:390px;overflow:auto;overscroll-behavior:contain;padding:15px 12px 80px 28px;scroll-behavior:smooth}
+.line{display:block;text-align:left;width:100%;border:0;background:none;border-radius:0;padding:12px 0;font-size:25px;font-weight:650;line-height:1.65;color:#ffffff65;transition:color .2s}
+.line.active{color:#fff}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin:22px 0 10px;align-items:center}
+.toolbar .sep{flex:1}
+input[type=search]{cursor:text;min-width:160px;flex:0 1 220px}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.page{display:contents}
+.card{padding:20px;border-radius:20px;background:#ffffff09;border:1px solid #ffffff18;min-width:0;display:flex;flex-direction:column}
+.card.active{border-color:var(--accent)}
+.card h3{font-size:17px;line-height:1.6;margin:6px 0}
+.card p{font-size:14px;line-height:1.8;color:#bec5cc;margin:0 0 12px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1}
+.card .row{display:flex;gap:12px;align-items:center}
+.card button{font-size:14px}
+.tag{display:inline-block;font-size:12px;padding:1px 9px;border-radius:99px;border:1px solid #ffffff30;margin-right:6px}
+.t-全球政治{color:#ffb4a2}.t-全球經濟{color:#ffd88a}.t-財經{color:#9fe0b4}.t-科技{color:#9cc9ff}
+.status{font-size:13px;line-height:1.8;color:#c5cbd0}
+.empty{grid-column:1/-1;text-align:center;padding:40px 0}
+footer{font-size:12px;color:#aebac3;margin:25px 0;line-height:1.8}
+label{font-size:13px}
+select{max-width:100%;font-size:13px}
+input[type=range]{accent-color:#fff;max-width:140px}
+@media(max-width:720px){
+main{padding:18px 14px}
+.player{grid-template-columns:1fr;padding:22px}
+.left{padding:0}.art{display:none}
+h1{font-size:22px}
+.script{padding:8px 0 35px;height:250px;border-top:1px solid #ffffff15}
+.line{font-size:21px}
+.transport{margin:15px 0}
+.grid{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;gap:12px;padding-bottom:15px}
+.page{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;flex:0 0 100%;scroll-snap-align:start}
+.card{padding:13px}.card h3{font-size:15px}.card p{font-size:13px}
+.glass{backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.toolbar .sep{display:none}
+input[type=search]{flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div><b>聲讀 DAILY</b><br><small>全球政治 · 全球經濟 · 財經 · 科技</small></div>
+  <button id="test">測試中文語音</button>
+</header>
+
+<section class="player glass" aria-label="播放器">
+  <div class="left">
+    <div class="art">每日五分鐘<br><small>全球政經快訊</small></div>
+    <small id="meta">等待選擇新聞</small>
+    <h1 id="title">先試聽，再開始今日快訊</h1>
+    <progress id="progress" max="1" value="0"></progress>
+    <small id="position">以完成句數顯示進度，非精確秒數</small>
+    <div class="transport">
+      <button id="prev" aria-label="上一則">上一則</button>
+      <button id="play">播放</button>
+      <button id="next" aria-label="下一則">下一則</button>
+      <button id="stop">停止</button>
+    </div>
+    <div class="ctrl">
+      <label>語速 <input id="rate" type="range" min="0.7" max="1.4" step="0.05" value="1"></label>
+      <select id="voice" aria-label="中文語音"><option value="">系統中文語音</option></select>
+    </div>
+    <p id="audio" class="status" role="status">按「測試中文語音」可獨立測試，不必等新聞載入。空白鍵可播放／暫停。</p>
+  </div>
+  <div>
+    <small>播報稿 · 點句子可從該句開始</small>
+    <div id="script" class="script"><p class="muted">新聞載入後，這裡會顯示實際朗讀的標題與摘要。播放時逐句高亮。</p></div>
+  </div>
+</section>
+
+<div class="toolbar" role="group" aria-label="快訊與分類">
+  <button id="refresh">更新新聞</button>
+  <button id="daily">約五分鐘快訊</button>
+  <button id="world">全球政經快訊</button>
+  <span class="sep"></span>
+  <input id="q" type="search" placeholder="搜尋標題／摘要" aria-label="搜尋新聞">
+</div>
+<div class="toolbar" id="cats" role="group" aria-label="分類篩選" style="margin-top:0"></div>
+<p id="newsStatus" class="status" role="status">正在載入新聞；手機下方可左右滑動，每頁兩則。</p>
+<div id="grid" class="grid"></div>
+
+<footer>僅朗讀來源提供的標題與摘要，並非新聞全文，亦非獨立查證的分析；分類為依來源與關鍵字自動判定，可能有誤。
+新聞更新需連線，頁面開啟期間每半小時更新。語音及來源服務可用性取決於裝置與第三方服務（rss2json／allorigins）。</footer>
+</main>
+
+<script>
+'use strict';
+const $=id=>document.getElementById(id),synth=window.speechSynthesis;
+const CATS=['全部','全球政治','全球經濟','財經','科技'];
+/* [來源, 預設分類, RSS 網址, 是否為綜合來源（以關鍵字再分類）] */
+const SOURCES=[
+ ['BBC 中文','全球政治','https://feeds.bbci.co.uk/zhongwen/trad/rss.xml',1],
+ ['德國之聲','全球政治','https://rss.dw.com/rdf/rss-chi-all',1],
+ ['紐約時報中文','全球政治','https://cn.nytimes.com/rss/zh-hant/',1],
+ ['聯合國新聞','全球政治','https://news.un.org/feed/subscribe/zh/news/all/rss.xml',1],
+ ['中央社國際','全球政治','https://www.cna.com.tw/rss/intworld.xml',1],
+ ['自由時報國際','全球政治','https://news.ltn.com.tw/rss/world.xml',1],
+ ['中央社財經','財經','https://www.cna.com.tw/rss/finance.xml',0],
+ ['自由時報財經','財經','https://news.ltn.com.tw/rss/business.xml',0],
+ ['科技新報','科技','https://technews.tw/feed/',0]
+];
+const ECON=/經濟|通膨|通脹|物價|利率|升息|降息|央行|聯準會|關稅|貿易|貨幣|匯率|股市|債|油價|能源|供應鏈|制裁|財政|赤字|失業|就業|景氣|衰退|成長|GDP|IMF|世銀|世界銀行|經貿|出口|進口|投資|銀行|OPEC/i;
+const POL=/選舉|總統|總理|首相|議會|國會|戰爭|衝突|停火|談判|外交|峰會|聯合國|北約|軍|飛彈|制裁|地緣|川普|拜登|普廷|普京|習近平|烏克蘭|加薩|以色列|伊朗|台海|北韓|歐盟/;
+const MAX_AGE=3*864e5; /* 只保留三天內 */
+let articles=[],queue=[],idx=0,lines=[],sentence=0,mode='idle',token=0,voices=[],category='全部',keyword='',loading=false,watchdog;
+
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function status(t){$('audio').textContent=t}
+
+/* ---------- 語音 ---------- */
+function populate(){
+  if(!synth)return;
+  voices=synth.getVoices().filter(v=>/^zh|^cmn|^yue/i.test(v.lang));
+  const saved=store.get('news-voice',''),sel=$('voice');
+  sel.replaceChildren(new Option('系統中文語音',''));
+  voices.forEach((v,i)=>sel.add(new Option(v.name+' · '+v.lang,String(i))));
+  const si=voices.findIndex(v=>v.name===saved);
+  if(si>=0)sel.value=String(si);
+  else{const i=voices.findIndex(v=>/TW|Hant/i.test(v.lang));if(i>=0)sel.value=String(i)}
+}
+if(synth){populate();synth.addEventListener('voiceschanged',populate)}else status('此瀏覽器未提供語音合成功能，請使用其他瀏覽器。');
+$('voice').onchange=()=>{const v=voices[Number($('voice').value)];store.set('news-voice',v?v.name:'')};
+$('rate').value=store.get('news-rate',1);
+$('rate').onchange=()=>store.set('news-rate',Number($('rate').value));
+
+function cancel(){token++;clearTimeout(watchdog);if(synth)synth.cancel();mode='idle';$('play').textContent='播放';setSession('none')}
+function clean(s){const d=new DOMParser().parseFromString(s||'','text/html');d.querySelectorAll('script,style').forEach(n=>n.remove());return(d.body.textContent||'').replace(/\s+/g,' ').trim()}
+const ABBR=[[/TechNews/gi,'科技新報'],[/\bAI\b/g,'人工智慧'],[/\bGDP\b/g,'國內生產毛額'],[/\bETF\b/g,'指數股票型基金'],
+ [/\bFed\b/g,'聯準會'],[/\bIMF\b/g,'國際貨幣基金'],[/\bWTO\b/g,'世界貿易組織'],[/\bOPEC\+?/g,'石油輸出國組織'],
+ [/\bNATO\b/g,'北約'],[/\bEU\b/g,'歐盟'],[/\bUN\b/g,'聯合國'],[/\bUS\b|\bUSA\b/g,'美國'],[/\bG7\b/g,'七大工業國集團'],
+ [/\bG20\b/g,'二十國集團'],[/\bCPI\b/g,'消費者物價指數'],[/\bECB\b/g,'歐洲央行'],[/\bIPO\b/g,'首次公開募股'],
+ [/\bEV\b/g,'電動車'],[/\bChatGPT\b/gi,'聊天機器人'],[/\bNVIDIA\b|輝達/gi,'輝達'],[/\bTSMC\b/g,'台積電']];
+function spoken(s){
+  ABBR.forEach(([r,t])=>{s=s.replace(r,t)});
+  let n=0;
+  s=s.replace(/[A-Za-z][A-Za-z0-9 .+&'-]*/g,()=>n++?'':'（外文名稱略）'); /* 同一句多次外文只讀一次 */
+  return s.replace(/\s+/g,' ').trim();
+}
+function splitSentences(t){return t.match(/[^。！？!?；;]+[。！？!?；;]?/g)||[]}
+
+function setArticle(){
+  const a=queue[idx];if(!a)return;sentence=0;
+  lines=[a.category+'消息。',spoken(a.title)+'。',...splitSentences(spoken(a.summary)||'來源未提供摘要。')].filter(t=>t.trim());
+  $('title').textContent=a.title;
+  $('meta').textContent=`第 ${idx+1} / ${queue.length} 則 · ${a.source} · ${ago(a.time)}`;
+  const sc=$('script');sc.replaceChildren();
+  lines.forEach((t,i)=>{const b=document.createElement('button');b.className='line';b.textContent=t;b.onclick=()=>{cancel();sentence=i;speakLine()};sc.append(b)});
+  highlight();render();updateSession(a);
+}
+function highlight(){
+  $('progress').max=Math.max(1,lines.length);$('progress').value=sentence;
+  $('position').textContent=`第 ${Math.min(sentence+1,lines.length)} / ${lines.length} 句`;
+  const sc=$('script');[...sc.children].forEach((n,i)=>n.classList.toggle('active',i===sentence));
+  const n=sc.children[sentence];
+  if(n)sc.scrollTo({top:Math.max(0,n.offsetTop-sc.offsetTop-65),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
+}
+function speakLine(){
+  if(!synth){status('此瀏覽器不支援語音合成。');return}
+  if(sentence>=lines.length){
+    if(idx+1<queue.length){idx++;setArticle()}
+    else{mode='ended';$('play').textContent='重新播放';status('快訊播報完畢。');setSession('none');return}
+  }
+  const t=token,u=new SpeechSynthesisUtterance(lines[sentence]);
+  u.lang='zh-TW';u.rate=Number($('rate').value);
+  const sel=$('voice').value;if(sel!==''&&voices[Number(sel)])u.voice=voices[Number(sel)];
+  mode='starting';$('play').textContent='暫停';highlight();
+  u.onstart=()=>{if(t!==token)return;clearTimeout(watchdog);mode='playing';setSession('playing');status('正在朗讀。右側顯示相同播報稿。')};
+  u.onend=()=>{if(t!==token)return;clearTimeout(watchdog);sentence++;speakLine()};
+  u.onerror=e=>{if(t!==token||e.error==='canceled'||e.error==='interrupted')return;clearTimeout(watchdog);mode='error';$('play').textContent='重試';status('語音錯誤：'+e.error+'。可重試或更換中文語音。')};
+  watchdog=setTimeout(()=>{if(t===token&&mode==='starting')status('尚未收到語音開始訊號。請按停止，再試中文語音；也可改用一般瀏覽器開啟。')},7000);
+  synth.speak(u);
+}
+function togglePlay(){
+  if(!synth)return;
+  if(mode==='playing'||mode==='starting'){synth.pause();mode='paused';$('play').textContent='繼續';setSession('paused');return}
+  if(mode==='paused'){synth.resume();mode='playing';$('play').textContent='暫停';setSession('playing');return}
+  if(!queue.length){status('尚無新聞。可以先按測試中文語音。');return}
+  if(mode==='ended'){idx=0;setArticle()}
+  speakLine();
+}
+$('play').onclick=togglePlay;
+$('stop').onclick=()=>{cancel();status('已停止；播放將從目前句子重新開始。')};
+function jump(d){if(!queue.length)return;cancel();idx=Math.max(0,Math.min(queue.length-1,idx+d));setArticle();speakLine()}
+$('prev').onclick=()=>jump(-1);$('next').onclick=()=>jump(1);
+document.addEventListener('keydown',e=>{
+  if(/INPUT|SELECT|TEXTAREA/.test(e.target.tagName))return;
+  if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePlay()}
+  else if(e.key==='ArrowRight')jump(1);else if(e.key==='ArrowLeft')jump(-1);
+});
+$('test').onclick=()=>{
+  cancel();if(!synth){status('此瀏覽器不支援語音。');return}
+  populate();const t=token,u=new SpeechSynthesisUtterance('這是中文語音測試。如果您聽到這段話，表示目前裝置可以播放中文語音。');
+  u.lang='zh-TW';if($('voice').value!=='')u.voice=voices[Number($('voice').value)];
+  u.onstart=()=>{if(t===token)status('系統已開始語音測試；是否實際聽到聲音，仍請您確認。')};
+  u.onend=()=>{if(t===token)status('語音測試已結束。若聽不到，請確認媒體音量、輸出裝置及中文語音。')};
+  u.onerror=e=>{if(t===token)status('測試錯誤：'+e.error)};
+  synth.speak(u);
+};
+
+/* ---------- 鎖定畫面／耳機控制（Media Session，支援度依瀏覽器而定） ---------- */
+function setSession(s){try{if('mediaSession' in navigator)navigator.mediaSession.playbackState=s}catch(e){}}
+function updateSession(a){
+  try{
+    if(!('mediaSession' in navigator)||!window.MediaMetadata)return;
+    navigator.mediaSession.metadata=new MediaMetadata({title:a.title,artist:a.source,album:'聲讀｜每日全球政經科技'});
+    navigator.mediaSession.setActionHandler('play',togglePlay);navigator.mediaSession.setActionHandler('pause',togglePlay);
+    navigator.mediaSession.setActionHandler('nexttrack',()=>jump(1));navigator.mediaSession.setActionHandler('previoustrack',()=>jump(-1));
+  }catch(e){}
+}
+
+/* ---------- 新聞列表 ---------- */
+function ago(t){
+  if(!t)return'時間未知';const m=Math.round((Date.now()-t)/6e4);
+  if(m<1)return'剛剛';if(m<60)return m+' 分鐘前';if(m<1440)return Math.round(m/60)+' 小時前';return Math.round(m/1440)+' 天前';
+}
+function classify(a,mixed,def){
+  if(!mixed)return def;
+  const s=a.title+' '+a.summary;
+  if(def==='全球政治'){if(ECON.test(a.title)||(ECON.test(s)&&!POL.test(a.title)))return'全球經濟'}
+  return def;
+}
+function visible(){
+  const k=keyword.trim().toLowerCase();
+  return articles.filter(a=>(category==='全部'||a.category===category)&&(!k||(a.title+a.summary).toLowerCase().includes(k)));
+}
+function buildCats(){
+  const box=$('cats');box.replaceChildren();
+  CATS.forEach(c=>{const b=document.createElement('button');b.textContent=c;b.setAttribute('aria-pressed',String(c===category));
+    b.onclick=()=>{category=c;buildCats();render()};box.append(b)});
+}
+function render(){
+  const list=visible(),grid=$('grid');grid.replaceChildren();
+  if(!list.length){const p=document.createElement('p');p.className='empty muted';p.textContent=articles.length?'沒有符合的新聞。':'尚無新聞資料。';grid.append(p);return}
+  for(let i=0;i<list.length;i+=2){
+    const page=document.createElement('div');page.className='page';
+    list.slice(i,i+2).forEach(a=>{
+      const c=document.createElement('article');c.className='card'+(queue[idx]&&queue[idx].link===a.link?' active':'');
+      const m=document.createElement('small'),tag=document.createElement('span');
+      tag.className='tag t-'+a.category;tag.textContent=a.category;m.append(tag,a.source+' · '+ago(a.time));
+      const h=document.createElement('h3');h.textContent=a.title;
+      const p=document.createElement('p');p.textContent=a.summary||'來源未提供摘要';
+      const row=document.createElement('div');row.className='row';
+      const b=document.createElement('button');b.textContent='播報這則';
+      b.onclick=()=>{cancel();queue=list.slice();idx=list.indexOf(a);setArticle();speakLine()};
+      const l=document.createElement('a');l.textContent='原文';l.href=a.link;l.target='_blank';l.rel='noopener noreferrer';
+      row.append(b,l);c.append(m,h,p,row);page.append(c);
+    });
+    grid.append(page);
+  }
+}
+$('q').oninput=()=>{keyword=$('q').value;render()};
+
+/* 約五分鐘快訊：各類輪流取，依字數估算 */
+function briefing(cats){
+  const pools=cats.map(c=>articles.filter(a=>a.category===c)),out=[];let budget=0;
+  const rate=Number($('rate').value);
+  for(let r=0;r<10;r++)for(const pool of pools){
+    const a=pool[r];if(!a||out.length>=10)continue;
+    const n=(a.title.length+a.summary.length+15)/(4*rate);
+    if(budget+n>300)continue;out.push(a);budget+=n;
+  }
+  return out;
+}
+function startBrief(cats){
+  cancel();queue=briefing(cats);idx=0;
+  if(!queue.length){status('目前沒有可播報的新聞。');return}
+  setArticle();speakLine();
+}
+$('daily').onclick=()=>startBrief(['全球政治','全球經濟','財經','科技']);
+$('world').onclick=()=>startBrief(['全球政治','全球經濟']);
+
+/* ---------- 載入（rss2json，失敗改用 allorigins 後備） ---------- */
+async function fetchJSON(url,ms){
+  const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),ms);
+  try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw Error(r.status);return await r.json()}
+  finally{clearTimeout(timer)}
+}
+function fromXML(txt){
+  const d=new DOMParser().parseFromString(txt,'text/xml');
+  return[...d.querySelectorAll('item')].map(i=>({title:i.querySelector('title')?.textContent,description:i.querySelector('description')?.textContent,link:i.querySelector('link')?.textContent,pubDate:i.querySelector('pubDate')?.textContent||i.getElementsByTagName('dc:date')[0]?.textContent}));
+}
+async function getItems(url){
+  try{
+    const d=await fetchJSON('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),10000);
+    if(d.status!=='ok')throw Error(d.message);return d.items;
+  }catch(e){
+    const d=await fetchJSON('https://api.allorigins.win/get?url='+encodeURIComponent(url),12000);
+    return fromXML(d.contents);
+  }
+}
+async function load(){
+  if(loading)return;loading=true;$('refresh').disabled=true;
+  $('newsStatus').textContent='更新中；已有新聞可繼續閱讀與播放。';
+  let failed=0;
+  const results=await Promise.all(SOURCES.map(async([source,def,url,mixed])=>{
+    try{
+      return(await getItems(url)).slice(0,12).map(i=>{
+        const a={title:clean(i.title),summary:clean(i.description).slice(0,260),link:i.link,source,time:Date.parse(i.pubDate)||0};
+        a.category=classify(a,mixed,def);return a;
+      }).filter(a=>a.title&&/^https?:\/\//i.test(a.link)&&(!a.time||Date.now()-a.time<MAX_AGE));
+    }catch(e){failed++;return[]}
+  }));
+  const seen=new Set();
+  const fresh=results.flat().filter(a=>{const k=a.link,t=a.title.slice(0,18);if(seen.has(k)||seen.has(t))return false;seen.add(k);seen.add(t);return true}).sort((a,b)=>b.time-a.time);
+  if(fresh.length){
+    articles=fresh;store.set('news-glass-v2',{saved:Date.now(),articles});render();
+    if(!queue.length||mode==='idle'||mode==='ended'){queue=briefing(['全球政治','全球經濟','財經','科技']);idx=0;setArticle()}
+  }
+  const n=c=>fresh.filter(a=>a.category===c).length;
+  $('newsStatus').textContent=fresh.length
+    ?`已取得 ${fresh.length} 則（政治 ${n('全球政治')}・經濟 ${n('全球經濟')}・財經 ${n('財經')}・科技 ${n('科技')}）· ${failed}/${SOURCES.length} 個來源失敗 · 更新於 ${new Date().toLocaleTimeString('zh-TW')}。五分鐘為按字數估計。`
+    :'目前無法取得新聞。'+(articles.length?'保留上次快取；不是即時新聞。':'請確認網路或稍後重試。語音測試仍可使用。');
+  loading=false;$('refresh').disabled=false;
+}
+buildCats();
+const cache=store.get('news-glass-v2',null);
+if(cache&&Array.isArray(cache.articles)){
+  articles=cache.articles;render();queue=briefing(['全球政治','全球經濟','財經','科技']);if(queue.length)setArticle();
+  $('newsStatus').textContent='顯示上次快取（'+ago(cache.saved)+'），正在更新。';
+}
+$('refresh').onclick=load;load();
+setInterval(()=>{if(document.visibilityState==='visible')load()},1800000);
+</script>
+</body>
+</html>
