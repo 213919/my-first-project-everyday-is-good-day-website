@@ -32,7 +32,7 @@ const SOFTEN = [
 const SENS = /戰爭|交火|空襲|轟炸|砲擊|飛彈|導彈|入侵|停火|人質|制裁|禁運|領土|主權|併吞|佔領|占領|人權|種族滅絕|酷刑|迫害|難民|\b(war|air ?strikes?|shelling|missiles?|invasion|troops|ceasefire|hostages?|sanctions?|embargo|territor\w+|sovereignty|annex\w*|occupied|human rights|genocide|torture|refugees?)\b/i;
 const ECON = /經濟|通膨|利率|升息|降息|央行|聯準會|關稅|貿易|匯率|股市|油價|財政|衰退|國際貨幣基金|世界銀行|\b(econom\w*|inflation|tariffs?|gdp|interest rates?|central bank|imf|world bank|wto|stocks|oil prices?|recession)\b/i;
 const soften = s => SOFTEN.reduce((t, [r, v]) => t.replace(r, v), String(s || ''));
-const hasZh = s => /[一-鿿]/.test(s);
+const hasZh = s => /[\u4e00-\u9fff]/.test(s);
 
 function decode(s) {
   return (s || '')

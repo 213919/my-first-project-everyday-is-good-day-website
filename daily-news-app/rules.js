@@ -50,7 +50,7 @@
   function hash(s) { let h = 5381; s = String(s || ''); for (let i = 0; i < s.length; i++) h = ((h << 5) + h + s.charCodeAt(i)) | 0; return 'h' + (h >>> 0).toString(36); }
   /* Google 新聞標題結尾固定加「 - 來源名稱」，去掉它 */
   function stripGnSuffix(t) { return String(t || '').replace(/\s+[-–—|]\s+[^-–—|]{1,40}$/, '').trim(); }
-  const HAS_ZH = /[一-鿿]/;
+  const HAS_ZH = /[\u4e00-\u9fff]/;
   const SIMP = /[这们说时会发经过对为与动实现开关进应东门问间见长电车书业产学乐习报纸价钱银战军统总选举]/g;
   /* 'en' 英文、'zh-CN' 簡體（需轉繁體）、'zh' 繁體 */
   function langOf(s) { s = String(s || ''); if (!HAS_ZH.test(s)) return 'en'; const m = s.match(SIMP); return m && m.length >= 2 ? 'zh-CN' : 'zh'; }
@@ -101,7 +101,7 @@
   }
 
   /* ---------- 原則 3：比對不同來源的相關報導 ---------- */
-  function norm(s) { return String(s || '').replace(/[^一-鿿A-Za-z0-9]/g, ''); }
+  function norm(s) { return String(s || '').replace(/[^\u4e00-\u9fffA-Za-z0-9]/g, ''); }
   function bigrams(s) { const t = norm(s), out = new Set(); for (let i = 0; i < t.length - 1; i++) out.add(t.slice(i, i + 2)); return out; }
   /* 共同詞的先後順序要一致，避免「甲攻擊乙」和「乙攻擊甲」被當成同一件事 */
   function orderAgree(a, b, shared) {
