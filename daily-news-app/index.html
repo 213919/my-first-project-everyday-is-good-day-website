@@ -398,7 +398,6 @@ function setPlayIcon(on){
 }
 setPlayIcon(false);
 function halt(){token++;clearTimeout(watchdog);if(synth){synth.cancel();lastCancel=Date.now()}}
-function clean(s){const d=new DOMParser().parseFromString(s||'','text/html');d.querySelectorAll('script,style').forEach(n=>n.remove());return(d.body.textContent||'').replace(/\s+/g,' ').trim()}
 const ABBR=[[/TechNews/gi,'科技新報'],[/\bAI\b/g,'人工智慧'],[/\bGDP\b/g,'國內生產毛額'],[/\bETF\b/g,'指數股票型基金'],
  [/\bFed\b/g,'聯準會'],[/\bIMF\b/g,'國際貨幣基金'],[/\bWTO\b/g,'世界貿易組織'],[/\bOPEC\+?/g,'石油輸出國組織'],
  [/\bNATO\b/g,'北約'],[/\bEU\b/g,'歐盟'],[/\bUN\b/g,'聯合國'],[/\bUSA?\b/g,'美國'],[/\bG7\b/g,'七大工業國集團'],
@@ -674,21 +673,9 @@ function startBrief(cats){
 $('daily').onclick=()=>startBrief(BRIEF_ALL);
 $('world').onclick=()=>startBrief(BRIEF_WORLD);
 
-/* ---------- 取得新聞：rss2json → allorigins → codetabs ---------- */
-function parseDate(s){
-  s=String(s||'').trim();if(!s)return 0;
-  if(/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(s))s=s.replace(' ','T')+'Z'; /* rss2json 格式（UTC）；Safari 無法直接解析 */
-  const t=Date.parse(s);return isNaN(t)?0:t;
-}
-function pickImg(i){
-  const enc=i.enclosure||{};
-  let u=i.thumbnail||((/^image\//i.test(enc.type||'')||/\.(jpe?g|png|webp|gif)(\?|$)/i.test(enc.link||''))?enc.link:'')||'';
-  if(!u){const m=/<img[^>]+src=["']([^"']+)["']/i.exec((i.description||'')+(i.content||''));if(m)u=m[1]}
-  u=String(u||'').replace(/&amp;/g,'&').trim();
-  if(/^\/\//.test(u))u='https:'+u;
-  if(/^http:\/\//i.test(u))u='https://'+u.slice(7); /* 避免 http 圖片被擋 */
-  return /^https:\/\/[^\s"'<>]+$/i.test(u)?u:'';
-}
+/* ---------- 取得新聞 ----------
+   1. 先向自己網站的 /api/news 要整理好的新聞（網站連結 GitHub 部署時，由 Netlify 伺服器每 10 分鐘整理一次，最快最穩）
+   2. 沒有伺服器（手動上傳版）時，改由瀏覽器經公開轉接服務抓取：哪個來源先回來就先顯示 */
 async function fetchRaw(url,ms){
   const ctl=new AbortController(),timer=setTimeout(()=>ctl.abort(),ms);
   try{const r=await fetch(url,{signal:ctl.signal});if(!r.ok)throw Error('HTTP '+r.status);return r}
@@ -696,141 +683,136 @@ async function fetchRaw(url,ms){
 }
 const fetchJSON=async(u,ms)=>(await fetchRaw(u,ms)).json();
 const fetchText=async(u,ms)=>(await fetchRaw(u,ms)).text();
-function fromXML(txt){
-  const d=new DOMParser().parseFromString(txt||'','text/xml');
-  return[...d.getElementsByTagName('item')].map(i=>{
-    const g=n=>{const x=i.getElementsByTagName(n)[0];return x?x.textContent:''};
-    const at=(n,a)=>{const x=i.getElementsByTagName(n)[0];return x?x.getAttribute(a)||'':''};
-    const enc=i.getElementsByTagName('enclosure')[0];
-    return{title:g('title'),description:g('description')||g('content:encoded'),link:g('link')||g('guid'),pubDate:g('pubDate')||g('dc:date'),
-      thumbnail:at('media:thumbnail','url')||at('media:content','url')||(enc&&/^image\//i.test(enc.getAttribute('type')||'')?enc.getAttribute('url'):'')};
-  });
+let serverMode=false,serverUpdated=0;
+async function loadFromServer(){
+  try{const d=await fetchJSON('/api/news',10000);return d&&Array.isArray(d.articles)&&d.articles.length?d:null}catch(e){return null}
 }
+
+/* 瀏覽器模式：同時向 rss2json、allorigins 要資料，先到先用；都失敗再試 codetabs */
 async function getItems(url){
-  try{const d=await fetchJSON('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),10000);if(d.status==='ok'&&d.items&&d.items.length)return d.items}catch(e){}
-  try{const d=await fetchJSON('https://api.allorigins.win/get?url='+encodeURIComponent(url),12000);const it=fromXML(d.contents);if(it.length)return it}catch(e){}
-  const it=fromXML(await fetchText('https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url),12000));
+  const a=fetchJSON('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent(url),7000).then(d=>{if(d.status!=='ok'||!d.items||!d.items.length)throw Error('rss2json');return d.items});
+  const b=fetchText('https://api.allorigins.win/raw?url='+encodeURIComponent(url),7000).then(t=>{const it=R.parseFeed(t);if(!it.length)throw Error('allorigins');return it});
+  try{return await Promise.any([a,b])}catch(e){}
+  const it=R.parseFeed(await fetchText('https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(url),7000));
   if(!it.length)throw Error('沒有資料');return it;
 }
-/* 主要網址失敗時改用備援網址 */
 async function fetchSource(src){
   const routes=[[src.url,!!src.gn,src.gn?'Google 新聞':'RSS']].concat(src.alt?[[src.alt,true,'Google 新聞（備援）']]:[]);
   let err;
   for(const [u,gn,via] of routes){try{return{items:await getItems(u),gn,via}}catch(e){err=e}}
   throw err||Error('沒有資料');
 }
-function normalize(src,items,gn){
-  const maxAge=R.TIER[src.tier].maxAgeH*3600e3,out=[];
-  for(const i of items.slice(0,10)){
-    let title=clean(i.title),summary=gn?'':clean(i.description||i.content).slice(0,320);
-    const link=String(i.link||i.guid||'').trim();
-    if(gn)title=R.stripGnSuffix(title);
-    if(!title||!/^https?:\/\//i.test(link))continue;
-    const bare=x=>x.replace(/[^\p{L}\p{N}]/gu,'');
-    if(summary&&bare(title)&&bare(summary).startsWith(bare(title)))summary=''; /* 摘要只是重複標題 */
-    const time=parseDate(i.pubDate);
-    if(time&&Date.now()-time>maxAge)continue;
-    const it={titleOrig:title,summaryOrig:summary,link,img:gn?'':pickImg(i),time,source:src.name,sourceId:src.id,tier:src.tier,defCat:src.cat,mixed:!!src.mixed};
-    if(R.isOpinion(it))continue; /* 原則 4：評論、社論、分析不收 */
-    it.sl=R.langOf(title+' '+summary);
-    out.push(it);
-  }
-  return out;
-}
 
-/* ---------- 翻譯成繁體中文（Google 翻譯免費介面；失敗時經由轉接服務，最後用 MyMemory） ---------- */
+/* 瀏覽器模式的翻譯：Google 翻譯免費介面；直接連線失敗兩次就改走轉接服務，不再空等 */
 const TR=store.get(TR_KEY,{});
-const trKey=(sl,t)=>R.hash(sl+'|'+t);
+const trLookup=(sl,t)=>TR[R.trKey(sl,t)];
 function trSave(){const k=Object.keys(TR);if(k.length>1200)k.slice(0,k.length-900).forEach(x=>delete TR[x]);store.set(TR_KEY,TR)}
-const GTX=(sl,q)=>'https://translate.googleapis.com/translate_a/single?client=gtx&sl='+sl+'&tl=zh-TW&dt=t&q='+encodeURIComponent(q);
-const VIA=[u=>u,u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u)];
-let trRoute=0;
+const TR_ROUTES=[{wrap:u=>u,fails:0},{wrap:u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),fails:0},{wrap:u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u),fails:0}];
 async function trChunk(sl,list){
-  const q=list.map(s=>s.replace(/\s*\n\s*/g,' ')).join('\n');
-  for(let k=0;k<VIA.length;k++){
-    const r=(trRoute+k)%VIA.length;
+  for(const r of TR_ROUTES){
+    if(r.fails>=2)continue;
     try{
-      const out=R.parseGtx(await fetchJSON(VIA[r](GTX(sl,q)),12000)).split('\n').map(s=>s.trim());
-      if(out.length===list.length&&out.every(Boolean)){trRoute=r;return out}
-      if(list.length>1){const h=Math.ceil(list.length/2),a=await trChunk(sl,list.slice(0,h)),b=a&&await trChunk(sl,list.slice(h));return a&&b?a.concat(b):null}
-    }catch(e){}
+      const out=R.gtxLines(await fetchJSON(r.wrap(R.gtxURL(sl,list)),8000),list.length);
+      r.fails=0;
+      if(out)return out;
+      if(list.length===1)return null;
+      const h=Math.ceil(list.length/2),a=await trChunk(sl,list.slice(0,h)),b=a&&await trChunk(sl,list.slice(h));
+      return a&&b?a.concat(b):null;
+    }catch(e){r.fails++}
   }
-  try{ /* 最後備援：MyMemory（每天有免費額度） */
-    const out=[];
-    for(const s of list){
-      const j=await fetchJSON('https://api.mymemory.translated.net/get?langpair='+(sl==='zh-CN'?'zh-CN':'en')+'%7Czh-TW&q='+encodeURIComponent(s.slice(0,480)),10000);
-      const t=j&&Number(j.responseStatus)===200&&j.responseData&&j.responseData.translatedText;if(!t)throw Error('mymemory');out.push(t);
-    }
-    return out;
-  }catch(e){}
   return null;
 }
-async function translateAll(jobs){
-  const groups={};
-  jobs.forEach(j=>{if(j.text&&!TR[trKey(j.sl,j.text)])(groups[j.sl]=groups[j.sl]||new Set()).add(j.text)});
-  const chunks=[];
-  for(const sl in groups){let cur=[],len=0;for(const t of groups[sl]){if(len+t.length>1200&&cur.length){chunks.push([sl,cur]);cur=[];len=0}cur.push(t);len+=t.length+1}if(cur.length)chunks.push([sl,cur])}
-  const total=chunks.reduce((s,c)=>s+c[1].length,0);let done=0,failed=0,i=0;
-  async function worker(){
-    while(i<chunks.length){
-      const [sl,list]=chunks[i++],out=await trChunk(sl,list);
-      if(out)list.forEach((t,k)=>{TR[trKey(sl,t)]=out[k]});else failed+=list.length;
-      done+=list.length;$('newsStatus').textContent=`翻譯英文新聞為繁體中文中…（${done}/${total}）`;
-    }
-  }
-  await Promise.all([worker(),worker()]);
-  trSave();
-  return{total,failed};
+/* 翻譯排隊：每批翻完就更新畫面 */
+const trPending=new Set();let trQueue=[],trBusy=0,trDone=0,trTotal=0,trFailed=0,trWaiters=[];
+function enqueueTranslation(items){
+  const chunks=R.chunkJobs(R.translationJobs(items),(sl,t)=>!!trLookup(sl,t)||trPending.has(R.trKey(sl,t)),1200);
+  chunks.forEach(([sl,list])=>{list.forEach(t=>trPending.add(R.trKey(sl,t)));trTotal+=list.length});
+  trQueue.push(...chunks);pumpTranslation();
 }
-/* 套用編輯規則：翻譯 → 排除評論性強內容 → 中性化 → 敏感議題 → 分類 → 相關報導 → 排序 */
-function finalize(raw){
-  const list=[];let untranslated=0,judged=0;
-  for(const it of raw){
-    const tr=it.sl!=='zh',tz=tr?TR[trKey(it.sl,it.titleOrig)]:it.titleOrig;
-    if(!tz){untranslated++;continue} /* 無法翻譯的英文新聞不列出 */
-    const sz=it.summaryOrig?(tr?TR[trKey(it.sl,it.summaryOrig)]||'':it.summaryOrig):'';
-    if(R.isJudgmental(tz+' '+it.titleOrig)){judged++;continue}
-    const a=Object.assign({},it,{title:R.soften(tz),summary:R.soften(sz),translated:it.sl==='en',converted:it.sl==='zh-CN'});
-    a.softened=a.title!==tz;
-    a.category=R.classify(a);
-    a.sensitive=R.sensitiveOf(a.title+' '+a.summary,it.sl==='en'?it.titleOrig+' '+it.summaryOrig:'');
-    list.push(a);
+function pumpTranslation(){
+  while(trBusy<2&&trQueue.length){
+    const [sl,list]=trQueue.shift();trBusy++;
+    trChunk(sl,list).then(out=>{if(out)list.forEach((t,i)=>{TR[R.trKey(sl,t)]=out[i]});else trFailed+=list.length})
+      .catch(()=>{trFailed+=list.length})
+      .finally(()=>{list.forEach(t=>trPending.delete(R.trKey(sl,t)));trDone+=list.length;trBusy--;scheduleRender();pumpTranslation();
+        if(!trBusy&&!trQueue.length){const w=trWaiters;trWaiters=[];w.forEach(f=>f())}});
   }
-  return{list:R.rank(R.cluster(list)),untranslated,judged};
 }
+const translationDone=()=>new Promise(res=>{if(!trBusy&&!trQueue.length)res();else trWaiters.push(res)});
+
+/* 有新資料就更新圖卡與播放清單（同樣內容不重畫） */
+let clientRaw=[],renderTimer=0,lastSig='';
+function scheduleRender(){clearTimeout(renderTimer);renderTimer=setTimeout(()=>{applyArticles(R.finalize(clientRaw,trLookup).list);progressStatus()},400)}
+function applyArticles(list){
+  if(!list.length)return;
+  const sig=list.map(a=>a.link+':'+a.title.length+':'+(a.summary||'').length).join('|');
+  if(sig===lastSig)return;
+  lastSig=sig;articles=list;loadedOnce=true;
+  if(!queue.length||autoQueue&&(mode==='idle'||mode==='ended')){queue=briefing(BRIEF_ALL);idx=0;autoQueue=true;queueKey='';setArticle()}
+  else if(deepArt&&queue[0]===deepArt){
+    /* 從小工具進來：換成完整處理過的版本，並接著播同類新聞 */
+    const fresh0=!isPlaying()&&mode!=='paused',m=list.find(x=>x.link===deepArt.link);
+    if(m&&fresh0){queue[0]=m;deepArt=m}
+    if(queue.length===1)queue.push(...list.filter(x=>x.category===deepArt.category&&x.link!==deepArt.link).slice(0,5));
+    if(fresh0)setArticle();else paintMeta();
+  }
+  if(pendingBrief){const c=pendingBrief;pendingBrief=null;startBrief(c)}
+  renderShelves();
+}
+function countText(list){const n=c=>list.filter(a=>a.category===c).length;return CATS.map(c=>c.replace('官方原始資料','官方').replace('台灣財經','財經')+' '+n(c)).join('・')}
+function progressStatus(){
+  if(!loading||serverMode)return;
+  const done=srcState.length,ok=srcState.filter(s=>s.ok).length;
+  $('newsStatus').textContent=`更新中：${done}/${R.SOURCES.length} 個來源已回應（${ok} 個成功）`+(trTotal?` · 翻譯 ${trDone}/${trTotal} 段`:'')+(articles.length?` · 目前 ${articles.length} 則，可先瀏覽播放`:'');
+}
+
+async function loadClient(){
+  clientRaw=[];srcState=[];trDone=trTotal=trFailed=0;
+  const seen=new Set();
+  await Promise.all(R.SOURCES.map(async src=>{
+    try{
+      const r=await fetchSource(src);
+      const l=R.normalize(src,r.items,r.gn).filter(x=>!seen.has(x.link)&&seen.add(x.link));
+      clientRaw.push(...l);srcState.push({src,ok:true,n:l.length,via:r.via});
+      enqueueTranslation(l);scheduleRender(); /* 中文來源不必翻譯，會最先出現 */
+    }catch(e){srcState.push({src,ok:false})}
+    progressStatus();paintSrcList();
+  }));
+  await translationDone();trSave();
+  clearTimeout(renderTimer);
+  const res=R.finalize(clientRaw,trLookup);applyArticles(res.list);
+  trNote=trTotal?`本次翻譯 ${trDone-trFailed}/${trTotal} 段`+(trFailed?'（部分失敗，翻譯服務可能暫時無法使用）':''):'全部使用先前的翻譯';
+  return res;
+}
+
 async function load(){
   if(loading)return;loading=true;$('refresh').disabled=true;
-  $('newsStatus').textContent='更新中：正在向各來源取得新聞…';
-  const res=await Promise.all(R.SOURCES.map(async src=>{try{return Object.assign({src},await fetchSource(src))}catch(e){return{src,items:null}}}));
-  let raw=[];srcState=[];
-  for(const r of res){
-    if(!r.items){srcState.push({src:r.src,ok:false});continue}
-    const l=normalize(r.src,r.items,r.gn);raw=raw.concat(l);srcState.push({src:r.src,ok:true,n:l.length,via:r.via});
-  }
-  const seenL=new Set();raw=raw.filter(x=>!seenL.has(x.link)&&seenL.add(x.link));
-  const jobs=[];raw.forEach(x=>{if(x.sl!=='zh'){jobs.push({sl:x.sl,text:x.titleOrig});if(x.summaryOrig)jobs.push({sl:x.sl,text:x.summaryOrig})}});
-  if(jobs.length){const r=await translateAll(jobs);trNote=r.total?`本次翻譯 ${r.total-r.failed}/${r.total} 段`+(r.failed?'（部分失敗，翻譯服務可能暫時無法使用）':''):'全部使用先前的翻譯'}
-  const {list:fresh,untranslated,judged}=finalize(raw);
-  loadedOnce=true;
-  if(fresh.length){
-    articles=fresh;store.set(CACHE_KEY,{saved:Date.now(),articles});
-    if(!queue.length||autoQueue&&(mode==='idle'||mode==='ended')){queue=briefing(BRIEF_ALL);idx=0;autoQueue=true;queueKey='';setArticle()}
-    else if(deepArt&&queue[0]===deepArt){
-      /* 從小工具進來：換成完整處理過的版本，並接著播同類新聞 */
-      const fresh0=!isPlaying()&&mode!=='paused',m=fresh.find(x=>x.link===deepArt.link);
-      if(m&&fresh0){queue[0]=m;deepArt=m}
-      if(queue.length===1)queue.push(...fresh.filter(x=>x.category===deepArt.category&&x.link!==deepArt.link).slice(0,5));
-      if(fresh0)setArticle();else paintMeta();
+  $('newsStatus').textContent='更新中…';
+  try{
+    const d=await loadFromServer();
+    let res;
+    if(d){
+      serverMode=true;serverUpdated=d.updated||Date.now();
+      srcState=(d.sources||[]).map(s=>({src:R.SOURCES.find(x=>x.id===s.id),ok:s.ok,n:s.n,via:s.via})).filter(s=>s.src);
+      trNote=d.translate&&d.translate.total?`伺服器翻譯 ${d.translate.total-d.translate.failed}/${d.translate.total} 段`:'伺服器整理（使用先前的翻譯）';
+      lastSig='';applyArticles(d.articles);
+      res={list:d.articles,untranslated:d.untranslated||0,judged:d.judged||0};
+    }else{
+      serverMode=false;
+      res=await loadClient();
     }
-    if(pendingBrief){const c=pendingBrief;pendingBrief=null;startBrief(c)}
+    loadedOnce=true;
+    if(res.list.length)store.set(CACHE_KEY,{saved:Date.now(),articles:res.list});
+    renderShelves();paintSrcList();
+    const ok=srcState.filter(s=>s.ok).length;
+    $('newsStatus').textContent=res.list.length
+      ?`已取得 ${res.list.length} 則（${countText(res.list)}）· ${ok}/${R.SOURCES.length} 個來源可用`
+        +(res.untranslated?` · ${res.untranslated} 則英文新聞暫時無法翻譯，未列出`:'')+(res.judged?` · 排除 ${res.judged} 則評論性標題`:'')
+        +(serverMode?` · 伺服器整理於 ${new Date(serverUpdated).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})}（每 10 分鐘更新）`:` · ${new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})} 更新`)+'。每列可左右滑動。'
+      :'目前無法取得新聞。'+(articles.length?'保留上次快取；不是即時新聞。':'請確認網路或稍後按「更新」重試。語音測試仍可使用。');
+  }finally{
+    loading=false;$('refresh').disabled=false;
   }
-  renderShelves();paintSrcList();
-  const ok=srcState.filter(s=>s.ok).length,n=c=>fresh.filter(a=>a.category===c).length;
-  $('newsStatus').textContent=fresh.length
-    ?`已取得 ${fresh.length} 則（${CATS.map(c=>c.replace('官方原始資料','官方').replace('台灣財經','財經')+' '+n(c)).join('・')}）· ${ok}/${R.SOURCES.length} 個來源可用`
-      +(untranslated?` · ${untranslated} 則英文新聞暫時無法翻譯，未列出`:'')+(judged?` · 排除 ${judged} 則評論性標題`:'')+` · ${new Date().toLocaleTimeString('zh-TW')} 更新。每列可左右滑動。`
-    :'目前無法取得新聞。'+(articles.length?'保留上次快取；不是即時新聞。':'請確認網路或稍後重試。語音測試仍可使用。');
-  loading=false;$('refresh').disabled=false;
 }
 
 /* ---------- 加到主畫面提示與 Service Worker ---------- */
@@ -889,7 +871,8 @@ $('copyWidget').onclick=async()=>{
 
 renderShelves();paintSrcList();
 $('refresh').onclick=load;load();
-setInterval(()=>{if(document.visibilityState==='visible')load()},1800000);
+setInterval(()=>{if(document.visibilityState==='visible')load()},600000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&loadedOnce&&!loading&&Date.now()-(store.get(CACHE_KEY,{}).saved||0)>600000)load()}); /* 回到畫面時若超過 10 分鐘就更新 */
 </script>
 </body>
 </html>

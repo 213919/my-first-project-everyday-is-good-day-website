@@ -1,0 +1,7 @@
+# 連結 GitHub 部署時使用：Netlify 的「Base directory」請填 daily-news-app
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"

@@ -195,7 +195,109 @@
   /* translate_a/single?client=gtx：[[["譯文","原文",...],...],...]，換行會保留在譯文中 */
   function parseGtx(j) { return Array.isArray(j) && Array.isArray(j[0]) ? j[0].map(seg => (seg && seg[0]) || '').join('') : ''; }
 
+  /* ---------- RSS 解析與整理（瀏覽器、伺服器共用，不依賴 DOM） ---------- */
+  const ENT = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
+  function decodeEntities(s) {
+    return String(s || '').replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e) => {
+      if (e[0] === '#') { const n = e[1] === 'x' || e[1] === 'X' ? parseInt(e.slice(2), 16) : parseInt(e.slice(1), 10); return n ? String.fromCodePoint(n) : m; }
+      const v = ENT[e.toLowerCase()]; return v === undefined ? m : v;
+    });
+  }
+  const unCdata = s => String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1');
+  /* HTML → 純文字（有些來源的摘要是「轉義過的 HTML」，所以解碼兩次） */
+  function cleanText(s) {
+    s = decodeEntities(unCdata(s)).replace(/<(script|style)[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ');
+    return decodeEntities(s).replace(/\s+/g, ' ').trim();
+  }
+  function xmlTag(b, name) { const m = b.match(new RegExp('<' + name + '(?:\\s[^>]*)?>([\\s\\S]*?)</' + name + '>', 'i')); return m ? unCdata(m[1]) : ''; }
+  function xmlAttr(b, name, attr) { const m = b.match(new RegExp('<' + name + '\\s[^>]*?' + attr + '=["\']([^"\']+)["\']', 'i')); return m ? m[1] : ''; }
+  function parseFeed(xml) {
+    return (String(xml || '').match(/<item[\s>][\s\S]*?<\/item>/gi) || []).map(b => {
+      let img = xmlAttr(b, 'media:thumbnail', 'url') || xmlAttr(b, 'media:content', 'url');
+      const enc = b.match(/<enclosure\s[^>]*>/i);
+      if (!img && enc && /type=["']image\//i.test(enc[0])) img = (enc[0].match(/url=["']([^"']+)["']/i) || [])[1] || '';
+      return { title: xmlTag(b, 'title'), description: xmlTag(b, 'description') || xmlTag(b, 'content:encoded'),
+        link: decodeEntities(xmlTag(b, 'link') || xmlTag(b, 'guid')).trim(), pubDate: xmlTag(b, 'pubDate') || xmlTag(b, 'dc:date'), thumbnail: decodeEntities(img) };
+    });
+  }
+  function parseDate(s) {
+    s = String(s || '').trim(); if (!s) return 0;
+    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}(:\d{2})?$/.test(s)) s = s.replace(' ', 'T') + 'Z'; /* rss2json 格式（UTC）；Safari 無法直接解析 */
+    const t = Date.parse(s); return isNaN(t) ? 0 : t;
+  }
+  function pickImg(i) {
+    const enc = i.enclosure || {};
+    let u = i.thumbnail || ((/^image\//i.test(enc.type || '') || /\.(jpe?g|png|webp|gif)(\?|$)/i.test(enc.link || '')) ? enc.link : '') || '';
+    if (!u) { const m = /<img[^>]+src=["']([^"']+)["']/i.exec(decodeEntities((i.description || '') + (i.content || ''))); if (m) u = m[1]; }
+    u = String(u || '').replace(/&amp;/g, '&').trim();
+    if (/^\/\//.test(u)) u = 'https:' + u;
+    if (/^http:\/\//i.test(u)) u = 'https://' + u.slice(7); /* 避免 http 圖片被擋 */
+    return /^https:\/\/[^\s"'<>]+$/i.test(u) ? u : '';
+  }
+  const bare = x => String(x || '').replace(/[^\p{L}\p{N}]/gu, '');
+  /* 單一來源的 RSS 項目 → 待翻譯的新聞資料（太舊、評論文章不收） */
+  function normalize(src, items, gn, now) {
+    now = now || Date.now();
+    const maxAge = TIER[src.tier].maxAgeH * 3600e3, out = [];
+    for (const i of (items || []).slice(0, 10)) {
+      let title = cleanText(i.title), summary = gn ? '' : cleanText(i.description || i.content).slice(0, 320);
+      const link = String(i.link || i.guid || '').trim();
+      if (gn) title = stripGnSuffix(title);
+      if (!title || !/^https?:\/\//i.test(link)) continue;
+      if (summary && bare(title) && bare(summary).startsWith(bare(title))) summary = ''; /* 摘要只是重複標題 */
+      const time = parseDate(i.pubDate);
+      if (time && now - time > maxAge) continue;
+      const it = { titleOrig: title, summaryOrig: summary, link, img: gn ? '' : pickImg(i), time, source: src.name, sourceId: src.id, tier: src.tier, defCat: src.cat, mixed: !!src.mixed };
+      if (isOpinion(it)) continue; /* 原則 4：評論、社論、分析不收 */
+      it.sl = langOf(title + ' ' + summary);
+      out.push(it);
+    }
+    return out;
+  }
+
+  /* ---------- 翻譯工作 ---------- */
+  const trKey = (sl, t) => hash(sl + '|' + t);
+  function translationJobs(raw) {
+    const jobs = [];
+    raw.forEach(x => { if (x.sl !== 'zh') { jobs.push({ sl: x.sl, text: x.titleOrig }); if (x.summaryOrig) jobs.push({ sl: x.sl, text: x.summaryOrig }); } });
+    return jobs;
+  }
+  /* 依語言分組、每組約 maxLen 字一批；have(sl, text) 為真者略過 */
+  function chunkJobs(jobs, have, maxLen) {
+    const groups = {};
+    jobs.forEach(j => { if (j.text && !have(j.sl, j.text)) (groups[j.sl] = groups[j.sl] || new Set()).add(j.text); });
+    const chunks = [];
+    for (const sl in groups) {
+      let cur = [], len = 0;
+      for (const t of groups[sl]) { if (len + t.length > maxLen && cur.length) { chunks.push([sl, cur]); cur = []; len = 0; } cur.push(t); len += t.length + 1; }
+      if (cur.length) chunks.push([sl, cur]);
+    }
+    return chunks;
+  }
+  const gtxURL = (sl, lines) => 'https://translate.googleapis.com/translate_a/single?client=gtx&sl=' + sl + '&tl=zh-TW&dt=t&q=' +
+    encodeURIComponent(lines.map(s => String(s).replace(/\s*\n\s*/g, ' ')).join('\n'));
+  function gtxLines(json, n) { const out = parseGtx(json).split('\n').map(s => s.trim()); return out.length === n && out.every(Boolean) ? out : null; }
+
+  /* 套用編輯規則：翻譯 → 排除評論性強內容 → 中性化 → 敏感議題 → 分類 → 相關報導 → 排序
+     lookup(sl, text) 回傳譯文；沒有譯文的英文新聞不列出 */
+  function finalize(raw, lookup) {
+    const list = []; let untranslated = 0, judged = 0;
+    for (const it of raw) {
+      const tr = it.sl !== 'zh', tz = tr ? lookup(it.sl, it.titleOrig) : it.titleOrig;
+      if (!tz) { untranslated++; continue; }
+      const sz = it.summaryOrig ? (tr ? lookup(it.sl, it.summaryOrig) || '' : it.summaryOrig) : '';
+      if (isJudgmental(tz + ' ' + it.titleOrig)) { judged++; continue; }
+      const a = Object.assign({}, it, { title: soften(tz), summary: soften(sz), translated: it.sl === 'en', converted: it.sl === 'zh-CN' });
+      a.softened = a.title !== tz;
+      a.category = classify(a);
+      a.sensitive = sensitiveOf(a.title + ' ' + a.summary, it.sl === 'en' ? it.titleOrig + ' ' + it.summaryOrig : '');
+      list.push(a);
+    }
+    return { list: rank(cluster(list)), untranslated, judged };
+  }
+
   const api = { CATS, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
-    bigrams, sameStory, cluster, rank, splitSentences, buildScript, parseGtx };
+    bigrams, sameStory, cluster, rank, splitSentences, buildScript, parseGtx,
+    decodeEntities, cleanText, parseFeed, parseDate, pickImg, normalize, trKey, translationJobs, chunkJobs, gtxURL, gtxLines, finalize };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.NewsRules = api;
 })(typeof globalThis !== 'undefined' ? globalThis : this);
