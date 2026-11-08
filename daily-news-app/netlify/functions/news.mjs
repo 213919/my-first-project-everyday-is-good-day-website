@@ -1,6 +1,7 @@
 // 聲讀 DAILY：伺服器端整理新聞（Netlify Function，網址 /api/news）
 // 抓取 rules.js 裡的各來源 RSS → 英文翻譯為繁體中文 → 套用編輯原則 → 回傳 JSON。
-// Netlify CDN 快取 10 分鐘；過期後一小時內先給舊資料、背景更新，使用者不用等。
+// Netlify CDN 快取 5 分鐘；過期後一小時內先給舊資料、背景更新，使用者不用等。
+// 按播放器右上角「重新整理」時會加上 ?fresh=，直接抓最新資料（不使用快取）。
 // 注意：只有網站「連結 GitHub」部署時才會啟用；手動拖拉上傳的網站不會執行這個檔案。
 import R from '../../rules.js';
 
@@ -51,7 +52,8 @@ async function translate(sl, list, end) {
   return a && b ? a.concat(b) : null;
 }
 
-export default async () => {
+export default async (req) => {
+  const fresh = new URL(req.url).searchParams.has('fresh');
   const start = Date.now(), end = start + DEADLINE;
   const fetched = await Promise.all(R.SOURCES.map(s => fetchSource(s, start + FEED_BUDGET)));
   const seen = new Set(), raw = [];
@@ -77,8 +79,8 @@ export default async () => {
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'public, max-age=60',
-      'netlify-cdn-cache-control': list.length ? 'public, durable, s-maxage=600, stale-while-revalidate=3600' : 'no-store'
+      'cache-control': fresh ? 'no-store' : 'public, max-age=60',
+      'netlify-cdn-cache-control': fresh || !list.length ? 'no-store' : 'public, durable, s-maxage=300, stale-while-revalidate=3600'
     }
   });
 };

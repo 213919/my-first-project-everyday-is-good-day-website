@@ -40,8 +40,8 @@
     { id: 'wto',         name: '世界貿易組織',   tier: 'origin', cat: '官方原始資料', url: 'https://www.wto.org/library/rss/latest_news_e.xml', alt: GN('site:wto.org when:7d') },
     { id: 'mofa-tw',     name: '我國外交部',     tier: 'origin', cat: '官方原始資料', gn: true, url: GN('site:mofa.gov.tw when:7d', true) },
     { id: 'state',       name: '美國國務院',     tier: 'origin', cat: '官方原始資料', gn: true, url: GN('site:state.gov when:7d') },
-    { id: 'reuters-fc',  name: '路透社事實查核', tier: 'check',  cat: '事實查核', gn: true, url: GN('site:reuters.com/fact-check when:21d') },
-    { id: 'afp-fc',      name: '法新社事實查核', tier: 'check',  cat: '事實查核', gn: true, url: GN('site:factcheck.afp.com when:21d') },
+    { id: 'reuters-fc',  name: '路透社事實查核', tier: 'check',  cat: '事實查核', gn: true, url: GN('site:reuters.com intitle:"fact check"'), alt: GN('reuters "fact check" when:30d') },
+    { id: 'afp-fc',      name: '法新社事實查核', tier: 'check',  cat: '事實查核', gn: true, url: GN('site:factcheck.afp.com'), alt: GN('"AFP Fact Check" when:30d') },
     { id: 'cna-fin',     name: '中央社',         tier: 'local',  cat: '台灣財經', url: 'https://feeds.feedburner.com/rsscna/finance', alt: GN('site:cna.com.tw/news/afe when:2d', true) },
     { id: 'technews',    name: '科技新報',       tier: 'local',  cat: '科技', url: 'https://technews.tw/feed/' }
   ];
@@ -151,13 +151,15 @@
   function score(a, now) { const ageH = a.time ? (now - a.time) / 3600e3 : 48; return TIER[a.tier].w + (a.related && a.related.length ? 2 : 0) + 2 * Math.max(0, 1 - ageH / 48); }
   function rank(items, now) { now = now || Date.now(); return items.slice().sort((a, b) => score(b, now) - score(a, now) || b.time - a.time); }
 
-  /* ---------- 原則 4：逐字稿結構 ---------- */
+  /* ---------- 原則 4：逐字稿結構 ----------
+     段落：發生了什麼 → 各方說法 → 下一步 → 消息來源。段落標題只顯示、不朗讀，讀起來才連貫。
+     只在句號、問號、驚嘆號處斷句（超過 120 字的長句才在逗號處分開）。 */
   function splitSentences(t) {
     const out = [];
-    (String(t || '').match(/[^。！？!?；;]+[。！？!?；;]?/g) || []).forEach(s => {
+    (String(t || '').match(/[^。！？!?；;]+(?:[。！？!?；;]+[」』”’）)]*)?/g) || []).forEach(s => {
       s = s.trim(); if (!s) return;
-      if (s.length <= 70) { out.push(s); return; }
-      let buf = ''; (s.match(/[^，、,]+[，、,]?/g) || [s]).forEach(p => { if ((buf + p).length > 60 && buf) { out.push(buf); buf = p; } else buf += p; }); if (buf) out.push(buf);
+      if (s.length <= 120) { out.push(s); return; }
+      let buf = ''; (s.match(/[^，,]+[，,]?/g) || [s]).forEach(p => { if ((buf + p).length > 100 && buf) { out.push(buf); buf = p; } else buf += p; }); if (buf) out.push(buf);
     });
     return out;
   }
@@ -165,30 +167,29 @@
   const SAID_RE = /表示|指出|說|稱|聲明|強調|呼籲|批評|回應|否認|認為|警告|透露|證實|發言人/;
   const end = s => String(s || '').replace(/[。．.！!？?\s]+$/, '');
   function joinNames(list) { return list.length <= 1 ? (list[0] || '') : list.slice(0, -1).join('、') + '及' + list[list.length - 1]; }
+  /* 回傳 { paras: [{kind, label, sents}], notes: [只顯示不朗讀的說明] } */
   function buildScript(a) {
-    const L = [], sens = a.sensitive || [];
-    if (sens.length) L.push(`提醒：本則涉及${sens.join('、')}議題，部分內容來自當事方說法，未經獨立證實。`);
-    if (a.tier === 'check') L.push('以下是事實查核報導。');
-    L.push(`發生了什麼：${end(a.title)}。`);
+    const sens = a.sensitive || [], paras = [], notes = [];
+    if (sens.length) paras.push({ kind: 'notice', label: '', sents: [`提醒：本則涉及${sens.join('、')}，部分說法未經獨立證實。`] });
     const what = [], said = [], next = [];
     splitSentences(a.summary).forEach(s => (NEXT_RE.test(s) ? next : SAID_RE.test(s) ? said : what).push(s));
-    const from = a.summaryFrom || a.source;
-    const official = a.tier === 'origin' && !a.summaryFrom;
-    if (what.length) what.forEach((s, i) => L.push(i ? s : (official ? `${from}指出：` : `據${from}報導：`) + s));
-    else if (said.length || next.length) L.push(official ? `以下為${from}發布的內容。` : `以下據${from}報導。`);
-    said.forEach((s, i) => L.push(i ? s : '各方說法：' + s));
-    next.forEach((s, i) => L.push(i ? s : '下一步：' + s));
+    if (a.summaryFrom) { const first = what.length ? what : said.length ? said : next; if (first.length) first[0] = `${a.summaryFrom}指出，${first[0]}`; }
+    const t = end(a.title);
+    const head = a.tier === 'check' ? (/^事實查核/.test(t) ? `${t}。` : `事實查核：${t}。`) : a.tier === 'origin' ? `${t}。` : `據${a.source}報導，${t}。`;
+    paras.push({ kind: 'what', label: '發生了什麼', sents: [head].concat(what) });
+    if (said.length) paras.push({ kind: 'said', label: '各方說法', sents: said });
+    if (next.length) paras.push({ kind: 'next', label: '下一步', sents: next });
     const others = [...new Set((a.related || []).map(r => r.source))].filter(n => n !== a.source);
-    const how = a.translated ? '（英文報導，機器翻譯）' : a.converted ? '（簡體中文，已轉為繁體）' : '';
     let src;
-    if (a.tier === 'origin') src = `以上為${a.source}的官方發布${how}，代表該機構立場。`;
-    else if (a.tier === 'check') src = `以上為${a.source}的查核報導${how}。`;
-    else src = `消息來源：${a.source}${how}。`;
-    if (others.length) src += `另有${joinNames(others)}的相關報導，可交叉查證。`;
-    else if (NEWS_TIERS.includes(a.tier)) src += '目前僅見單一來源，以上為該媒體的報導內容。';
-    if (!a.summary) src += '此來源僅提供標題，詳細內容請見原文。';
-    L.push(src);
-    return L;
+    if (a.tier === 'origin') src = `以上為${a.source}的官方發布。` + (others.length ? `${joinNames(others)}也有相關報導。` : '');
+    else if (a.tier === 'check') src = `以上為${a.source}的查核報導。`;
+    else src = others.length ? `消息來源：${a.source}；${joinNames(others)}也有相關報導。` : `消息來源：${a.source}（單一來源）。`;
+    paras.push({ kind: 'source', label: '', sents: [src] });
+    if (a.translated) notes.push('英文報導經機器翻譯，用詞以原文為準');
+    if (a.converted) notes.push('簡體中文已轉為繁體');
+    if (a.titleOrig && a.titleOrig !== a.title) notes.push((a.translated ? '原文標題：' : '原標題：') + a.titleOrig);
+    if (!a.summary) notes.push('此來源只提供標題，詳細內容請點原文');
+    return { paras, notes };
   }
 
   /* ---------- 翻譯服務回應解析 ---------- */
