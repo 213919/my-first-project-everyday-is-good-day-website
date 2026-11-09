@@ -1,5 +1,5 @@
 /* 聲讀 Service Worker：只快取播放器本身，新聞資料一律走網路 */
-const CACHE = 'daily-news-v10';
+const CACHE = 'daily-news-v11';
 const SHELL = [
   '/',
   '/index.html',

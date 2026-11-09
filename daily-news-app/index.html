@@ -215,7 +215,7 @@ const ICON_PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11
 const ICON_PAUSE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>';
 const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)'),smooth=()=>reduceMotion.matches?'auto':'smooth';
 
-let articles=[],queue=[],idx=0,sents=[],sentence=0,mode='idle',token=0,voice=null,loading=false,loadedOnce=false,watchdog,
+let wakeLock=null,articles=[],queue=[],idx=0,sents=[],sentence=0,mode='idle',token=0,voice=null,loading=false,loadedOnce=false,watchdog,
     current=null,lastCancel=0,loop=false,rate=1,speechPrimed=false,ctlVisible=true,autoQueue=true,queueKey='',lastUpdated=0;
 
 const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -261,6 +261,7 @@ $('loop').onclick=()=>{loop=!loop;store.set('news-loop',loop);paintLoop()};
 
 /* ---------- 逐字稿 ---------- */
 function setPlayIcon(on){
+  keepAwake(on);
   for(const b of [$('play'),$('miniPlay')]){b.innerHTML=on?ICON_PAUSE:ICON_PLAY;b.setAttribute('aria-label',on?'暫停':'播放')}
   document.body.classList.toggle('is-playing',on);
 }
@@ -382,6 +383,17 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();togglePlay()}
   else if(e.key==='ArrowRight')jump(1);else if(e.key==='ArrowLeft')jump(-1);
 });
+
+/* ---------- 朗讀時螢幕保持亮著（像看 YouTube，不會 30 秒就自動關螢幕） ----------
+   使用 Screen Wake Lock（iOS 16.4+）。播放中取得，暫停或播完就釋放；切回畫面時自動重新取得。 */
+async function keepAwake(on){
+  try{
+    if(on&&'wakeLock' in navigator&&document.visibilityState==='visible'&&(!wakeLock||wakeLock.released)){
+      wakeLock=await navigator.wakeLock.request('screen');
+    }else if(!on&&wakeLock){const w=wakeLock;wakeLock=null;await w.release()}
+  }catch(e){wakeLock=null}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&isPlaying())keepAwake(true)});
 
 /* ---------- 朗讀守護 ----------
    iPhone 的語音常被系統打斷（切換畫面、通知、其他聲音），會停在暫停或卡住不動。

@@ -64,6 +64,22 @@ export default async (req) => {
     return { id: src.id, ok: true, n: l.length, via };
   });
 
+  /* RSS 摘要太短的新聞，到原文網頁補抓內文（每個來源分類取最新、最重要的前幾則） */
+  const need = it => it.summaryOrig.length < (it.sl === 'en' ? 700 : 400);
+  const byCat = {};
+  raw.filter(it => it.summaryOrig && need(it)).sort((a, b) => R.TIER[b.tier].w - R.TIER[a.tier].w || b.time - a.time)
+    .forEach(it => { const l = byCat[it.defCat] = byCat[it.defCat] || []; if (l.length < 8) l.push(it); });
+  let enriched = 0;
+  await Promise.all(Object.values(byCat).flat().map(async it => {
+    const left = Math.min(end - 3500 - Date.now(), 3500);
+    if (left < 600) return;
+    try {
+      const html = (await (await get(it.link, left)).text()).slice(0, 400000);
+      const text = R.extractArticleText(html, it.sl !== 'en');
+      if (text.length > it.summaryOrig.length + 60) { it.summaryOrig = text; enriched++; }
+    } catch (e) { /* 抓不到就沿用 RSS 摘要 */ }
+  }));
+
   const chunks = R.chunkJobs(R.translationJobs(raw), (sl, t) => memo.has(R.trKey(sl, t)), 1500);
   let total = 0, failed = 0;
   await Promise.all(chunks.map(async ([sl, list]) => {
@@ -75,7 +91,7 @@ export default async (req) => {
   if (memo.size > 3000) [...memo.keys()].slice(0, memo.size - 2000).forEach(k => memo.delete(k));
 
   const { list, untranslated, judged, headlineOnly } = R.finalize(raw, (sl, t) => memo.get(R.trKey(sl, t)));
-  const body = { updated: Date.now(), articles: list, sources, untranslated, judged, headlineOnly, translate: { total, failed }, ms: Date.now() - start };
+  const body = { updated: Date.now(), articles: list, sources, untranslated, judged, headlineOnly, translate: { total, failed }, ms: Date.now() - start, enriched };
   return new Response(JSON.stringify(body), {
     headers: {
       'content-type': 'application/json; charset=utf-8',

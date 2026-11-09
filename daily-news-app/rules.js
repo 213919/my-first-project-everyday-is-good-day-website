@@ -199,18 +199,11 @@
     if (sens.length) paras.push({ kind: 'notice', label: '', sents: [`提醒：本則涉及${sens.join('、')}，部分說法未經獨立證實。`] });
     const what = [], said = [], next = [];
     splitSentences(a.summary).forEach(s => (NEXT_RE.test(s) ? next : SAID_RE.test(s) ? said : what).push(s));
-    if (a.summaryFrom) { const first = what.length ? what : said.length ? said : next; if (first.length) first[0] = `${a.summaryFrom}指出，${first[0]}`; }
     const t = end(a.title);
-    const head = a.tier === 'check' ? (/^事實查核/.test(t) ? `${t}。` : `事實查核：${t}。`) : a.tier === 'origin' ? `${t}。` : `據${a.source}報導，${t}。`;
-    paras.push({ kind: 'what', label: '發生了什麼', sents: [head].concat(what) });
+    paras.push({ kind: 'what', label: '發生了什麼', sents: [a.tier === 'check' && !/^事實查核/.test(t) ? `事實查核：${t}。` : `${t}。`].concat(what) });
     if (said.length) paras.push({ kind: 'said', label: '各方說法', sents: said });
     if (next.length) paras.push({ kind: 'next', label: '下一步', sents: next });
-    const others = [...new Set((a.related || []).map(r => r.source))].filter(n => n !== a.source);
-    let src;
-    if (a.tier === 'origin') src = `以上為${a.source}的官方發布。` + (others.length ? `${joinNames(others)}也有相關報導。` : '');
-    else if (a.tier === 'check') src = `以上為${a.source}的查核報導。`;
-    else src = others.length ? `消息來源：${a.source}；${joinNames(others)}也有相關報導。` : `消息來源：${a.source}（單一來源）。`;
-    paras.push({ kind: 'source', label: '', sents: [src] });
+    /* 來源只顯示在畫面上（來源名稱與原文連結），不朗讀 */
     if (a.translated) notes.push('英文報導經機器翻譯，用詞以原文為準');
     if (a.converted) notes.push('簡體中文已轉為繁體');
     if (a.titleOrig && a.titleOrig !== a.title) notes.push((a.translated ? '原文標題：' : '原標題：') + a.titleOrig);
@@ -273,7 +266,7 @@
   }
   /* 描述與全文擇一：全文明顯較長時用全文的前段 */
   function pickSummary(desc, full, zh) {
-    const max = zh ? 280 : 520;
+    const max = zh ? 900 : 1500;
     const d = trimSummary(desc, max), f = trimSummary(full, max);
     return f.length > d.length + 40 ? f : d;
   }
@@ -296,6 +289,25 @@
       out.push(it);
     }
     return out;
+  }
+
+  /* ---------- 從文章網頁擷取內文段落（伺服器用；RSS 摘要太短時補足） ---------- */
+  const JUNK = /(copyright|all rights reserved|subscribe|sign up|newsletter|cookie|advertisement|follow us|read more|privacy policy|terms of use|版權所有|訂閱|廣告|延伸閱讀|相關新聞|責任編輯|加入.*好友|點擊|下載.*App)/i;
+  function extractArticleText(html, zh) {
+    html = String(html || '').replace(/<(script|style|noscript|nav|header|footer|aside|form|figure|figcaption)[\s\S]*?<\/\1>/gi, ' ');
+    const art = html.match(/<article[\s\S]*?<\/article>/i);
+    const scope = art ? art[0] : (html.match(/<main[\s\S]*?<\/main>/i) || [html])[0];
+    const minLen = zh ? 22 : 55, out = [];
+    for (const m of scope.matchAll(/<p[\s>][\s\S]*?<\/p>/gi)) {
+      const t = cleanText(m[0]);
+      if (t.length >= minLen && !JUNK.test(t) && !out.includes(t)) out.push(t);
+    }
+    let text = out.join(' ');
+    if (text.length < 120) { /* 找不到段落時退而用網頁摘要 */
+      const og = html.match(/<meta[^>]+(?:property|name)=["'](?:og:description|description)["'][^>]+content=["']([^"']+)["']/i) || html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+(?:property|name)=["'](?:og:description|description)["']/i);
+      if (og) text = cleanText(og[1]);
+    }
+    return trimSummary(text, zh ? 900 : 1500);
   }
 
   /* ---------- 翻譯工作 ---------- */
@@ -344,7 +356,7 @@
     return { list: topPerCat(rank(full)), untranslated, judged, headlineOnly: list.length - full.length };
   }
 
-  const api = { CATS, PER_CAT, topPerCat, trimSummary, pickSummary, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
+  const api = { CATS, PER_CAT, topPerCat, trimSummary, pickSummary, extractArticleText, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
     bigrams, sameStory, cluster, rank, splitSentences, buildScript, parseGtx,
     decodeEntities, cleanText, parseFeed, parseDate, pickImg, normalize, trKey, translationJobs, chunkJobs, gtxURL, gtxLines, finalize };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.NewsRules = api;
