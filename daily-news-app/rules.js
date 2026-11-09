@@ -193,13 +193,21 @@
   const end = s => String(s || '').replace(/[。．.！!？?\s]+$/, '');
   function joinNames(list) { return list.length <= 1 ? (list[0] || '') : list.slice(0, -1).join('、') + '及' + list[list.length - 1]; }
   /* 回傳 { paras: [{kind, label, sents}], notes: [只顯示不朗讀的說明] } */
+  const SPEAK_MAX = 240; /* 一則最多約 1 分鐘（以每秒約 4 個字、1.0 倍速計）：標題＋內文＋提醒 */
+  /* 依字數預算挑句子：由前往後取，整句放不下就停，內文至少保留一句 */
+  function fitSentences(sents, budget) {
+    const out = []; let n = 0;
+    for (const s of sents) { if (out.length && n + s.length > budget) break; out.push(s); n += s.length; if (n >= budget) break; }
+    return out;
+  }
   function buildScript(a) {
     const sens = a.sensitive || [], paras = [], notes = [];
     if (a.intro) paras.push({ kind: 'intro', label: '', sents: [a.intro] });
     if (sens.length) paras.push({ kind: 'notice', label: '', sents: [`提醒：本則涉及${sens.join('、')}，部分說法未經獨立證實。`] });
     const what = [], said = [], next = [];
-    splitSentences(a.summary).forEach(s => (NEXT_RE.test(s) ? next : SAID_RE.test(s) ? said : what).push(s));
     const t = end(a.title);
+    const budget = SPEAK_MAX - t.length - (sens.length ? 28 : 0) - (a.intro ? a.intro.length : 0);
+    fitSentences(splitSentences(a.summary), Math.max(60, budget)).forEach(s => (NEXT_RE.test(s) ? next : SAID_RE.test(s) ? said : what).push(s));
     paras.push({ kind: 'what', label: '發生了什麼', sents: [a.tier === 'check' && !/^事實查核/.test(t) ? `事實查核：${t}。` : `${t}。`].concat(what) });
     if (said.length) paras.push({ kind: 'said', label: '各方說法', sents: said });
     if (next.length) paras.push({ kind: 'next', label: '下一步', sents: next });
@@ -256,8 +264,14 @@
   }
   const bare = x => String(x || '').replace(/[^\p{L}\p{N}]/gu, '');
   const BOILER = [/The post .*? appeared first on .*$/i, /Continue reading.*$/i, /Read more.*$/i, /閱讀全文.*$/, /\[(…|\.\.\.)\]/g, /^（中央社[^）]{0,40}）/, /^\(?(AP|Reuters|AFP)\)?\s*[—–-]\s*/];
+  /* 網頁雜訊：播放器、瀏覽器、訂閱、登入、cookie 等「不是新聞」的句子 */
+  const NOT_NEWS = /(影片|視訊|播放).{0,12}(混亂|錯誤|失敗)|瀏覽器|擴充功能|視訊播放器|影片播放器|播放器載入|無法載入|無法播放|啟用.{0,6}JavaScript|JavaScript|Cookie|cookie|請登入|登入帳號|訂閱.{0,6}(電子報|頻道|我們)|加入.{0,4}(會員|好友)|版權所有|廣告|分享到|點擊.{0,6}(查看|閱讀|觀看)|下載.{0,4}(App|應用)|開啟通知|your browser|browser extension|video player|enable javascript|javascript|cookies?\b|sign in|log in|subscribe|newsletter|advertisement|click here|watch live|listen live|download the app|all rights reserved|copyright/i;
+  function dropJunk(t) {
+    const parts = String(t || '').match(/[^。！？!?.]+(?:[。！？!?.]+["」』”’）)]*)?\s*/g) || [];
+    return parts.filter(p => !NOT_NEWS.test(p)).join('').trim();
+  }
   function trimSummary(t, max) {
-    t = BOILER.reduce((s, r) => s.replace(r, ''), String(t || '')).replace(/\s+/g, ' ').trim();
+    t = dropJunk(BOILER.reduce((s, r) => s.replace(r, ''), String(t || '')).replace(/\s+/g, ' ').trim());
     if (t.length <= max) return t;
     const parts = t.match(/[^。！？!?.]+(?:[。！？!?.]+["」』”’）)]*)?\s*/g) || [t];
     let out = '';
@@ -300,7 +314,7 @@
     const minLen = zh ? 22 : 55, out = [];
     for (const m of scope.matchAll(/<p[\s>][\s\S]*?<\/p>/gi)) {
       const t = cleanText(m[0]);
-      if (t.length >= minLen && !JUNK.test(t) && !out.includes(t)) out.push(t);
+      if (t.length >= minLen && !JUNK.test(t) && !NOT_NEWS.test(t) && !out.includes(t)) out.push(t);
     }
     let text = out.join(' ');
     if (text.length < 120) { /* 找不到段落時退而用網頁摘要 */
@@ -340,7 +354,7 @@
     for (const it of raw) {
       const tr = it.sl !== 'zh', tz = tr ? lookup(it.sl, it.titleOrig) : it.titleOrig;
       if (!tz) { untranslated++; continue; }
-      const sz = it.summaryOrig ? (tr ? lookup(it.sl, it.summaryOrig) || '' : it.summaryOrig) : '';
+      const sz = it.summaryOrig ? dropJunk(tr ? lookup(it.sl, it.summaryOrig) || '' : it.summaryOrig) : '';
       if (isJudgmental(tz + ' ' + it.titleOrig)) { judged++; continue; }
       const a = Object.assign({}, it, { title: soften(tz), summary: soften(sz), translated: it.sl === 'en', converted: it.sl === 'zh-CN' });
       a.softened = a.title !== tz;
@@ -356,7 +370,7 @@
     return { list: topPerCat(rank(full)), untranslated, judged, headlineOnly: list.length - full.length };
   }
 
-  const api = { CATS, PER_CAT, topPerCat, trimSummary, pickSummary, extractArticleText, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
+  const api = { CATS, PER_CAT, SPEAK_MAX, dropJunk, fitSentences, topPerCat, trimSummary, pickSummary, extractArticleText, TIER, SOURCES, NEWS_TIERS, GN, hash, stripGnSuffix, langOf, isOpinion, isJudgmental, soften, sensitiveOf, classify,
     bigrams, sameStory, cluster, rank, splitSentences, buildScript, parseGtx,
     decodeEntities, cleanText, parseFeed, parseDate, pickImg, normalize, trKey, translationJobs, chunkJobs, gtxURL, gtxLines, finalize };
   if (typeof module !== 'undefined' && module.exports) module.exports = api; else root.NewsRules = api;
