@@ -7,7 +7,10 @@
 <meta name="theme-color" content="#121212">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
-<link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png">
+<link rel="icon" type="image/png" href="/icons/icon-192.png" media="(prefers-color-scheme: light)">
+<link rel="icon" type="image/png" href="/icons/icon-dark-192.png" media="(prefers-color-scheme: dark)">
+<script>/* 加到主畫面時，依手機目前的淺色／深色模式選用對應圖示 */
+(function(){try{var q=matchMedia('(prefers-color-scheme: dark)'),a=document.querySelector('link[rel=apple-touch-icon]'),f=function(){a.href=q.matches?'/icons/icon-dark-180.png':'/icons/icon-180.png'};f();q.addEventListener&&q.addEventListener('change',f)}catch(e){}})();</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="聲讀">
@@ -144,6 +147,35 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
 .mp svg{width:30px;height:30px}.mn svg{width:26px;height:26px}
 .mbar{position:absolute;left:10px;right:10px;bottom:0;height:2px;border-radius:1px;background:rgba(255,255,255,.25)}
 .mbar i{display:block;height:100%;width:0;border-radius:1px;background:#fff;transition:width .3s}
+/* 重點摘要 */
+.points{margin:0 0 14px;padding:12px 14px 4px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.06)}
+.points h4{margin:0 0 6px;font-size:12px;font-weight:800;letter-spacing:.14em;color:var(--mute)}
+.points button{display:block;width:100%;text-align:left;padding:7px 0 9px;border-top:1px solid rgba(255,255,255,.07)}
+.points button:first-of-type{border-top:0}
+.points b{display:block;font-size:14.5px;line-height:1.4;font-weight:700}
+.points span{display:block;margin-top:2px;font-size:13px;line-height:1.5;color:var(--mute)}
+.points button.cur b{color:var(--green)}
+/* 世界地圖 */
+.worldmap{margin-top:36px}
+.mapbox{margin:12px -4px 0;padding:6px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+#mapSvg{display:block;width:100%;height:auto}
+#mapSvg path{fill:#2b2b2b;stroke:#121212;stroke-width:.5;transition:fill .4s}
+#mapSvg path.lit{stroke:rgba(255,255,255,.55);stroke-width:.7;cursor:pointer;animation:glow 2.4s ease-in-out infinite alternate}
+#mapSvg path.sel{stroke:#fff;stroke-width:1.6}
+#mapSvg path.now{stroke:#fff;stroke-width:1.8;animation:none}
+@keyframes glow{from{opacity:.78}to{opacity:1}}
+.mapnote{margin:10px 2px 0;font-size:12.5px;color:var(--mute)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin:10px 2px 0;font-size:12px;color:var(--mute)}
+.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:99px;background:rgba(255,255,255,.08);font-size:13.5px;font-weight:700}
+.chip i{width:8px;height:8px;border-radius:50%}
+.chip small{color:var(--mute);font-weight:700;font-size:12px}
+.chip.on{background:#fff;color:#000}.chip.on small{color:#444}
+.mapnews{margin-top:12px}
+.mapnews h4{margin:0 0 4px;font-size:15px}
+.mapnews button{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;padding:9px 0;border-top:1px solid rgba(255,255,255,.07);font-size:14px;line-height:1.45;font-weight:600}
+.mapnews button i{flex:none;width:8px;height:8px;border-radius:50%;margin-top:7px}
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -189,6 +221,15 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
   <div class="home-head"><h2 id="newsHead">今日重點</h2><small id="newsStatus">載入中…</small></div>
   <div id="shelves"></div>
 </section>
+
+<section class="worldmap" id="worldmap" aria-labelledby="mapHead">
+  <div class="home-head"><h2 id="mapHead">世界地圖</h2><small id="mapCount"></small></div>
+  <div class="mapbox"><svg id="mapSvg" role="img" aria-label="世界地圖，亮起的國家表示今日新聞提到該地區"></svg></div>
+  <div class="legend" id="legend"></div>
+  <p class="mapnote">亮起的地區＝今日新聞提到的地方，點選可看相關新聞。</p>
+  <div class="chips" id="mapChips"></div>
+  <div class="mapnews" id="mapNews"></div>
+</section>
 </div>
 
 <div class="mini" id="mini" role="region" aria-label="正在播放">
@@ -200,6 +241,7 @@ input[type=range]::-moz-range-thumb{width:12px;height:12px;border:0;border-radiu
 </div>
 
 <script src="/rules.js"></script>
+<script src="/map.js"></script>
 <script>
 'use strict';
 const R=window.NewsRules;
@@ -450,7 +492,26 @@ function skeleton(){
   });
   return frag;
 }
+/* ---------- 重點摘要：每個板塊的重點（標題＋內文第一句） ---------- */
+function firstSentence(a){
+  const t=R.splitSentences(a.summary||'')[0]||'';
+  if(!t||t===a.title)return'';
+  if(t.length<=52)return t;
+  const cut=t.slice(0,52),k=Math.max(cut.lastIndexOf('，'),cut.lastIndexOf('、'));
+  return (k>20?cut.slice(0,k):cut)+'…';
+}
+function pointsBox(list,c){
+  const box=document.createElement('div');box.className='points';
+  const h=document.createElement('h4');h.textContent='重點摘要';box.append(h);
+  list.forEach((a,i)=>{
+    const b=document.createElement('button'),t=document.createElement('b');b.dataset.link=a.link;t.textContent=a.title;b.append(t);
+    const f=firstSentence(a);if(f){const sp=document.createElement('span');sp.textContent=f;b.append(sp)}
+    b.onclick=()=>cardTap(list,i,c);box.append(b);
+  });
+  return box;
+}
 function renderShelves(){
+  renderMap();
   const box=$('shelves'),pos={};
   box.querySelectorAll('.track[data-key]').forEach(t=>{pos[t.dataset.key]=t.scrollLeft}); /* 重畫時保留各列滑動位置 */
   box.replaceChildren();
@@ -465,10 +526,11 @@ function renderShelves(){
     sec.className='shelf';sec.setAttribute('aria-label',c);head.className='shelf-head';h.textContent=c;
     all.textContent='全部播放';all.onclick=()=>playFrom(list,0,c);
     head.append(h,all);
+    if(list.length)sec.append(head,pointsBox(list,c));
     if(!list.length){const e=document.createElement('p');e.className='empty-row';e.textContent='目前沒有足夠內容的新聞，稍後會自動更新。';all.hidden=true;sec.className='shelf';head.className='shelf-head';h.textContent=c;sec.append(head,e);box.append(sec);return}
     track.className='track';track.dataset.key=c;track.setAttribute('role','list');track.setAttribute('aria-label',c+'（左右滑動）');
     list.forEach((a,i)=>track.append(makeCard(a,()=>cardTap(list,i,c))));
-    sec.append(head,track);box.append(sec);
+    if(!sec.contains(head))sec.append(head);sec.append(track);box.append(sec);
     if(pos[c])track.scrollLeft=pos[c];
   });
   markPlaying(false);
@@ -476,11 +538,55 @@ function renderShelves(){
 function markPlaying(follow=true){
   const cur=queue[idx]?queue[idx].link:'';
   document.querySelectorAll('#shelves .card[data-link]').forEach(c=>c.classList.toggle('playing',!!cur&&c.dataset.link===cur));
+  document.querySelectorAll('#shelves .points button').forEach(c=>c.classList.toggle('cur',!!cur&&c.dataset.link===cur));
+  markMapNow();
   if(!follow||!cur)return;
   const key=queueKey||(queue[idx]&&queue[idx].category);
   const t=[...document.querySelectorAll('#shelves .track')].find(x=>x.dataset.key===key); /* 自動播下一則時，讓該張卡片滑進畫面 */
   const c=t&&[...t.children].find(x=>x.dataset.link===cur);
   if(c)t.scrollTo({left:Math.max(0,c.offsetLeft-16),behavior:smooth()});
+}
+
+/* ---------- 世界地圖：新聞提到的地區亮燈 ---------- */
+const WM=window.WorldMap,CAT_COLOR={'全球政治':'#ff7a45','全球經濟':'#ffc93c','全球科技':'#4fc3f7','對台灣的影響':'#1ed760'};
+let mapPaths=null,mapSel=null,regionIndex={},chipsAll=false;
+function buildMap(){
+  const svg=$('mapSvg');if(!WM||mapPaths)return;
+  svg.setAttribute('viewBox','0 0 '+WM.MAP.w+' '+WM.MAP.h);mapPaths={};
+  for(const id in WM.MAP.c){
+    const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+    p.setAttribute('d',WM.MAP.c[id].d);p.dataset.id=id;p.onclick=()=>{if(regionIndex[id])selectRegion(id)};
+    svg.append(p);mapPaths[id]=p;
+  }
+  $('legend').innerHTML=CATS.map(c=>`<span><i style="background:${CAT_COLOR[c]}"></i>${c}</span>`).join('');
+}
+function renderMap(){
+  if(!WM)return;buildMap();
+  regionIndex={};
+  CATS.forEach(c=>articles.filter(a=>a.category===c).slice(0,PER).forEach(a=>{
+    WM.detect(a.title+' '+(a.summary||'')).forEach(id=>{const r=regionIndex[id]=regionIndex[id]||{cat:c,list:[]};if(!r.list.includes(a))r.list.push(a)});
+  }));
+  for(const id in mapPaths){const p=mapPaths[id],r=regionIndex[id];p.classList.toggle('lit',!!r);p.style.fill=r?CAT_COLOR[r.cat]:'';}
+  const ids=Object.keys(regionIndex).sort((a,b)=>regionIndex[b].list.length-regionIndex[a].list.length);
+  $('mapCount').textContent=ids.length?ids.length+' 個地區有新聞':'';
+  const chips=$('mapChips');chips.replaceChildren();
+  const LIM=14,shown=chipsAll||(mapSel&&ids.indexOf(mapSel)>=LIM)?ids:ids.slice(0,LIM);
+  shown.forEach(id=>{const b=document.createElement('button'),r=regionIndex[id];b.className='chip'+(mapSel===id?' on':'');b.dataset.id=id;
+    b.innerHTML=`<i style="background:${CAT_COLOR[r.cat]}"></i>${WM.name(id)} <small>${r.list.length}</small>`;b.onclick=()=>selectRegion(id);chips.append(b)});
+  if(ids.length>LIM){const m=document.createElement('button');m.className='chip';m.textContent=chipsAll?'收合':'更多 '+(ids.length-LIM)+' 個';m.onclick=()=>{chipsAll=!chipsAll;renderMap()};chips.append(m)}
+  if(mapSel&&!regionIndex[mapSel])mapSel=null;
+  paintMapNews();markMapNow();
+}
+function selectRegion(id){mapSel=mapSel===id?null:id;document.querySelectorAll('#mapChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.id===mapSel));for(const k in mapPaths)mapPaths[k].classList.toggle('sel',k===mapSel);paintMapNews()}
+function paintMapNews(){
+  const box=$('mapNews');box.replaceChildren();const r=mapSel&&regionIndex[mapSel];if(!r)return;
+  const h=document.createElement('h4');h.textContent=WM.name(mapSel)+' · '+r.list.length+' 則新聞';box.append(h);
+  r.list.forEach((a,i)=>{const b=document.createElement('button'),d=document.createElement('i');d.style.background=CAT_COLOR[a.category];b.append(d,a.title);b.onclick=()=>playFrom(r.list,i,'');box.append(b)});
+}
+/* 正在播的新聞提到的地區，地圖上加白框 */
+function markMapNow(){
+  if(!mapPaths)return;const a=queue[idx],ids=a?new Set(WM.detect(a.title+' '+(a.summary||''))):new Set();
+  for(const k in mapPaths)mapPaths[k].classList.toggle('now',ids.has(k)&&!!regionIndex[k]);
 }
 
 /* ---------- 迷你播放列：往下滑看新聞時顯示 ---------- */

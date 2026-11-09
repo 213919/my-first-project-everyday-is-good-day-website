@@ -1,12 +1,14 @@
 /* 聲讀 Service Worker：只快取播放器本身，新聞資料一律走網路 */
-const CACHE = 'daily-news-v12';
+const CACHE = 'daily-news-v13';
 const SHELL = [
   '/',
   '/index.html',
   '/rules.js',
+  '/map.js',
   '/manifest.webmanifest',
   '/icons/icon-180.png',
   '/icons/icon-192.png',
+  '/icons/icon-dark-180.png',
   '/icons/icon-512.png'
 ];
 
