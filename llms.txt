@@ -20,7 +20,7 @@
 - [中壢借址登記](https://edgd2619.com/address-registration.html)：法規依據、費用、流程與 FAQ
 - [中壢辦公室出租](https://edgd2619.com/office.html)：獨立辦公室與共享空間方案
 - [辦公環境](https://edgd2619.com/space.html)：空間實景照片
-- [ON LINE 全景參觀](https://edgd2619.com/tour.html)：手機即可線上走訪全館
+- [中壢館 3D 環景導覽](https://edgd2619.com/tour.html)：拖曳環顧 8 個場景，手機可用體感轉動視角，可直接連到單一場景（例如 tour.html#s4）
 - [常見問題 FAQ](https://edgd2619.com/faq.html)：28 題涵蓋借址登記、公司設立、辦公室、稅務
 - [青埔借址登記](https://edgd2619.com/qingpu.html)：青埔館服務內容、鄰近高鐵桃園站
 - [九項創業服務](https://edgd2619.com/services.html)
