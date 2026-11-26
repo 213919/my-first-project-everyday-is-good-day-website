@@ -22,7 +22,7 @@
 <link rel="canonical" href="https://edgd2619.com/tour.html"/>
 <link rel="preload" href="images/tour/tour-1.webp" as="image" fetchpriority="high"/>
 <link rel="icon" href="/images/logo.webp" type="image/webp"/>
-<link rel="apple-touch-icon" href="/images/logo.webp"/>
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png"/>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebPage","name":"中壢館 3D 環景導覽","description":"日日好日商務中心中壢館 3D 互動環景導覽，可拖曳環顧並點擊箭頭走過入口接待區、會議區、日式走廊、休憩區與城市窗景共八個場景。","url":"https://edgd2619.com/tour.html","primaryImageOfPage":"https://edgd2619.com/images/tour/tour-og.webp","isPartOf":{"@type":"WebSite","name":"日日好日商務中心","url":"https://edgd2619.com"},"about":{"@type":"LocalBusiness","name":"日日好日商務中心","telephone":"03-275-9489","address":{"@type":"PostalAddress","streetAddress":"延平路261號9樓","addressLocality":"中壢區","addressRegion":"桃園市","addressCountry":"TW"}}}</script>
 <style>
 :root{
@@ -607,7 +607,7 @@ function prefetchNext(){
 var thumbs=SCENES.map(function(s,i){
   var b=document.createElement('button');b.className='th';b.setAttribute('role','listitem');
   b.setAttribute('aria-label','場景 '+(i+1)+'：'+s.name);
-  b.innerHTML='<img src="'+s.thumb+'" alt="" width="240" height="160" loading="lazy" decoding="async"/><span>'+(i+1)+'</span>';
+  b.innerHTML='<img src="'+s.thumb+'" alt="" width="160" height="107" loading="lazy" decoding="async"/><span>'+(i+1)+'</span>';
   b.addEventListener('click',function(){stopAuto();if(!gl){fbShow(i);return;}go(i);});
   strip.appendChild(b);return b;
 });
