@@ -126,6 +126,119 @@ function loadGtagLib(){
 }
 ['scroll','pointerdown','keydown','touchstart'].forEach(function(ev){window.addEventListener(ev,loadGtagLib,{once:true,passive:true});});if('requestIdleCallback' in window){requestIdleCallback(loadGtagLib,{timeout:6000});}else{setTimeout(loadGtagLib,4000);}
 </script>
+<style id="site-theme">
+/* Calm, readable system: warm cream + white grounds, charcoal headings, khaki for structure, green only as a small accent */
+:root:root{--brand:#7E6748;--brand-deep:#634F35;--accent:#2D5016;
+  --khaki:#A68B67;--khaki-soft:#F2ECE2;--khaki-line:#E2D7C6;
+  --off-white:#F8F4EE;--gray:#F8F4EE;--gray-deep:#EFE8DD;--text:#2B2A27;--text-sub:#5C5751;--text-light:#8C877F;
+  --border:#E6DED2;--border-lt:#EFE9E0;--radius-sm:4px;--radius:6px;--radius-lg:8px;--radius-xl:10px;
+  --shadow-xs:none;--shadow-sm:none;--shadow-md:0 6px 18px rgba(43,42,39,.06);--shadow-lg:0 10px 28px rgba(43,42,39,.08);
+  --kw-sans:'Noto Sans TC','PingFang TC','Microsoft JhengHei','Heiti TC',Arial,sans-serif}
+body{color:var(--text-sub)}
+:is(#_,h1,h2,h3,h4,.section-title,.hero-title,.plan-name){font-family:var(--kw-sans)!important;font-weight:700!important;letter-spacing:.04em}
+:is(#_,.section-title){font-size:clamp(1.6rem,2.6vw,2.15rem)!important}
+:is(#_,.section-title,.hero-title){word-break:keep-all}
+:is(#_,.section-title)::after,:is(#_,.divider){display:none!important}
+:is(#_,.eyebrow){color:var(--accent)!important;font-size:.74rem;letter-spacing:.22em}
+:is(#_,.section-lead){color:var(--text-sub)!important}
+:is(#_,.hero-title,.page-hero h1){color:var(--accent)!important}
+/* green accents: section titles, prices, bolded keywords */
+:is(#_,.section-title){color:var(--accent)!important}
+:is(#_,.hp-num,.kw-price){color:var(--accent)!important}
+:is(#_,.hp-num) small{color:var(--text-sub)!important}
+:is(#_,.hero-desc,.section-lead,.kw-lead,.plan-fit,.kw-need p) strong,:is(#_,p) > strong{color:var(--accent)!important;font-weight:700}
+:is(#_,.hero-amp){color:var(--khaki)!important}
+/* green as accent only */
+:is(#_,.nav-links a.active){color:var(--accent)!important}
+:is(#_,.nav-links a)::after{background:var(--accent)!important}
+:is(#_,.plan-icon){color:var(--accent);font-size:0!important;line-height:0}
+/* literal greens converted to khaki */
+:is(#_,.hamburger){border-color:var(--khaki-line)!important}
+:is(#_,.hamburger span){background:var(--brand)!important}
+:is(#_,.mobile-cta a,.btn-solid-warm){background:var(--brand)!important;border-color:var(--brand)!important}
+:is(#_,.btn-outline-warm){color:var(--brand)!important;border-color:var(--khaki)!important}
+:is(#_,.cta-banner){background:linear-gradient(150deg,#A68B67 0%,#8E7553 48%,#6F5A3E 100%)!important}
+/* cards: hairline border, small radius, no drop shadow */
+:is(#_,.glass,.glass-card,.stat-card,.svc-card,.otype-card,.news-card,.proc-step,.faq-item,.sp-prev-card,.about-service-item,.loc-card,.plan-card,.rv-card,.hp-faq-item,.amenity,.about-badge,.hp-card){
+  border-radius:8px!important;box-shadow:none!important;border:1px solid var(--border)!important}
+:is(#_,.plan-card-featured){border:1.5px solid var(--khaki)!important}
+:is(#_,.sp-prev-card,.loc-card,.rv-card,.plan-card,.hp-faq-item) img{border-radius:6px 6px 0 0}
+:is(#_,.btn,.nav-cta){border-radius:4px!important;box-shadow:none!important;letter-spacing:.08em}
+:is(#_,.hni-bell){color:var(--khaki);display:inline-flex}
+:is(#_,.plan-badge){border-radius:3px!important}
+/* new sections */
+.kw-head{max-width:720px;margin:0 auto 40px;text-align:center}
+.kw-label{display:block;font-size:.74rem;font-weight:700;letter-spacing:.22em;color:var(--accent);margin-bottom:10px}
+.kw-h2{font-size:clamp(1.6rem,2.6vw,2.15rem);color:var(--accent);line-height:1.35;margin:0 0 12px;text-wrap:balance;word-break:keep-all}
+.kw-lead{color:var(--text-sub);line-height:1.85;margin:0}
+.kw-why{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+.kw-tile{display:flex;flex-direction:column;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.kw-tile-ic{display:flex;align-items:center;justify-content:center;height:104px;background:var(--khaki-soft);color:var(--accent)}
+.kw-tile-tx{flex:1;background:var(--brand);color:#fff;padding:18px 20px 20px}
+.kw-tile-tx h3{font-size:1.02rem;color:#fff;margin:0 0 6px;letter-spacing:.06em}
+.kw-tile-tx p{font-size:.88rem;line-height:1.75;color:rgba(255,255,255,.88);margin:0}
+.kw-table-wrap{max-width:860px;margin:0 auto;overflow-x:auto;border:1px solid var(--border);border-radius:8px;background:#fff}
+.kw-table{width:100%;border-collapse:collapse;font-size:.95rem;min-width:520px}
+.kw-table th,.kw-table td{padding:16px 18px;border-bottom:1px solid var(--border-lt);text-align:center;vertical-align:middle}
+.kw-table tbody tr:last-child th,.kw-table tbody tr:last-child td{border-bottom:none}
+.kw-table thead th{background:var(--gray);color:var(--text);font-weight:700;letter-spacing:.06em}
+.kw-table thead th.kw-us{background:var(--brand);color:#fff}
+.kw-table thead small{font-weight:500;opacity:.88;font-size:.78rem}
+.kw-table tbody th{text-align:left;color:var(--text);font-weight:700;white-space:nowrap}
+.kw-table td span{display:block;margin-top:6px;color:var(--text-sub);font-size:.86rem}
+.kw-table td:nth-child(2){background:var(--khaki-soft)}
+.kw-mk{width:24px;height:24px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;display:inline-block;vertical-align:middle}
+.kw-yes{stroke:var(--accent)}.kw-mid{stroke:var(--khaki)}.kw-no{stroke:#B0A496}
+.kw-legend{text-align:center;color:var(--text-light);font-size:.84rem;margin:16px 0 0;display:flex;gap:6px;justify-content:center;align-items:center;flex-wrap:wrap}
+.kw-legend .kw-mk{width:16px;height:16px}
+.kw-needs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}
+.kw-need{display:flex;flex-direction:column;gap:10px;padding:26px 22px;border:1px solid var(--border);border-radius:8px;background:#fff;color:inherit;transition:border-color .2s,transform .2s}
+.kw-need:hover{border-color:var(--khaki);transform:translateY(-2px)}
+.kw-need:focus-visible{outline:2px solid var(--brand);outline-offset:3px}
+.kw-need-ic{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--khaki-soft);color:var(--accent)}
+.kw-need h3{font-size:1.04rem;color:var(--text);margin:4px 0 0}
+.kw-need p{font-size:.9rem;line-height:1.8;color:var(--text-sub);margin:0;flex:1}
+.kw-more{font-size:.86rem;font-weight:700;color:var(--brand)}
+.kw-cta-bar{margin-top:28px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding:22px 24px;border-radius:8px;background:#fff;border:1px solid var(--border)}
+.kw-cta-bar p{margin:0;color:var(--text);font-weight:500}
+.kw-cta-bar p a{color:var(--brand);font-weight:700;text-decoration:underline;text-underline-offset:3px}
+.kw-cta-bar>div{display:flex;gap:10px;flex-wrap:wrap}
+.kw-btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:4px;font-weight:700;letter-spacing:.06em;font-size:.92rem}
+.kw-btn-gold{background:var(--brand);color:#fff}
+.kw-btn-line{border:1.5px solid var(--khaki);color:var(--brand);background:#fff}
+/* mobile bottom bar: one tone, three equal segments, only the booking segment filled */
+.kbar{display:none}
+@media(max-width:768px){
+  .kbar{display:grid;grid-template-columns:1fr 1fr 1.2fr;align-items:stretch;gap:6px;position:fixed;left:0;right:0;bottom:0;z-index:850;
+    padding:6px max(10px,env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-right));
+    background:#FFFDF9;border-top:1px solid var(--border);box-shadow:0 -6px 18px rgba(43,42,39,.05)}
+  .kb-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:54px;border-radius:6px;
+    color:var(--brand);font-size:.78rem;font-weight:700;letter-spacing:.08em;text-decoration:none;transition:transform .15s}
+  .kb-item svg{width:22px;height:22px;flex-shrink:0}
+  .kb-item:nth-child(2)::before{content:'';position:absolute;left:-3px;top:12px;bottom:12px;width:1px;background:var(--border)}
+  .kb-main{background:var(--brand);color:#fff}
+  .kb-item:active{transform:scale(.96)}
+  .kb-item:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+}
+@media(max-width:900px){.kw-why{grid-template-columns:repeat(2,minmax(0,1fr))}.kw-needs{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){
+  .kw-why{grid-template-columns:1fr 1fr;gap:12px}
+  .kw-tile-ic{height:76px}.kw-tile-tx{padding:14px 14px 16px}.kw-tile-tx h3{font-size:.95rem}.kw-tile-tx p{font-size:.8rem}
+  .kw-needs{grid-template-columns:1fr;gap:12px}
+  .kw-table{min-width:0;font-size:.86rem}.kw-table th,.kw-table td{padding:12px 10px}
+  .kw-table tbody th{white-space:normal}
+  .kw-cta-bar{flex-direction:column;align-items:stretch}.kw-cta-bar>div{flex-direction:column}.kw-btn{justify-content:center}
+}
+
+/* other page templates: cards 8px, pills 4px (true circles keep their shape) */
+:is(#_,.hero-copy,.hero-visual,.article,.cta,.aside-card,.compare,.note,.compare-3col,.notice-box,.info-note,.news-list-card,.info-card,.form-card,.pp-body){border-radius:8px!important}
+:is(#_,.eyebrow,.article-back,.meta-chip,.btn-submit,.hero-main-btn,.hero-sub-btn,.faq-jump-toggle,.hni-btn,.loc-badge,.filter-btn,.news-tag,.news-btn,.group-badge,.svc-chip,.otype-tag,.plan-badge){border-radius:4px!important}
+:is(#_,a,div,span,li,p)[style*="border-radius:999px"],:is(#_,a,div,span,li,p)[style*="border-radius: 999px"]{border-radius:4px!important}
+:is(#_,a,div,li,section,article)[style*="border-radius:16px"],:is(#_,a,div,li,section,article)[style*="border-radius:20px"],:is(#_,a,div,li,section,article)[style*="border-radius:24px"]{border-radius:8px!important}
+:is(#_,.news-tag){background:var(--khaki-soft)!important;color:var(--brand)!important;border-color:transparent!important}
+:is(#_,.filter-btn.active){background:var(--brand)!important;color:#fff!important;border-color:var(--brand)!important}
+.ui-ic{width:1.1em;height:1.1em;flex-shrink:0;display:inline-block;vertical-align:-.18em;fill:none;stroke:var(--accent);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+</style>
 </head>
 <body>
 
@@ -319,11 +432,7 @@ function loadGtagLib(){
 body{padding-bottom:76px!important}
 }
 </style>
-<div class="callbar">
-<a class="cb-call" href="tel:032759489" aria-label="立即來電 03-275-9489"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1em;height:1em;vertical-align:-0.15em;flex-shrink:0;display:inline-block"><path d="M6.6 10.8c1.3 2.6 3.5 4.8 6.1 6.1l2-2c.3-.3.7-.4 1.1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1v3.3c0 .6-.4 1-1 1C10 20.6 3.4 14 3.4 5.8c0-.6.4-1 1-1h3.3c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1.1l-2 2Z"/><path d="M14.8 7.2a5.8 5.8 0 0 1 3.8 3.8M14.3 3.3a9.8 9.8 0 0 1 7.2 7.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg> 立即來電諮詢</a>
-<a class="cb-tour" href="tour.html" aria-label="3D 環景導覽">3D 參觀</a>
-<a class="cb-book" href="contact.html" aria-label="預約參觀"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="width:1em;height:1em;vertical-align:-0.15em;flex-shrink:0;display:inline-block"><rect x="3" y="4.5" width="18" height="16" rx="2.5" fill-opacity=".3"/><path d="M3 9.5h18" stroke="currentColor" stroke-width="1.6"/><path d="M8 3v3M16 3v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg> 預約參觀</a>
-</div>
+<nav class="kbar" aria-label="快速聯絡"><a class="kb-item" href="tel:032759489" aria-label="立即來電 03-275-9489"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6.6 10.8c1.3 2.6 3.5 4.8 6.1 6.1l2-2c.3-.3.7-.4 1.1-.2 1.1.4 2.3.6 3.5.6.6 0 1 .4 1 1v3.3c0 .6-.4 1-1 1C10 20.6 3.4 14 3.4 5.8c0-.6.4-1 1-1h3.3c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.5.1.4 0 .8-.2 1.1l-2 2Z"/></svg><span>來電諮詢</span></a><a class="kb-item" href="tour.html" aria-label="3D 環景導覽"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.8 20 7.4v9.2L12 21.2 4 16.6V7.4z"/><path d="M12 12 20 7.4M12 12v9.2M12 12 4 7.4"/></svg><span>3D 參觀</span></a><a class="kb-item kb-main" href="contact.html" aria-label="預約參觀"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="16" rx="1.5"/><path d="M3 9.5h18M8 3v3M16 3v3"/></svg><span>預約參觀</span></a></nav>
 <script>
 (function(){
 document.querySelectorAll('.nav-trigger').forEach(function(btn){
